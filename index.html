@@ -23,6 +23,93 @@
             margin: 0 auto;
         }
         
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .auth-container h2 {
+            color: #2563eb;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+        }
+        
+        .btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .btn:hover {
+            background: #1d4ed8;
+        }
+        
+        .btn-secondary {
+            background: #6b7280;
+        }
+        
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+        
+        .error-message {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .success-message {
+            background: #f0fdf4;
+            color: #16a34a;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .hidden { display: none; }
+        
+        /* Styles từ version gốc */
         .header {
             background: white;
             padding: 30px;
@@ -42,21 +129,6 @@
         
         .header p {
             color: #666;
-        }
-        
-        .btn {
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s;
-        }
-        
-        .btn:hover {
-            background: #1d4ed8;
         }
         
         .btn-sm {
@@ -89,18 +161,18 @@
             border-left: 4px solid #ea580c;
         }
         
-        .form-group {
+        .form-section .form-group {
             margin-bottom: 20px;
         }
         
-        .form-group label {
+        .form-section .form-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
             color: #374151;
         }
         
-        .form-group input, .form-group select {
+        .form-section .form-group input, .form-section .form-group select {
             width: 100%;
             padding: 12px;
             border: 2px solid #d1d5db;
@@ -109,7 +181,7 @@
             transition: border-color 0.3s;
         }
         
-        .form-group input:focus, .form-group select:focus {
+        .form-section .form-group input:focus, .form-section .form-group select:focus {
             outline: none;
             border-color: #2563eb;
         }
@@ -251,8 +323,6 @@
             font-size: 14px;
         }
         
-        .hidden { display: none; }
-        
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -269,6 +339,28 @@
         .empty-state p {
             color: #6b7280;
             margin-bottom: 20px;
+        }
+        
+        .user-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .user-info span {
+            color: #374151;
+            font-weight: 500;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
         }
         
         @media (max-width: 768px) {
@@ -294,18 +386,74 @@
             .card-actions {
                 justify-content: center;
             }
+            
+            .user-info {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Loading State -->
+    <div id="loadingState" class="loading">
+        <h3>Đang tải...</h3>
+    </div>
+
+    <!-- Authentication Form -->
+    <div id="authContainer" class="auth-container hidden">
+        <h2>Đăng nhập vào ứng dụng</h2>
+        
+        <div id="errorMessage" class="error-message hidden"></div>
+        <div id="successMessage" class="success-message hidden"></div>
+        
+        <div id="loginForm">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" placeholder="Nhập email của bạn">
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <input type="password" id="loginPassword" placeholder="Nhập mật khẩu">
+            </div>
+            <button class="btn" onclick="app.login()">Đăng nhập</button>
+            <button class="btn btn-secondary" onclick="app.showRegister()">Chưa có tài khoản? Đăng ký</button>
+        </div>
+        
+        <div id="registerForm" class="hidden">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="registerEmail" placeholder="Nhập email của bạn">
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <input type="password" id="registerPassword" placeholder="Tối thiểu 6 ký tự">
+            </div>
+            <div class="form-group">
+                <label>Xác nhận mật khẩu</label>
+                <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu">
+            </div>
+            <button class="btn" onclick="app.register()">Đăng ký</button>
+            <button class="btn btn-secondary" onclick="app.showLogin()">Đã có tài khoản? Đăng nhập</button>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="container hidden">
+        <!-- User Info -->
+        <div class="user-info">
+            <span>Xin chào, <strong id="userEmail"></strong></span>
+            <button class="btn btn-sm btn-gray" onclick="app.logout()">Đăng xuất</button>
+        </div>
+
         <!-- Header -->
         <div class="header">
             <div>
                 <h1>💳 Nhắc nhở thanh toán thẻ tín dụng</h1>
                 <p>Không bao giờ bỏ lỡ thanh toán</p>
             </div>
-            <button class="btn" onclick="showAddForm()">➕ Thêm thẻ</button>
+            <button class="btn" onclick="app.showAddForm()">➕ Thêm thẻ</button>
         </div>
 
         <!-- Add Card Form -->
@@ -320,11 +468,11 @@
             <div class="form-group">
                 <label>Loại ngày đến hạn</label>
                 <div class="card-type-selector">
-                    <div class="card-type-option active" onclick="selectCardType('fixed')">
+                    <div class="card-type-option active" onclick="app.selectCardType('fixed')">
                         <h3>📅 Ngày cố định</h3>
                         <p>VD: Ngày 15 hàng tháng</p>
                     </div>
-                    <div class="card-type-option" onclick="selectCardType('variable')">
+                    <div class="card-type-option" onclick="app.selectCardType('variable')">
                         <h3>🔄 Ngày biến động</h3>
                         <p>Dựa trên ngày thông báo + số ngày</p>
                     </div>
@@ -349,8 +497,8 @@
             </div>
             
             <div style="display: flex; gap: 10px;">
-                <button class="btn" onclick="addCard()">Thêm thẻ</button>
-                <button class="btn btn-gray" onclick="hideAddForm()">Hủy</button>
+                <button class="btn" onclick="app.addCard()">Thêm thẻ</button>
+                <button class="btn btn-gray" onclick="app.hideAddForm()">Hủy</button>
             </div>
         </div>
 
@@ -366,11 +514,11 @@
             <div class="form-group">
                 <label>Loại ngày đến hạn</label>
                 <div class="card-type-selector">
-                    <div class="card-type-option" onclick="selectEditCardType('fixed')">
+                    <div class="card-type-option" onclick="app.selectEditCardType('fixed')">
                         <h3>📅 Ngày cố định</h3>
                         <p>VD: Ngày 15 hàng tháng</p>
                     </div>
-                    <div class="card-type-option" onclick="selectEditCardType('variable')">
+                    <div class="card-type-option" onclick="app.selectEditCardType('variable')">
                         <h3>🔄 Ngày biến động</h3>
                         <p>Dựa trên ngày thông báo + số ngày</p>
                     </div>
@@ -395,8 +543,8 @@
             </div>
             
             <div style="display: flex; gap: 10px;">
-                <button class="btn btn-orange" onclick="saveEditCard()">💾 Lưu thay đổi</button>
-                <button class="btn btn-gray" onclick="cancelEdit()">❌ Hủy</button>
+                <button class="btn btn-orange" onclick="app.saveEditCard()">💾 Lưu thay đổi</button>
+                <button class="btn btn-gray" onclick="app.cancelEdit()">❌ Hủy</button>
             </div>
         </div>
 
@@ -428,632 +576,605 @@
     </div>
     
     <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
-    import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-database.js";
-    
+        // Import Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-    const firebaseConfig = {
-    apiKey: "AIzaSyDLPqEYL2v38kOyzH42THhs4NuOKR8e3sw",
-    authDomain: "payping-edfa8.firebaseapp.com",
-    databaseURL: "https://payping-edfa8-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "payping-edfa8",
-    storageBucket: "payping-edfa8.firebasestorage.app",
-    messagingSenderId: "860071397124",
-    appId: "1:860071397124:web:ae343fcdded6209167b251",
-    measurementId: "G-2MSKBH9JDF"
-    };
-    
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    const db = getDatabase(app);
-    
-    let cards = [];
-    let editingCardId = null;
-    let currentCardType = 'fixed';
-    let currentEditCardType = 'fixed';
-    
-    async function loadCards() {
-    const snapshot = await get(ref(db, "cards/"));
-    if (snapshot.exists()) {
-    cards = snapshot.val();
-    } else {
-    cards = [];
-    }
-    renderCards();
-    updateStats();
-    }
-    
-    
-    function saveCards() {
-    set(ref(db, "cards/"), cards);
-    }
-
-        // Calculate next due date for fixed type cards
-        function getNextDueDateFixed(dueDate) {
-            const today = new Date();
-            const cardDueDay = new Date(dueDate).getDate();
-            
-            let nextDue = new Date(today.getFullYear(), today.getMonth(), cardDueDay);
-            
-            if (nextDue <= today) {
-                nextDue = new Date(today.getFullYear(), today.getMonth() + 1, cardDueDay);
-            }
-            
-            // Handle months with fewer days
-            if (nextDue.getDate() !== cardDueDay) {
-                nextDue = new Date(nextDue.getFullYear(), nextDue.getMonth() + 1, 0); // Last day of month
-            }
-            
-            return nextDue;
-        }
-
-        // Calculate due date for variable type cards
-        function getDueDateVariable(transactionDate, daysToAdd) {
-            const txDate = new Date(transactionDate);
-            const dueDate = new Date(txDate);
-            dueDate.setDate(txDate.getDate() + parseInt(daysToAdd));
-            return dueDate;
-        }
-
-        // Estimate next cycle for variable cards based on payment history
-        function estimateNextCycle(card) {
-            if (!card.paymentHistory || card.paymentHistory.length === 0) {
-                // No history, use current transaction date + estimated cycle (30 days default)
-                const estimatedCycleDays = card.estimatedCycleDays || 30;
-                const currentTxDate = new Date(card.transactionDate);
-                const nextTxDate = new Date(currentTxDate);
-                nextTxDate.setDate(currentTxDate.getDate() + estimatedCycleDays);
-                return {
-                    transactionDate: nextTxDate.toISOString().split('T')[0],
-                    daysToAdd: card.daysToAdd
-                };
-            }
-
-            // Calculate average cycle length from history
-            let totalCycleDays = 0;
-            let cycleCount = 0;
-
-            for (let i = 1; i < card.paymentHistory.length; i++) {
-                const prevTxDate = new Date(card.paymentHistory[i-1].transactionDate);
-                const currTxDate = new Date(card.paymentHistory[i].transactionDate);
-                const cycleDays = Math.round((currTxDate - prevTxDate) / (1000 * 60 * 60 * 24));
-                
-                if (cycleDays > 0 && cycleDays < 60) { // Reasonable cycle length
-                    totalCycleDays += cycleDays;
-                    cycleCount++;
-                }
-            }
-
-            // If we have cycle data, use average; otherwise use estimated or default
-            let avgCycleDays = cycleCount > 0 ? Math.round(totalCycleDays / cycleCount) : (card.estimatedCycleDays || 30);
-            
-            // Get the last transaction date and add average cycle
-            const lastTxDate = new Date(card.paymentHistory[card.paymentHistory.length - 1].transactionDate);
-            const nextTxDate = new Date(lastTxDate);
-            nextTxDate.setDate(lastTxDate.getDate() + avgCycleDays);
-
-            return {
-                transactionDate: nextTxDate.toISOString().split('T')[0],
-                daysToAdd: card.daysToAdd,
-                estimatedCycleDays: avgCycleDays
-            };
-        }
-
-        // Calculate days until due
-        function getDaysUntilDue(dueDate) {
-            const today = new Date();
-            const due = new Date(dueDate);
-            const diffTime = due - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            return diffDays;
-        }
-
-        // Get card status
-        function getCardStatus(daysUntil, isPaid) {
-            if (isPaid) {
-                return { status: 'Đã thanh toán', class: 'paid', badge: 'status-paid' };
-            }
-            if (daysUntil < 0) {
-                return { status: 'Quá hạn', class: 'overdue', badge: 'status-overdue' };
-            }
-            if (daysUntil <= 3) {
-                return { status: 'Sắp đến hạn', class: 'due-soon', badge: 'status-due-soon' };
-            }
-            return { status: 'Sắp tới', class: 'upcoming', badge: 'status-upcoming' };
-        }
-
-        // Show add form
-        function showAddForm() {
-            document.getElementById('addForm').classList.remove('hidden');
-            document.getElementById('cardName').focus();
-        }
-
-        // Hide add form
-        function hideAddForm() {
-            document.getElementById('addForm').classList.add('hidden');
-            clearAddForm();
-        }
-
-        // Clear add form
-        function clearAddForm() {
-            document.getElementById('cardName').value = '';
-            document.getElementById('dueDate').value = '';
-            document.getElementById('transactionDate').value = '';
-            document.getElementById('daysToAdd').value = '20';
-            selectCardType('fixed');
-        }
-
-        // Select card type for add form
-        function selectCardType(type) {
-            currentCardType = type;
-            
-            // Update UI
-            document.querySelectorAll('#addForm .card-type-option').forEach(option => {
-                option.classList.remove('active');
-            });
-            
-            if (type === 'fixed') {
-                document.querySelectorAll('#addForm .card-type-option')[0].classList.add('active');
-                document.getElementById('fixedDateInput').classList.remove('hidden');
-                document.getElementById('variableDateInput').classList.add('hidden');
-            } else {
-                document.querySelectorAll('#addForm .card-type-option')[1].classList.add('active');
-                document.getElementById('fixedDateInput').classList.add('hidden');
-                document.getElementById('variableDateInput').classList.remove('hidden');
-            }
-        }
-
-        // Select card type for edit form
-        function selectEditCardType(type) {
-            currentEditCardType = type;
-            
-            // Update UI
-            document.querySelectorAll('#editForm .card-type-option').forEach(option => {
-                option.classList.remove('active');
-            });
-            
-            if (type === 'fixed') {
-                document.querySelectorAll('#editForm .card-type-option')[0].classList.add('active');
-                document.getElementById('editFixedDateInput').classList.remove('hidden');
-                document.getElementById('editVariableDateInput').classList.add('hidden');
-            } else {
-                document.querySelectorAll('#editForm .card-type-option')[1].classList.add('active');
-                document.getElementById('editFixedDateInput').classList.add('hidden');
-                document.getElementById('editVariableDateInput').classList.remove('hidden');
-            }
-        }
-
-        // Add new card
-        function addCard() {
-            const name = document.getElementById('cardName').value.trim();
-            
-            if (!name) {
-                alert('Vui lòng nhập tên thẻ');
-                return;
-            }
-            
-            let nextDue;
-            let cardData = {
-                id: Date.now(),
-                name: name,
-                type: currentCardType,
-                isPaid: false,
-                lastPaidDate: null,
-                paymentHistory: []
-            };
-            
-            if (currentCardType === 'fixed') {
-                const dueDate = document.getElementById('dueDate').value;
-                if (!dueDate) {
-                    alert('Vui lòng chọn ngày đến hạn');
-                    return;
-                }
-                cardData.originalDueDate = dueDate;
-                nextDue = getNextDueDateFixed(dueDate);
-            } else {
-                const transactionDate = document.getElementById('transactionDate').value;
-                const daysToAdd = document.getElementById('daysToAdd').value;
-                
-                if (!transactionDate || !daysToAdd) {
-                    alert('Vui lòng điền đầy đủ thông tin');
-                    return;
-                }
-                
-                cardData.transactionDate = transactionDate;
-                cardData.daysToAdd = parseInt(daysToAdd);
-                cardData.estimatedCycleDays = 30; // Default cycle estimation
-                nextDue = getDueDateVariable(transactionDate, daysToAdd);
-            }
-            
-            cardData.nextDueDate = nextDue.toISOString();
-            cards.push(cardData);
-            
-            saveCards();
-            renderCards();
-            updateStats();
-            hideAddForm();
-        }
-
-        // Start editing card
-        function startEdit(cardId) {
-            const card = cards.find(c => c.id === cardId);
-            if (!card) return;
-            
-            editingCardId = cardId;
-            
-            document.getElementById('editCardName').value = card.name;
-            document.getElementById('editDueDate').value = card.originalDueDate || '';
-            document.getElementById('editTransactionDate').value = card.transactionDate || '';
-            document.getElementById('editDaysToAdd').value = card.daysToAdd || 20;
-            
-            selectEditCardType(card.type);
-            document.getElementById('editForm').classList.remove('hidden');
-        }
-
-        // Save edited card
-        function saveEditCard() {
-            const name = document.getElementById('editCardName').value.trim();
-            
-            if (!name) {
-                alert('Vui lòng nhập tên thẻ');
-                return;
-            }
-            
-            const cardIndex = cards.findIndex(c => c.id === editingCardId);
-            if (cardIndex === -1) return;
-            
-            let nextDue;
-            let cardData = {
-                ...cards[cardIndex],
-                name: name,
-                type: currentEditCardType,
-                isPaid: false,
-                lastPaidDate: null,
-                paymentHistory: cards[cardIndex].paymentHistory || [] // Preserve history
-            };
-            
-            if (currentEditCardType === 'fixed') {
-                const dueDate = document.getElementById('editDueDate').value;
-                if (!dueDate) {
-                    alert('Vui lòng chọn ngày đến hạn');
-                    return;
-                }
-                cardData.originalDueDate = dueDate;
-                cardData.transactionDate = null;
-                cardData.daysToAdd = null;
-                cardData.estimatedCycleDays = null;
-                nextDue = getNextDueDateFixed(dueDate);
-            } else {
-                const transactionDate = document.getElementById('editTransactionDate').value;
-                const daysToAdd = document.getElementById('editDaysToAdd').value;
-                
-                if (!transactionDate || !daysToAdd) {
-                    alert('Vui lòng điền đầy đủ thông tin');
-                    return;
-                }
-                
-                cardData.originalDueDate = null;
-                cardData.transactionDate = transactionDate;
-                cardData.daysToAdd = parseInt(daysToAdd);
-                cardData.estimatedCycleDays = cardData.estimatedCycleDays || 30;
-                nextDue = getDueDateVariable(transactionDate, daysToAdd);
-            }
-            
-            cardData.nextDueDate = nextDue.toISOString();
-            cards[cardIndex] = cardData;
-            
-            saveCards();
-            renderCards();
-            updateStats();
-            cancelEdit();
-        }
-
-        // Cancel editing
-        function cancelEdit() {
-            editingCardId = null;
-            document.getElementById('editForm').classList.add('hidden');
-        }
-
-        // Mark card as paid
-        function markAsPaid(cardId) {
-            const cardIndex = cards.findIndex(c => c.id === cardId);
-            if (cardIndex === -1) return;
-            
-            const card = cards[cardIndex];
-            const today = new Date();
-            
-            // Create payment history entry
-            const paymentEntry = {
-                paidDate: today.toISOString().split('T')[0],
-                transactionDate: card.transactionDate || null,
-                dueDate: card.nextDueDate.split('T')[0],
-                cycleDays: null
-            };
-            
-            // Calculate cycle days for variable cards
-            if (card.type === 'variable' && card.paymentHistory.length > 0) {
-                const lastPayment = card.paymentHistory[card.paymentHistory.length - 1];
-                if (lastPayment.transactionDate && card.transactionDate) {
-                    const lastTxDate = new Date(lastPayment.transactionDate);
-                    const currentTxDate = new Date(card.transactionDate);
-                    paymentEntry.cycleDays = Math.round((currentTxDate - lastTxDate) / (1000 * 60 * 60 * 24));
-                }
-            }
-            
-            // Add to payment history
-            const updatedHistory = [...(card.paymentHistory || []), paymentEntry];
-            
-            // Calculate next cycle
-            let nextDue;
-            let updatedCard = {
-                ...card,
-                isPaid: true,
-                lastPaidDate: today.toISOString(),
-                paymentHistory: updatedHistory
-            };
-            
-            if (card.type === 'fixed') {
-                // For fixed cards, move to next month
-                nextDue = getNextDueDateFixed(card.originalDueDate);
-                updatedCard.nextDueDate = nextDue.toISOString();
-            } else {
-                // For variable cards, estimate next cycle
-                const nextCycle = estimateNextCycle(updatedCard);
-                updatedCard.transactionDate = nextCycle.transactionDate;
-                updatedCard.daysToAdd = nextCycle.daysToAdd;
-                updatedCard.estimatedCycleDays = nextCycle.estimatedCycleDays;
-                nextDue = getDueDateVariable(nextCycle.transactionDate, nextCycle.daysToAdd);
-                updatedCard.nextDueDate = nextDue.toISOString();
-            }
-            
-            // Reset paid status for new cycle
-            updatedCard.isPaid = false;
-            updatedCard.lastPaidDate = today.toISOString();
-            
-            cards[cardIndex] = updatedCard;
-            
-            saveCards();
-            renderCards();
-            updateStats();
-        }
-
-        // Undo last payment (revert to previous cycle)
-        function undoLastPayment(cardId) {
-            const cardIndex = cards.findIndex(c => c.id === cardId);
-            if (cardIndex === -1) return;
-            
-            const card = cards[cardIndex];
-            
-            if (!card.paymentHistory || card.paymentHistory.length === 0) {
-                alert('Không có lịch sử thanh toán để hoàn tác');
-                return;
-            }
-            
-            // Remove last payment from history
-            const updatedHistory = card.paymentHistory.slice(0, -1);
-            const lastPayment = card.paymentHistory[card.paymentHistory.length - 1];
-            
-            let updatedCard = {
-                ...card,
-                paymentHistory: updatedHistory,
-                isPaid: false
-            };
-            
-            if (card.type === 'fixed') {
-                // Revert to previous due date
-                updatedCard.nextDueDate = new Date(lastPayment.dueDate).toISOString();
-            } else {
-                // Revert to previous transaction date and due date
-                if (lastPayment.transactionDate) {
-                    updatedCard.transactionDate = lastPayment.transactionDate;
-                    const revertedDueDate = getDueDateVariable(lastPayment.transactionDate, card.daysToAdd);
-                    updatedCard.nextDueDate = revertedDueDate.toISOString();
-                }
-            }
-            
-            cards[cardIndex] = updatedCard;
-            
-            saveCards();
-            renderCards();
-            updateStats();
-        }
-
-        // Reset card
-        function resetCard(cardId) {
-            const cardIndex = cards.findIndex(c => c.id === cardId);
-            if (cardIndex === -1) return;
-            
-            cards[cardIndex] = {
-                ...cards[cardIndex],
-                isPaid: false,
-                lastPaidDate: null
-            };
-            
-            saveCards();
-            renderCards();
-            updateStats();
-        }
-
-        // Update transaction date
-        function updateTransactionDate(cardId, newDate) {
-            const cardIndex = cards.findIndex(c => c.id === cardId);
-            if (cardIndex === -1) return;
-            
-            const card = cards[cardIndex];
-            if (card.type !== 'variable') return;
-            
-            const newDueDate = getDueDateVariable(newDate, card.daysToAdd);
-            
-            cards[cardIndex] = {
-                ...card,
-                transactionDate: newDate,
-                nextDueDate: newDueDate.toISOString(),
-                isPaid: false,
-                lastPaidDate: null
-            };
-            
-            saveCards();
-            renderCards();
-            updateStats();
-        }
-
-        // Delete card
-        function deleteCard(cardId) {
-            if (confirm('Bạn có chắc muốn xóa thẻ này?')) {
-                cards = cards.filter(c => c.id !== cardId);
-                saveCards();
-                renderCards();
-                updateStats();
-            }
-        }
-
-        // Render cards
-        function renderCards() {
-            const cardsList = document.getElementById('cardsList');
-            
-            if (cards.length === 0) {
-                cardsList.innerHTML = `
-                    <div class="empty-state">
-                        <h3>Chưa có thẻ nào</h3>
-                        <p>Thêm thẻ tín dụng đầu tiên để bắt đầu theo dõi ngày đến hạn</p>
-                        <button class="btn" onclick="showAddForm()">Thêm thẻ đầu tiên</button>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Sort cards by due date
-            const sortedCards = [...cards].sort((a, b) => {
-                const aDays = getDaysUntilDue(a.nextDueDate);
-                const bDays = getDaysUntilDue(b.nextDueDate);
-                return aDays - bDays;
-            });
-            
-            cardsList.innerHTML = sortedCards.map(card => {
-                const daysUntil = getDaysUntilDue(card.nextDueDate);
-                const { status, class: cardClass, badge } = getCardStatus(daysUntil, card.isPaid);
-                const dueDate = new Date(card.nextDueDate);
-                
-                let daysText;
-                if (daysUntil === 0) daysText = 'Đến hạn hôm nay';
-                else if (daysUntil === 1) daysText = 'Đến hạn ngày mai';
-                else if (daysUntil < 0) daysText = `Quá hạn ${Math.abs(daysUntil)} ngày`;
-                else daysText = `Còn ${daysUntil} ngày`;
-                
-                let typeInfo = '';
-                if (card.type === 'variable') {
-                    const estimatedText = card.estimatedCycleDays ? 
-                        ` (Chu kỳ ước tính: ${card.estimatedCycleDays} ngày)` : '';
-                    typeInfo = `<div style="font-size: 12px; color: #6b7280; margin-top: 5px;">
-                        Ngày GD: ${new Date(card.transactionDate).toLocaleDateString('vi-VN')} + ${card.daysToAdd} ngày${estimatedText}
-                    </div>`;
-                }
-                
-                // Payment history
-                let historyInfo = '';
-                if (card.paymentHistory && card.paymentHistory.length > 0) {
-                    const recentPayments = card.paymentHistory.slice(-3).reverse(); // Last 3 payments
-                    historyInfo = `<div style="font-size: 11px; color: #6b7280; margin-top: 8px; padding: 8px; background: #f9fafb; border-radius: 4px;">
-                        <strong>📊 Lịch sử thanh toán gần đây:</strong><br>
-                        ${recentPayments.map(payment => {
-                            const cycleText = payment.cycleDays ? ` (${payment.cycleDays} ngày)` : '';
-                            return `• ${new Date(payment.paidDate).toLocaleDateString('vi-VN')}${cycleText}`;
-                        }).join('<br>')}
-                    </div>`;
-                }
-                
-                let actionButtons = '';
-                if (!card.isPaid) {
-                    actionButtons += `<button class="btn btn-sm btn-green" onclick="markAsPaid(${card.id})">✅ Đánh dấu đã thanh toán</button>`;
-                } else {
-                    actionButtons += `<button class="btn btn-sm btn-gray" onclick="resetCard(${card.id})">🔄 Đặt lại</button>`;
-                }
-                
-                // Add undo button if there's payment history
-                if (card.paymentHistory && card.paymentHistory.length > 0) {
-                    actionButtons += `<button class="btn btn-sm" style="background: #8b5cf6; color: white;" onclick="undoLastPayment(${card.id})" title="Hoàn tác thanh toán tháng trước">↶ Hoàn tác</button>`;
-                }
-                
-                if (card.type === 'variable') {
-                    actionButtons += `
-                        <input type="date" onchange="updateTransactionDate(${card.id}, this.value)" 
-                               style="font-size: 12px; padding: 4px; margin: 2px; border: 1px solid #d1d5db; border-radius: 4px;"
-                               title="Cập nhật ngày thông báo giao dịch mới">
-                        <span style="font-size: 10px; color: #6b7280;">Ngày GD mới</span>
-                    `;
-                }
-                
-                actionButtons += `
-                    <button class="btn btn-sm btn-orange" onclick="startEdit(${card.id})">✏️ Sửa</button>
-                    <button class="btn btn-sm btn-red" onclick="deleteCard(${card.id})">🗑️ Xóa</button>
-                `;
-                
-                return `
-                    <div class="card-item ${cardClass}">
-                        <div class="card-header">
-                            <div class="card-info">
-                                <h3>${card.name}</h3>
-                                <div class="card-meta">
-                                    <span style="background: ${card.type === 'fixed' ? '#dbeafe' : '#dcfce7'}; 
-                                                 color: ${card.type === 'fixed' ? '#1e40af' : '#166534'}; 
-                                                 padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-right: 10px;">
-                                        ${card.type === 'fixed' ? '📅 Ngày cố định' : '🔄 Ngày biến động'}
-                                    </span>
-                                    Đến hạn: ${dueDate.toLocaleDateString('vi-VN', { 
-                                        weekday: 'short', 
-                                        year: 'numeric', 
-                                        month: 'short', 
-                                        day: 'numeric' 
-                                    })}
-                                </div>
-                                ${typeInfo}
-                                ${historyInfo}
-                            </div>
-                            <div class="card-status">
-                                <div class="status-badge ${badge}">${status}</div>
-                                <div style="color: #6b7280; font-size: 14px;">${daysText}</div>
-                            </div>
-                        </div>
-                        <div class="card-actions">
-                            ${actionButtons}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Update stats
-        function updateStats() {
-            if (cards.length === 0) {
-                document.getElementById('stats').classList.add('hidden');
-                return;
-            }
-            
-            document.getElementById('stats').classList.remove('hidden');
-            
-            const totalCards = cards.length;
-            const paidCards = cards.filter(card => card.isPaid).length;
-            const dueSoonCards = cards.filter(card => 
-                !card.isPaid && 
-                getDaysUntilDue(card.nextDueDate) <= 3 && 
-                getDaysUntilDue(card.nextDueDate) >= 0
-            ).length;
-            const overdueCards = cards.filter(card => 
-                !card.isPaid && 
-                getDaysUntilDue(card.nextDueDate) < 0
-            ).length;
-            
-            document.getElementById('totalCards').textContent = totalCards;
-            document.getElementById('paidCards').textContent = paidCards;
-            document.getElementById('dueSoonCards').textContent = dueSoonCards;
-            document.getElementById('overdueCards').textContent = overdueCards;
-        }
-
-        // Initialize app
-        window.onload = function() {
-            loadCards();
+        // Firebase config - BẠN CẦN THAY ĐỔI THÔNG TIN NÀY
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY_HERE",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "YOUR_APP_ID"
         };
+
+        // Initialize Firebase
+        const firebaseApp = initializeApp(firebaseConfig);
+        const auth = getAuth(firebaseApp);
+        const db = getFirestore(firebaseApp);
+
+        // Main application
+        const app = {
+            currentUser: null,
+            cards: [],
+            editingCardId: null,
+            currentCardType: 'fixed',
+            currentEditCardType: 'fixed',
+
+            // Initialize app
+            async init() {
+                this.showLoading(true);
+                
+                // Listen for auth state changes
+                onAuthStateChanged(auth, (user) => {
+                    this.currentUser = user;
+                    if (user) {
+                        this.showMainApp();
+                        this.loadCards();
+                    } else {
+                        this.showAuth();
+                    }
+                    this.showLoading(false);
+                });
+            },
+
+            // UI Management
+            showLoading(show) {
+                document.getElementById('loadingState').classList.toggle('hidden', !show);
+            },
+
+            showAuth() {
+                document.getElementById('authContainer').classList.remove('hidden');
+                document.getElementById('mainApp').classList.add('hidden');
+            },
+
+            showMainApp() {
+                document.getElementById('authContainer').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                document.getElementById('userEmail').textContent = this.currentUser?.email || '';
+            },
+
+            showMessage(message, isError = false) {
+                const errorEl = document.getElementById('errorMessage');
+                const successEl = document.getElementById('successMessage');
+                
+                if (isError) {
+                    errorEl.textContent = message;
+                    errorEl.classList.remove('hidden');
+                    successEl.classList.add('hidden');
+                } else {
+                    successEl.textContent = message;
+                    successEl.classList.remove('hidden');
+                    errorEl.classList.add('hidden');
+                }
+                
+                setTimeout(() => {
+                    errorEl.classList.add('hidden');
+                    successEl.classList.add('hidden');
+                }, 5000);
+            },
+
+            // Authentication
+            showLogin() {
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('registerForm').classList.add('hidden');
+            },
+
+            showRegister() {
+                document.getElementById('loginForm').classList.add('hidden');
+                document.getElementById('registerForm').classList.remove('hidden');
+            },
+
+            async register() {
+                const email = document.getElementById('registerEmail').value;
+                const password = document.getElementById('registerPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                if (!email || !password) {
+                    this.showMessage('Vui lòng điền đầy đủ thông tin', true);
+                    return;
+                }
+
+                if (password.length < 6) {
+                    this.showMessage('Mật khẩu phải có ít nhất 6 ký tự', true);
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    this.showMessage('Mật khẩu xác nhận không khớp', true);
+                    return;
+                }
+
+                try {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    this.showMessage('Đăng ký thành công!');
+                } catch (error) {
+                    console.error('Registration error:', error);
+                    let message = 'Đăng ký thất bại';
+                    if (error.code === 'auth/email-already-in-use') {
+                        message = 'Email đã được sử dụng';
+                    } else if (error.code === 'auth/weak-password') {
+                        message = 'Mật khẩu quá yếu';
+                    } else if (error.code === 'auth/invalid-email') {
+                        message = 'Email không hợp lệ';
+                    }
+                    this.showMessage(message, true);
+                }
+            },
+
+            async login() {
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+
+                if (!email || !password) {
+                    this.showMessage('Vui lòng điền đầy đủ thông tin', true);
+                    return;
+                }
+
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    this.showMessage('Đăng nhập thành công!');
+                } catch (error) {
+                    console.error('Login error:', error);
+                    let message = 'Đăng nhập thất bại';
+                    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                        message = 'Email hoặc mật khẩu không đúng';
+                    } else if (error.code === 'auth/invalid-email') {
+                        message = 'Email không hợp lệ';
+                    }
+                    this.showMessage(message, true);
+                }
+            },
+
+            async logout() {
+                try {
+                    await signOut(auth);
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
+            },
+
+            // Card Management
+            async loadCards() {
+                if (!this.currentUser) return;
+
+                try {
+                    const q = query(
+                        collection(db, 'cards'),
+                        where('userId', '==', this.currentUser.uid),
+                        orderBy('nextDueDate', 'asc')
+                    );
+                    
+                    const querySnapshot = await getDocs(q);
+                    this.cards = [];
+                    
+                    querySnapshot.forEach((doc) => {
+                        this.cards.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+                    
+                    this.renderCards();
+                    this.updateStats();
+                } catch (error) {
+                    console.error('Error loading cards:', error);
+                    this.showMessage('Lỗi khi tải dữ liệu', true);
+                }
+            },
+
+            async saveCard(cardData) {
+                if (!this.currentUser) return;
+
+                try {
+                    cardData.userId = this.currentUser.uid;
+                    await addDoc(collection(db, 'cards'), cardData);
+                    this.loadCards();
+                } catch (error) {
+                    console.error('Error saving card:', error);
+                    this.showMessage('Lỗi khi lưu thẻ', true);
+                }
+            },
+
+            async updateCard(cardId, updateData) {
+                try {
+                    const cardRef = doc(db, 'cards', cardId);
+                    await updateDoc(cardRef, updateData);
+                    this.loadCards();
+                } catch (error) {
+                    console.error('Error updating card:', error);
+                    this.showMessage('Lỗi khi cập nhật thẻ', true);
+                }
+            },
+
+            async deleteCard(cardId) {
+                if (!confirm('Bạn có chắc muốn xóa thẻ này?')) return;
+
+                try {
+                    await deleteDoc(doc(db, 'cards', cardId));
+                    this.loadCards();
+                } catch (error) {
+                    console.error('Error deleting card:', error);
+                    this.showMessage('Lỗi khi xóa thẻ', true);
+                }
+            },
+
+            // Card Logic (giữ nguyên từ version cũ)
+            getNextDueDateFixed(dueDate) {
+                const today = new Date();
+                const cardDueDay = new Date(dueDate).getDate();
+                
+                let nextDue = new Date(today.getFullYear(), today.getMonth(), cardDueDay);
+                
+                if (nextDue <= today) {
+                    nextDue = new Date(today.getFullYear(), today.getMonth() + 1, cardDueDay);
+                }
+                
+                if (nextDue.getDate() !== cardDueDay) {
+                    nextDue = new Date(nextDue.getFullYear(), nextDue.getMonth() + 1, 0);
+                }
+                
+                return nextDue;
+            },
+
+            getDueDateVariable(transactionDate, daysToAdd) {
+                const txDate = new Date(transactionDate);
+                const dueDate = new Date(txDate);
+                dueDate.setDate(txDate.getDate() + parseInt(daysToAdd));
+                return dueDate;
+            },
+
+            getDaysUntilDue(dueDate) {
+                const today = new Date();
+                const due = new Date(dueDate);
+                const diffTime = due - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays;
+            },
+
+            getCardStatus(daysUntil, isPaid) {
+                if (isPaid) {
+                    return { status: 'Đã thanh toán', class: 'paid', badge: 'status-paid' };
+                }
+                if (daysUntil < 0) {
+                    return { status: 'Quá hạn', class: 'overdue', badge: 'status-overdue' };
+                }
+                if (daysUntil <= 3) {
+                    return { status: 'Sắp đến hạn', class: 'due-soon', badge: 'status-due-soon' };
+                }
+                return { status: 'Sắp tới', class: 'upcoming', badge: 'status-upcoming' };
+            },
+
+            // Form Management
+            showAddForm() {
+                document.getElementById('addForm').classList.remove('hidden');
+                document.getElementById('cardName').focus();
+            },
+
+            hideAddForm() {
+                document.getElementById('addForm').classList.add('hidden');
+                this.clearAddForm();
+            },
+
+            clearAddForm() {
+                document.getElementById('cardName').value = '';
+                document.getElementById('dueDate').value = '';
+                document.getElementById('transactionDate').value = '';
+                document.getElementById('daysToAdd').value = '20';
+                this.selectCardType('fixed');
+            },
+
+            selectCardType(type) {
+                this.currentCardType = type;
+                
+                document.querySelectorAll('#addForm .card-type-option').forEach(option => {
+                    option.classList.remove('active');
+                });
+                
+                if (type === 'fixed') {
+                    document.querySelectorAll('#addForm .card-type-option')[0].classList.add('active');
+                    document.getElementById('fixedDateInput').classList.remove('hidden');
+                    document.getElementById('variableDateInput').classList.add('hidden');
+                } else {
+                    document.querySelectorAll('#addForm .card-type-option')[1].classList.add('active');
+                    document.getElementById('fixedDateInput').classList.add('hidden');
+                    document.getElementById('variableDateInput').classList.remove('hidden');
+                }
+            },
+
+            selectEditCardType(type) {
+                this.currentEditCardType = type;
+                
+                document.querySelectorAll('#editForm .card-type-option').forEach(option => {
+                    option.classList.remove('active');
+                });
+                
+                if (type === 'fixed') {
+                    document.querySelectorAll('#editForm .card-type-option')[0].classList.add('active');
+                    document.getElementById('editFixedDateInput').classList.remove('hidden');
+                    document.getElementById('editVariableDateInput').classList.add('hidden');
+                } else {
+                    document.querySelectorAll('#editForm .card-type-option')[1].classList.add('active');
+                    document.getElementById('editFixedDateInput').classList.add('hidden');
+                    document.getElementById('editVariableDateInput').classList.remove('hidden');
+                }
+            },
+
+            async addCard() {
+                const name = document.getElementById('cardName').value.trim();
+                
+                if (!name) {
+                    alert('Vui lòng nhập tên thẻ');
+                    return;
+                }
+                
+                let nextDue;
+                let cardData = {
+                    name: name,
+                    type: this.currentCardType,
+                    isPaid: false,
+                    lastPaidDate: null,
+                    paymentHistory: [],
+                    createdAt: new Date().toISOString()
+                };
+                
+                if (this.currentCardType === 'fixed') {
+                    const dueDate = document.getElementById('dueDate').value;
+                    if (!dueDate) {
+                        alert('Vui lòng chọn ngày đến hạn');
+                        return;
+                    }
+                    cardData.originalDueDate = dueDate;
+                    nextDue = this.getNextDueDateFixed(dueDate);
+                } else {
+                    const transactionDate = document.getElementById('transactionDate').value;
+                    const daysToAdd = document.getElementById('daysToAdd').value;
+                    
+                    if (!transactionDate || !daysToAdd) {
+                        alert('Vui lòng điền đầy đủ thông tin');
+                        return;
+                    }
+                    
+                    cardData.transactionDate = transactionDate;
+                    cardData.daysToAdd = parseInt(daysToAdd);
+                    cardData.estimatedCycleDays = 30;
+                    nextDue = this.getDueDateVariable(transactionDate, daysToAdd);
+                }
+                
+                cardData.nextDueDate = nextDue.toISOString();
+                
+                await this.saveCard(cardData);
+                this.hideAddForm();
+            },
+
+            startEdit(cardId) {
+                const card = this.cards.find(c => c.id === cardId);
+                if (!card) return;
+                
+                this.editingCardId = cardId;
+                
+                document.getElementById('editCardName').value = card.name;
+                document.getElementById('editDueDate').value = card.originalDueDate || '';
+                document.getElementById('editTransactionDate').value = card.transactionDate || '';
+                document.getElementById('editDaysToAdd').value = card.daysToAdd || 20;
+                
+                this.selectEditCardType(card.type);
+                document.getElementById('editForm').classList.remove('hidden');
+            },
+
+            async saveEditCard() {
+                const name = document.getElementById('editCardName').value.trim();
+                
+                if (!name) {
+                    alert('Vui lòng nhập tên thẻ');
+                    return;
+                }
+                
+                let nextDue;
+                let updateData = {
+                    name: name,
+                    type: this.currentEditCardType,
+                    isPaid: false,
+                    lastPaidDate: null,
+                    updatedAt: new Date().toISOString()
+                };
+                
+                if (this.currentEditCardType === 'fixed') {
+                    const dueDate = document.getElementById('editDueDate').value;
+                    if (!dueDate) {
+                        alert('Vui lòng chọn ngày đến hạn');
+                        return;
+                    }
+                    updateData.originalDueDate = dueDate;
+                    updateData.transactionDate = null;
+                    updateData.daysToAdd = null;
+                    updateData.estimatedCycleDays = null;
+                    nextDue = this.getNextDueDateFixed(dueDate);
+                } else {
+                    const transactionDate = document.getElementById('editTransactionDate').value;
+                    const daysToAdd = document.getElementById('editDaysToAdd').value;
+                    
+                    if (!transactionDate || !daysToAdd) {
+                        alert('Vui lòng điền đầy đủ thông tin');
+                        return;
+                    }
+                    
+                    updateData.originalDueDate = null;
+                    updateData.transactionDate = transactionDate;
+                    updateData.daysToAdd = parseInt(daysToAdd);
+                    updateData.estimatedCycleDays = 30;
+                    nextDue = this.getDueDateVariable(transactionDate, daysToAdd);
+                }
+                
+                updateData.nextDueDate = nextDue.toISOString();
+                
+                await this.updateCard(this.editingCardId, updateData);
+                this.cancelEdit();
+            },
+
+            cancelEdit() {
+                this.editingCardId = null;
+                document.getElementById('editForm').classList.add('hidden');
+            },
+
+            async markAsPaid(cardId) {
+                const card = this.cards.find(c => c.id === cardId);
+                if (!card) return;
+                
+                const today = new Date();
+                let nextDue;
+                
+                if (card.type === 'fixed') {
+                    nextDue = this.getNextDueDateFixed(card.originalDueDate);
+                } else {
+                    // For variable cards, estimate next cycle (simplified)
+                    const estimatedCycleDays = card.estimatedCycleDays || 30;
+                    const currentTxDate = new Date(card.transactionDate);
+                    const nextTxDate = new Date(currentTxDate);
+                    nextTxDate.setDate(currentTxDate.getDate() + estimatedCycleDays);
+                    
+                    nextDue = this.getDueDateVariable(nextTxDate.toISOString().split('T')[0], card.daysToAdd);
+                }
+                
+                const updateData = {
+                    isPaid: false, // Reset for new cycle
+                    lastPaidDate: today.toISOString(),
+                    nextDueDate: nextDue.toISOString(),
+                    updatedAt: today.toISOString()
+                };
+                
+                if (card.type === 'variable') {
+                    const estimatedCycleDays = card.estimatedCycleDays || 30;
+                    const currentTxDate = new Date(card.transactionDate);
+                    const nextTxDate = new Date(currentTxDate);
+                    nextTxDate.setDate(currentTxDate.getDate() + estimatedCycleDays);
+                    updateData.transactionDate = nextTxDate.toISOString().split('T')[0];
+                }
+                
+                await this.updateCard(cardId, updateData);
+            },
+
+            // Render functions
+            renderCards() {
+                const cardsList = document.getElementById('cardsList');
+                
+                if (this.cards.length === 0) {
+                    cardsList.innerHTML = `
+                        <div class="empty-state">
+                            <h3>Chưa có thẻ nào</h3>
+                            <p>Thêm thẻ tín dụng đầu tiên để bắt đầu theo dõi ngày đến hạn</p>
+                            <button class="btn" onclick="app.showAddForm()">Thêm thẻ đầu tiên</button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const sortedCards = [...this.cards].sort((a, b) => {
+                    const aDays = this.getDaysUntilDue(a.nextDueDate);
+                    const bDays = this.getDaysUntilDue(b.nextDueDate);
+                    return aDays - bDays;
+                });
+                
+                cardsList.innerHTML = sortedCards.map(card => {
+                    const daysUntil = this.getDaysUntilDue(card.nextDueDate);
+                    const { status, class: cardClass, badge } = this.getCardStatus(daysUntil, card.isPaid);
+                    const dueDate = new Date(card.nextDueDate);
+                    
+                    let daysText;
+                    if (daysUntil === 0) daysText = 'Đến hạn hôm nay';
+                    else if (daysUntil === 1) daysText = 'Đến hạn ngày mai';
+                    else if (daysUntil < 0) daysText = `Quá hạn ${Math.abs(daysUntil)} ngày`;
+                    else daysText = `Còn ${daysUntil} ngày`;
+                    
+                    let typeInfo = '';
+                    if (card.type === 'variable') {
+                        const estimatedText = card.estimatedCycleDays ? 
+                            ` (Chu kỳ ước tính: ${card.estimatedCycleDays} ngày)` : '';
+                        typeInfo = `<div style="font-size: 12px; color: #6b7280; margin-top: 5px;">
+                            Ngày GD: ${new Date(card.transactionDate).toLocaleDateString('vi-VN')} + ${card.daysToAdd} ngày${estimatedText}
+                        </div>`;
+                    }
+                    
+                    let actionButtons = '';
+                    if (!card.isPaid) {
+                        actionButtons += `<button class="btn btn-sm btn-green" onclick="app.markAsPaid('${card.id}')">✅ Đánh dấu đã thanh toán</button>`;
+                    }
+                    
+                    actionButtons += `
+                        <button class="btn btn-sm btn-orange" onclick="app.startEdit('${card.id}')">✏️ Sửa</button>
+                        <button class="btn btn-sm btn-red" onclick="app.deleteCard('${card.id}')">🗑️ Xóa</button>
+                    `;
+                    
+                    return `
+                        <div class="card-item ${cardClass}">
+                            <div class="card-header">
+                                <div class="card-info">
+                                    <h3>${card.name}</h3>
+                                    <div class="card-meta">
+                                        <span style="background: ${card.type === 'fixed' ? '#dbeafe' : '#dcfce7'}; 
+                                                     color: ${card.type === 'fixed' ? '#1e40af' : '#166534'}; 
+                                                     padding: 2px 8px; border-radius: 12px; font-size: 11px; margin-right: 10px;">
+                                            ${card.type === 'fixed' ? '📅 Ngày cố định' : '🔄 Ngày biến động'}
+                                        </span>
+                                        Đến hạn: ${dueDate.toLocaleDateString('vi-VN', { 
+                                            weekday: 'short', 
+                                            year: 'numeric', 
+                                            month: 'short', 
+                                            day: 'numeric' 
+                                        })}
+                                    </div>
+                                    ${typeInfo}
+                                </div>
+                                <div class="card-status">
+                                    <div class="status-badge ${badge}">${status}</div>
+                                    <div style="color: #6b7280; font-size: 14px;">${daysText}</div>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                ${actionButtons}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            },
+
+            updateStats() {
+                if (this.cards.length === 0) {
+                    document.getElementById('stats').classList.add('hidden');
+                    return;
+                }
+                
+                document.getElementById('stats').classList.remove('hidden');
+                
+                const totalCards = this.cards.length;
+                const paidCards = this.cards.filter(card => card.isPaid).length;
+                const dueSoonCards = this.cards.filter(card => 
+                    !card.isPaid && 
+                    this.getDaysUntilDue(card.nextDueDate) <= 3 && 
+                    this.getDaysUntilDue(card.nextDueDate) >= 0
+                ).length;
+                const overdueCards = this.cards.filter(card => 
+                    !card.isPaid && 
+                    this.getDaysUntilDue(card.nextDueDate) < 0
+                ).length;
+                
+                document.getElementById('totalCards').textContent = totalCards;
+                document.getElementById('paidCards').textContent = paidCards;
+                document.getElementById('dueSoonCards').textContent = dueSoonCards;
+                document.getElementById('overdueCards').textContent = overdueCards;
+            }
+        };
+
+        // Make app globally available
+        window.app = app;
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            app.init();
+        });
     </script>
 </body>
 </html>
