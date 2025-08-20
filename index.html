@@ -1033,6 +1033,31 @@
         window.onload = function() {
             loadCards();
         };
+
+        <script type="module">
+          // Import the functions you need from the SDKs you need
+          import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+          import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-analytics.js";
+          // TODO: Add SDKs for Firebase products that you want to use
+          // https://firebase.google.com/docs/web/setup#available-libraries
+        
+          // Your web app's Firebase configuration
+          // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+          const firebaseConfig = {
+            apiKey: "AIzaSyDLPqEYL2v38kOyzH42THhs4NuOKR8e3sw",
+            authDomain: "payping-edfa8.firebaseapp.com",
+            databaseURL: "https://payping-edfa8-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "payping-edfa8",
+            storageBucket: "payping-edfa8.firebasestorage.app",
+            messagingSenderId: "860071397124",
+            appId: "1:860071397124:web:ae343fcdded6209167b251",
+            measurementId: "G-2MSKBH9JDF"
+          };
+        
+          // Initialize Firebase
+          const app = initializeApp(firebaseConfig);
+          const analytics = getAnalytics(app);
+        </script>
     </script>
 </body>
 </html>
