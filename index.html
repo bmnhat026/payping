@@ -670,9 +670,14 @@
             },
 
             async register() {
-                const email = document.getElementById('registerEmail').value;
-                const password = document.getElementById('registerPassword').value;
-                const confirmPassword = document.getElementById('confirmPassword').value;
+                const email = document.getElementById('registerEmail').value.trim();
+                const password = document.getElementById('registerPassword').value.trim();
+                const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+                console.log('Debug - Email:', email);
+                console.log('Debug - Password length:', password.length);
+                console.log('Debug - Confirm password length:', confirmPassword.length);
+                console.log('Debug - Passwords match:', password === confirmPassword);
 
                 if (!email || !password) {
                     this.showMessage('Vui lòng điền đầy đủ thông tin', true);
@@ -685,7 +690,7 @@
                 }
 
                 if (password !== confirmPassword) {
-                    this.showMessage('Mật khẩu xác nhận không khớp', true);
+                    this.showMessage(`Mật khẩu xác nhận không khớp. Pass: "${password}", Confirm: "${confirmPassword}"`, true);
                     return;
                 }
 
