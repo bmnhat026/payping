@@ -1422,38 +1422,31 @@
             async markAsPaid(cardId) {
                 const card = this.cards.find(c => c.id === cardId);
                 if (!card) return;
-                
                 const today = new Date();
                 let nextDue;
-                
-                if (card.type === 'fixed') {
+                let updateData = {
+                    isPaid: false, // Đặt về false để tính lại kỳ tới
+                    lastPaidDate: today.toISOString(),
+                    updatedAt: today.toISOString(),
+                };
+            
+                if (card.type === "fixed") {
                     nextDue = this.getNextDueDateFixed(card.originalDueDate);
+                    updateData.nextDueDate = nextDue.toISOString();
                 } else {
                     const estimatedCycleDays = card.estimatedCycleDays || 30;
                     const currentTxDate = new Date(card.transactionDate);
                     const nextTxDate = new Date(currentTxDate);
                     nextTxDate.setDate(currentTxDate.getDate() + estimatedCycleDays);
-                    
                     nextDue = this.getDueDateVariable(nextTxDate.toISOString().split('T')[0], card.daysToAdd);
-                }
-                
-                const updateData = {
-                    isPaid: false,
-                    lastPaidDate: today.toISOString(),
-                    nextDueDate: nextDue.toISOString(),
-                    updatedAt: today.toISOString()
-                };
-                
-                if (card.type === 'variable') {
-                    const estimatedCycleDays = card.estimatedCycleDays || 30;
-                    const currentTxDate = new Date(card.transactionDate);
-                    const nextTxDate = new Date(currentTxDate);
-                    nextTxDate.setDate(currentTxDate.getDate() + estimatedCycleDays);
                     updateData.transactionDate = nextTxDate.toISOString().split('T')[0];
+                    updateData.nextDueDate = nextDue.toISOString();
                 }
-                
+            
+                // LƯU Ý: Không được đặt isPaid = true, phải cho cycle kế tiếp
                 await this.updateCard(cardId, updateData);
-            },
+            }
+
 
             // Render functions
             renderCards() {
