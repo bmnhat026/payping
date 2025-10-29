@@ -73,6 +73,11 @@
             100% { background-position: 0% 50%; }
         }
 
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -102,6 +107,77 @@
             padding: 20px;
             position: relative;
             z-index: 2;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header h1 {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 36px;
+            font-weight: 800;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Search & Filter */
+        .search-filter {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .filter-select {
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary);
         }
 
         /* Glassmorphism Auth Container */
@@ -179,6 +255,64 @@
             transform: translateY(-2px);
         }
 
+        .form-group input.error,
+        .form-group select.error {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+        }
+
+        .error-message {
+            color: var(--danger);
+            font-size: 12px;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .success-message {
+            color: var(--success);
+            font-size: 12px;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-row-full {
+            grid-column: 1 / -1;
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .toggle-btn.active {
+            background: var(--gradient-1);
+            color: white;
+            border-color: var(--primary);
+        }
+
         /* Modern Buttons */
         .btn {
             background: var(--gradient-1);
@@ -186,35 +320,19 @@
             border: none;
             padding: 14px 28px;
             border-radius: 12px;
-            cursor: pointer;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
+            cursor: pointer;
             transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn:hover::before {
-            left: 100%;
+            box-shadow: var(--shadow-lg);
         }
 
         .btn:active {
@@ -222,233 +340,116 @@
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .btn-success {
             background: var(--gradient-success);
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
 
         .btn-warning {
-            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         }
 
         .btn-danger {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
         }
 
         .btn-sm {
-            padding: 8px 16px;
-            font-size: 14px;
+            padding: 10px 16px;
+            font-size: 13px;
+            border-radius: 8px;
         }
 
-        /* Messages */
-        .message {
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            animation: slideInRight 0.4s ease-out;
-            position: relative;
-            overflow: hidden;
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
-        .error-message {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
-            color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.3);
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
         }
 
-        .success-message {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
-            color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        /* Main App Header */
-        .header {
+        .stat-card {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            padding: 32px;
-            border-radius: 24px;
-            box-shadow: var(--shadow-xl);
-            margin-bottom: 32px;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
             border: 1px solid rgba(255, 255, 255, 0.2);
             animation: fadeIn 0.6s ease-out;
         }
 
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 24px;
+        .stat-card.hidden {
+            display: none;
         }
 
-        .header h1 {
-            font-size: 36px;
+        .stat-label {
+            font-size: 14px;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 32px;
             font-weight: 800;
             background: var(--gradient-1);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 8px;
         }
 
-        .header-subtitle {
-            color: var(--gray);
-            font-size: 18px;
+        .stat-card.warning .stat-value {
+            background: linear-gradient(135deg, #f59e0b 0%, #dc2626 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        /* User Info Bar */
-        .user-info {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 20px 24px;
-            border-radius: 16px;
-            margin-bottom: 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: var(--shadow-md);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: fadeIn 0.5s ease-out;
+        .stat-card.danger .stat-value {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .user-info-text {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 500;
+        .stat-card.success .stat-value {
+            background: var(--gradient-success);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--gradient-1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
-        }
-
-        /* Form Section */
-        .form-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 36px;
-            border-radius: 24px;
-            box-shadow: var(--shadow-xl);
-            margin-bottom: 32px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: fadeIn 0.6s ease-out;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .form-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 4px;
-            height: 100%;
-            background: var(--gradient-1);
-        }
-
-        .form-section.edit::before {
-            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
-        }
-
-        .form-section h2 {
-            color: var(--dark);
-            margin-bottom: 28px;
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        /* Card Type Selector */
-        .card-type-selector {
+        /* Cards List */
+        .cards-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-top: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
         }
 
-        .card-type-option {
-            padding: 24px;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-        .card-type-option::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--gradient-1);
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 0;
-        }
-
-        .card-type-option:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .card-type-option.active {
-            border-color: var(--primary);
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-        }
-
-        .card-type-option.active::before {
-            opacity: 0.1;
-        }
-
-        .card-type-option h3,
-        .card-type-option p {
-            position: relative;
-            z-index: 1;
-        }
-
-        .card-type-option h3 {
-            font-size: 20px;
-            margin-bottom: 8px;
-            color: var(--dark);
-        }
-
-        .card-type-option p {
-            color: var(--gray);
-            font-size: 14px;
-        }
-
-        /* Card Items */
         .card-item {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            padding: 28px;
-            border-radius: 20px;
-            box-shadow: var(--shadow-lg);
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            border: 2px solid #e2e8f0;
+            transition: var(--transition);
+            animation: fadeIn 0.6s ease-out;
             position: relative;
             overflow: hidden;
-            transition: var(--transition);
-            animation: fadeIn 0.5s ease-out;
         }
 
         .card-item::before {
@@ -456,1073 +457,1098 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 5px;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transition: width 0.3s;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-1);
         }
 
-        .card-item:hover {
-            transform: translateX(8px);
-            box-shadow: var(--shadow-xl);
+        .card-item.status-due-soon::before {
+            background: linear-gradient(90deg, #f59e0b, #dc2626);
         }
 
-        .card-item:hover::before {
-            width: 8px;
+        .card-item.status-overdue::before {
+            background: linear-gradient(90deg, #ef4444, #991b1b);
+            animation: glow 2s ease-in-out infinite;
         }
 
-        .card-item.paid {
-            background: rgba(255, 255, 255, 0.95);
-        }
-
-        .card-item.paid::before {
+        .card-item.status-paid::before {
             background: var(--gradient-success);
         }
 
-        .card-item.due-soon {
-            background: rgba(255, 255, 255, 0.95);
-        }
-
-        .card-item.due-soon::before {
-            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
-        }
-
-        .card-item.overdue {
-            background: rgba(255, 255, 255, 0.95);
-            animation: pulse 2s infinite;
-        }
-
-        .card-item.overdue::before {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        .card-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
         }
 
         .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
-        .card-info h3 {
-            color: var(--dark);
-            font-size: 22px;
+        .card-header h3 {
+            font-size: 18px;
             font-weight: 700;
             margin-bottom: 8px;
+            color: var(--dark);
         }
 
         .card-meta {
             display: flex;
-            align-items: center;
+            flex-wrap: wrap;
             gap: 12px;
+            font-size: 13px;
             color: var(--gray);
-            font-size: 14px;
         }
 
         .card-type-badge {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary);
             padding: 4px 12px;
             border-radius: 20px;
-            font-size: 12px;
             font-weight: 600;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-            color: var(--primary);
+        }
+
+        .card-info {
+            margin-bottom: 12px;
+        }
+
+        .card-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 14px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .card-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .card-info-label {
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .card-info-value {
+            font-weight: 600;
+            color: var(--dark);
         }
 
         .card-status {
-            text-align: right;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f1f5f9;
         }
 
         .status-badge {
-            padding: 6px 16px;
+            padding: 6px 12px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
-            margin-bottom: 8px;
-            display: inline-block;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            animation: float 3s ease-in-out infinite;
         }
 
-        .status-paid {
-            background: var(--gradient-success);
-            color: white;
+        .status-badge.on-time {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
         }
 
-        .status-due-soon {
-            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
-            color: white;
-            animation: pulse 2s infinite;
+        .status-badge.due-soon {
+            background: rgba(245, 158, 11, 0.1);
+            color: #d97706;
         }
 
-        .status-overdue {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-            animation: pulse 1s infinite;
+        .status-badge.overdue {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
         }
 
-        .status-upcoming {
-            background: var(--gradient-3);
-            color: white;
+        .status-badge.paid {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .card-days-text {
+            font-size: 13px;
+            color: var(--gray);
+            font-weight: 500;
         }
 
         .card-actions {
             display: flex;
+            gap: 8px;
+            margin-top: 16px;
             flex-wrap: wrap;
-            gap: 10px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.active {
+            display: flex;
             align-items: center;
+            justify-content: center;
         }
 
-        /* Stats Section */
-        .stats {
-            background: rgba(255, 255, 255, 0.95);
+        .modal-content {
+            background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);
-            padding: 36px;
             border-radius: 24px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
             box-shadow: var(--shadow-xl);
-            margin-top: 32px;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            animation: fadeIn 0.7s ease-out;
+            animation: slideInRight 0.3s ease-out;
         }
 
-        .stats h3 {
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-header h2 {
             font-size: 24px;
             font-weight: 700;
             color: var(--dark);
-            margin-bottom: 24px;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 24px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
-            border: 1px solid rgba(99, 102, 241, 0.1);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-item::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
-            animation: float 5s ease-in-out infinite;
-        }
-
-        .stat-item:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-lg);
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-        }
-
-        .stat-number {
-            font-size: 36px;
-            font-weight: 800;
-            margin-bottom: 8px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .stat-label {
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
             color: var(--gray);
-            font-size: 14px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            position: relative;
-            z-index: 1;
+            transition: var(--transition);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .modal-close:hover {
+            background: #f1f5f9;
+            color: var(--dark);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 32px;
+        }
+
+        .hidden {
+            display: none;
         }
 
         /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 80px 20px;
+            padding: 60px 20px;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
-            border-radius: 24px;
-            box-shadow: var(--shadow-xl);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            border: 2px dashed #e2e8f0;
             animation: fadeIn 0.6s ease-out;
         }
 
         .empty-state-icon {
-            font-size: 80px;
-            margin-bottom: 24px;
-            animation: float 3s ease-in-out infinite;
+            font-size: 64px;
+            margin-bottom: 16px;
         }
 
         .empty-state h3 {
-            color: var(--dark);
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
-            margin-bottom: 12px;
+            color: var(--dark);
+            margin-bottom: 8px;
         }
 
         .empty-state p {
             color: var(--gray);
-            font-size: 16px;
-            margin-bottom: 32px;
-        }
-
-        /* Loading State */
-        .loading {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            color: white;
-        }
-
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255, 255, 255, 0.2);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
             margin-bottom: 24px;
+            font-size: 14px;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        /* Notification Toast */
+        .notification {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: rgba(16, 185, 129, 0.95);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            z-index: 2000;
+            animation: slideDown 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            backdrop-filter: blur(10px);
         }
 
-        .loading h3 {
-            font-size: 24px;
-            font-weight: 600;
-            animation: pulse 2s infinite;
+        .notification.error {
+            background: rgba(239, 68, 68, 0.95);
         }
 
-        /* Utilities */
-        .hidden {
-            display: none !important;
+        .notification.warning {
+            background: rgba(245, 158, 11, 0.95);
         }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        /* Responsive Design */
+        /* Responsive */
         @media (max-width: 768px) {
-            .header-content {
+            .header {
                 flex-direction: column;
-                text-align: center;
+                align-items: flex-start;
             }
 
             .header h1 {
                 font-size: 28px;
             }
 
+            .search-filter {
+                flex-direction: column;
+            }
+
             .form-row {
                 grid-template-columns: 1fr;
             }
 
-            .card-type-selector {
+            .cards-container {
                 grid-template-columns: 1fr;
             }
 
-            .card-header {
-                flex-direction: column;
-                gap: 16px;
+            .notification {
+                bottom: 12px;
+                right: 12px;
+                left: 12px;
             }
 
-            .card-actions {
+            .modal-content {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 12px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .btn-sm {
+                flex: 1;
                 justify-content: center;
             }
 
-            .user-info {
+            .card-actions {
                 flex-direction: column;
-                gap: 16px;
-                text-align: center;
             }
 
-            .stats-grid {
-                grid-template-columns: 1fr;
+            .card-actions .btn-sm {
+                width: 100%;
             }
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(99, 102, 241, 0.5);
-            border-radius: 5px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(99, 102, 241, 0.7);
         }
     </style>
 </head>
 <body>
-    <!-- Loading State -->
-    <div id="loadingState" class="loading">
-        <div class="loading-spinner"></div>
-        <h3>Đang tải PingPay...</h3>
-    </div>
-
-    <!-- Authentication Form -->
-    <div id="authContainer" class="auth-container hidden">
-        <h2>✨ PingPay</h2>
-        
-        <div id="errorMessage" class="message error-message hidden"></div>
-        <div id="successMessage" class="message success-message hidden"></div>
-        
-        <div id="loginForm">
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="loginEmail" placeholder="Nhập email của bạn">
-            </div>
-            <div class="form-group">
-                <label>Mật khẩu</label>
-                <input type="password" id="loginPassword" placeholder="Nhập mật khẩu">
-            </div>
-            <button class="btn" onclick="app.login()" style="width: 100%; margin-bottom: 12px;">Đăng nhập</button>
-            <button class="btn btn-secondary" onclick="app.showRegister()" style="width: 100%;">Tạo tài khoản mới</button>
-        </div>
-        
-        <div id="registerForm" class="hidden">
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" id="registerEmail" placeholder="Nhập email của bạn">
-            </div>
-            <div class="form-group">
-                <label>Mật khẩu</label>
-                <input type="password" id="registerPassword" placeholder="Tối thiểu 6 ký tự">
-            </div>
-            <div class="form-group">
-                <label>Xác nhận mật khẩu</label>
-                <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu">
-            </div>
-            <button class="btn" onclick="app.register()" style="width: 100%; margin-bottom: 12px;">Đăng ký</button>
-            <button class="btn btn-secondary" onclick="app.showLogin()" style="width: 100%;">Đã có tài khoản</button>
-        </div>
-    </div>
-
-    <!-- Main App -->
-    <div id="mainApp" class="container hidden">
-        <!-- User Info -->
-        <div class="user-info">
-            <div class="user-info-text">
-                <div class="user-avatar" id="userAvatar">U</div>
-                <span>Xin chào, <strong id="userEmail"></strong></span>
-            </div>
-            <button class="btn btn-sm" onclick="app.logout()">Đăng xuất</button>
-        </div>
-
+    <div class="container">
         <!-- Header -->
         <div class="header">
-            <div class="header-content">
-                <div>
-                    <h1>💳 PingPay</h1>
-                    <p class="header-subtitle">Không bao giờ bỏ lỡ thanh toán</p>
-                </div>
-                <button class="btn btn-success" onclick="app.showAddForm()">
-                    ➕ Thêm thẻ mới
+            <div>
+                <h1>💳 PingPay</h1>
+                <p style="color: rgba(255,255,255,0.8); margin-top: 4px; font-size: 14px;">Quản lý ngày thanh toán thẻ tín dụng</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="app.showExportDialog()" aria-label="Xuất dữ liệu">
+                    ⬇️ Xuất
+                </button>
+                <button class="btn btn-secondary" onclick="app.showImportDialog()" aria-label="Nhập dữ liệu">
+                    ⬆️ Nhập
+                </button>
+                <button class="btn btn-success" onclick="app.showAddForm()" aria-label="Thêm thẻ tín dụng mới">
+                    + Thêm thẻ
                 </button>
             </div>
         </div>
 
-        <!-- Add Card Form -->
-        <div id="addForm" class="form-section hidden">
-            <h2>Thêm thẻ tín dụng mới</h2>
-            
-            <div class="form-group">
-                <label>Tên thẻ</label>
-                <input type="text" id="cardName" placeholder="VD: Techcombank Visa, VPBank Mastercard">
-            </div>
-            
-            <div class="form-group">
-                <label>Loại ngày đến hạn</label>
-                <div class="card-type-selector">
-                    <div class="card-type-option active" onclick="app.selectCardType('fixed')">
-                        <h3>📅 Ngày cố định</h3>
-                        <p>VD: Ngày 15 hàng tháng</p>
-                    </div>
-                    <div class="card-type-option" onclick="app.selectCardType('variable')">
-                        <h3>🔄 Ngày biến động</h3>
-                        <p>Dựa trên ngày thông báo + số ngày</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="fixedDateInput" class="form-group">
-                <label>Ngày đến hạn hàng tháng</label>
-                <input type="date" id="dueDate">
-                <small style="color: var(--gray); display: block; margin-top: 8px;">
-                    Chỉ cần chọn một ngày bất kỳ, ứng dụng sẽ lấy ngày trong tháng đó làm ngày cố định
-                </small>
-            </div>
-            
-            <div id="variableDateInput" class="form-row hidden">
-                <div class="form-group">
-                    <label>Ngày thông báo giao dịch</label>
-                    <input type="date" id="transactionDate">
-                </div>
-                <div class="form-group">
-                    <label>Số ngày cộng thêm</label>
-                    <input type="number" id="daysToAdd" value="20" min="1" max="365">
-                </div>
-            </div>
-            
-            <div style="display: flex; gap: 12px;">
-                <button class="btn btn-success" onclick="app.addCard()">Thêm thẻ</button>
-                <button class="btn btn-secondary" onclick="app.hideAddForm()">Hủy</button>
-            </div>
+        <!-- Search & Filter -->
+        <div class="search-filter">
+            <input 
+                type="text" 
+                class="search-input" 
+                id="searchInput" 
+                placeholder="Tìm kiếm thẻ..." 
+                onkeyup="app.filterCards()"
+                aria-label="Tìm kiếm thẻ tín dụng"
+            >
+            <select class="filter-select" id="filterSelect" onchange="app.filterCards()" aria-label="Lọc theo trạng thái">
+                <option value="">Tất cả trạng thái</option>
+                <option value="on-time">Còn thời gian</option>
+                <option value="due-soon">Sắp đến hạn</option>
+                <option value="overdue">Quá hạn</option>
+                <option value="paid">Đã thanh toán</option>
+            </select>
         </div>
 
-        <!-- Edit Card Form -->
-        <div id="editForm" class="form-section edit hidden">
-            <h2 style="color: var(--warning);">Chỉnh sửa thẻ tín dụng</h2>
-            
-            <div class="form-group">
-                <label>Tên thẻ</label>
-                <input type="text" id="editCardName" placeholder="VD: Techcombank Visa, VPBank Mastercard">
+        <!-- Stats -->
+        <div id="stats" class="stats-container">
+            <div class="stat-card">
+                <div class="stat-label">Tổng thẻ</div>
+                <div class="stat-value" id="totalCards">0</div>
             </div>
-            
-            <div class="form-group">
-                <label>Loại ngày đến hạn</label>
-                <div class="card-type-selector">
-                    <div class="card-type-option" onclick="app.selectEditCardType('fixed')">
-                        <h3>📅 Ngày cố định</h3>
-                        <p>VD: Ngày 15 hàng tháng</p>
-                    </div>
-                    <div class="card-type-option" onclick="app.selectEditCardType('variable')">
-                        <h3>🔄 Ngày biến động</h3>
-                        <p>Dựa trên ngày thông báo + số ngày</p>
-                    </div>
-                </div>
+            <div class="stat-card success">
+                <div class="stat-label">Đã thanh toán</div>
+                <div class="stat-value" id="paidCards">0</div>
             </div>
-            
-            <div id="editFixedDateInput" class="form-group">
-                <label>Ngày đến hạn hàng tháng</label>
-                <input type="date" id="editDueDate">
-                <small style="color: var(--gray); display: block; margin-top: 8px;">
-                    Chỉ cần chọn một ngày bất kỳ, ứng dụng sẽ lấy ngày trong tháng đó làm ngày cố định
-                </small>
+            <div class="stat-card warning">
+                <div class="stat-label">Sắp đến hạn</div>
+                <div class="stat-value" id="dueSoonCards">0</div>
             </div>
-            
-            <div id="editVariableDateInput" class="form-row hidden">
-                <div class="form-group">
-                    <label>Ngày thông báo giao dịch</label>
-                    <input type="date" id="editTransactionDate">
-                </div>
-                <div class="form-group">
-                    <label>Số ngày cộng thêm</label>
-                    <input type="number" id="editDaysToAdd" value="20" min="1" max="365">
-                </div>
-            </div>
-            
-            <div style="display: flex; gap: 12px;">
-                <button class="btn btn-warning" onclick="app.saveEditCard()">💾 Lưu thay đổi</button>
-                <button class="btn btn-secondary" onclick="app.cancelEdit()">Hủy</button>
+            <div class="stat-card danger">
+                <div class="stat-label">Quá hạn</div>
+                <div class="stat-value" id="overdueCards">0</div>
             </div>
         </div>
 
         <!-- Cards List -->
-        <div id="cardsList"></div>
+        <div id="cardsList" class="cards-container"></div>
+    </div>
 
-        <!-- Stats -->
-        <div id="stats" class="stats hidden">
-            <h3>📊 Tổng quan</h3>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-number" id="totalCards">0</div>
-                    <div class="stat-label">Tổng số thẻ</div>
+    <!-- Add/Edit Modal -->
+    <div id="formModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="formTitle">Thêm thẻ tín dụng</h2>
+                <button class="modal-close" onclick="app.cancelForm()" aria-label="Đóng">✕</button>
+            </div>
+            
+            <form id="cardForm" onsubmit="app.handleFormSubmit(event)">
+                <div class="form-group">
+                    <label for="cardName">Tên thẻ *</label>
+                    <input 
+                        type="text" 
+                        id="cardName" 
+                        placeholder="VD: Thẻ Visa MB" 
+                        required
+                        aria-label="Tên thẻ tín dụng"
+                    >
+                    <div class="error-message hidden" id="cardNameError"></div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-number" style="color: var(--success);" id="paidCards">0</div>
-                    <div class="stat-label">Đã thanh toán</div>
+
+                <div class="form-group">
+                    <label>Loại ngày đến hạn *</label>
+                    <div class="toggle-group">
+                        <button 
+                            type="button" 
+                            class="toggle-btn active" 
+                            onclick="app.setCardType('fixed')"
+                            aria-pressed="true"
+                        >
+                            📅 Cố định
+                        </button>
+                        <button 
+                            type="button" 
+                            class="toggle-btn" 
+                            onclick="app.setCardType('variable')"
+                            aria-pressed="false"
+                        >
+                            🔄 Biến động
+                        </button>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-number" style="color: var(--warning);" id="dueSoonCards">0</div>
-                    <div class="stat-label">Sắp đến hạn</div>
+
+                <!-- Fixed Type -->
+                <div id="fixedSection" class="form-group">
+                    <label for="fixedDueDate">Ngày đến hạn hàng tháng *</label>
+                    <input 
+                        type="number" 
+                        id="fixedDueDate" 
+                        min="1" 
+                        max="31" 
+                        placeholder="Ví dụ: 15"
+                        aria-label="Ngày đến hạn cố định"
+                    >
+                    <small style="color: var(--gray); display: block; margin-top: 4px;">
+                        Nhập số từ 1 đến 31 (nếu chọn ngày > số ngày trong tháng, sẽ dùng ngày cuối cùng)
+                    </small>
+                    <div class="error-message hidden" id="fixedDueDateError"></div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-number" style="color: var(--danger);" id="overdueCards">0</div>
-                    <div class="stat-label">Quá hạn</div>
+
+                <!-- Variable Type -->
+                <div id="variableSection" class="form-group hidden">
+                    <div class="form-row">
+                        <div class="form-row-full">
+                            <label for="transactionDate">Ngày giao dịch *</label>
+                            <input 
+                                type="date" 
+                                id="transactionDate"
+                                aria-label="Ngày giao dịch"
+                            >
+                            <div class="error-message hidden" id="transactionDateError"></div>
+                        </div>
+                        
+                        <div>
+                            <label for="daysToAdd">Ngày thanh toán (sau giao dịch) *</label>
+                            <input 
+                                type="number" 
+                                id="daysToAdd" 
+                                min="1" 
+                                max="60" 
+                                placeholder="Ví dụ: 20"
+                                aria-label="Số ngày cộng thêm"
+                            >
+                            <div class="error-message hidden" id="daysToAddError"></div>
+                        </div>
+                        
+                        <div>
+                            <label for="estimatedCycleDays">Chu kỳ ước tính (ngày) *</label>
+                            <input 
+                                type="number" 
+                                id="estimatedCycleDays" 
+                                min="1" 
+                                max="365" 
+                                value="30"
+                                placeholder="Ví dụ: 30"
+                                aria-label="Chu kỳ ước tính"
+                            >
+                            <small style="color: var(--gray); display: block; margin-top: 4px;">
+                                Khoảng thời gian dự kiến giữa các giao dịch (dùng để tính ngày giao dịch tiếp theo)
+                            </small>
+                            <div class="error-message hidden" id="estimatedCycleDaysError"></div>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="app.cancelForm()" aria-label="Hủy">
+                        Hủy
+                    </button>
+                    <button type="submit" class="btn btn-success" aria-label="Lưu thẻ">
+                        💾 Lưu
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 id="confirmTitle">Xác nhận</h2>
+                <button class="modal-close" onclick="app.cancelConfirm()" aria-label="Đóng">✕</button>
+            </div>
+            <p id="confirmMessage" style="color: var(--gray); margin-bottom: 24px;"></p>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="app.cancelConfirm()" aria-label="Hủy">
+                    Hủy
+                </button>
+                <button id="confirmBtn" class="btn btn-danger" aria-label="Xác nhận">
+                    Xác nhận
+                </button>
             </div>
         </div>
     </div>
-    
-    <script type="module">
-        // Import Firebase
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // Firebase config
-        const firebaseConfig = {
-            apiKey: "AIzaSyBEtdEz6RJF1_eLoCNE9_Pp0oZLqDzaLuk",
-            authDomain: "pingpay-16a26.firebaseapp.com",
-            databaseURL: "https://pingpay-16a26-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "pingpay-16a26",
-            storageBucket: "pingpay-16a26.firebasestorage.app",
-            messagingSenderId: "533740183343",
-            appId: "1:533740183343:web:9a9a0b4ea709e34ec28bda"
-        };
-
-        // Initialize Firebase
-        const firebaseApp = initializeApp(firebaseConfig);
-        const auth = getAuth(firebaseApp);
-        const db = getFirestore(firebaseApp);
-
-        // Main application
+    <script>
         const app = {
-            currentUser: null,
             cards: [],
             editingCardId: null,
             currentCardType: 'fixed',
-            currentEditCardType: 'fixed',
+            confirmAction: null,
+            filteredCards: [],
 
-            // Initialize app
-            async init() {
-                this.showLoading(true);
-                
-                // Listen for auth state changes
-                onAuthStateChanged(auth, (user) => {
-                    this.currentUser = user;
-                    if (user) {
-                        this.showMainApp();
-                        this.loadCards();
-                    } else {
-                        this.showAuth();
-                    }
-                    this.showLoading(false);
-                });
+            // Initialize
+            init() {
+                this.loadData();
+                this.render();
+                // Check for notifications daily
+                this.checkNotifications();
+                setInterval(() => this.checkNotifications(), 60 * 60 * 1000); // Check every hour
             },
 
-            // UI Management
-            showLoading(show) {
-                document.getElementById('loadingState').classList.toggle('hidden', !show);
+            // Data Management
+            loadData() {
+                const saved = localStorage.getItem('pingpayCards');
+                this.cards = saved ? JSON.parse(saved) : [];
             },
 
-            showAuth() {
-                document.getElementById('authContainer').classList.remove('hidden');
-                document.getElementById('mainApp').classList.add('hidden');
+            saveData() {
+                localStorage.setItem('pingpayCards', JSON.stringify(this.cards));
             },
 
-            showMainApp() {
-                document.getElementById('authContainer').classList.add('hidden');
-                document.getElementById('mainApp').classList.remove('hidden');
-                const email = this.currentUser?.email || '';
-                document.getElementById('userEmail').textContent = email;
-                if (email) {
-                    document.getElementById('userAvatar').textContent = email[0].toUpperCase();
+            // Validation Functions
+            validateCardName(name) {
+                if (!name || name.trim().length === 0) {
+                    return { valid: false, error: 'Tên thẻ không được để trống' };
                 }
+                if (name.length > 50) {
+                    return { valid: false, error: 'Tên thẻ tối đa 50 ký tự' };
+                }
+                // Check for duplicates (excluding current editing card)
+                if (this.cards.some(c => c.id !== this.editingCardId && c.name.toLowerCase() === name.toLowerCase())) {
+                    return { valid: false, error: 'Tên thẻ này đã tồn tại' };
+                }
+                return { valid: true };
             },
 
-            showMessage(message, isError = false) {
-                const errorEl = document.getElementById('errorMessage');
-                const successEl = document.getElementById('successMessage');
-                
-                if (isError) {
-                    errorEl.textContent = message;
-                    errorEl.classList.remove('hidden');
-                    successEl.classList.add('hidden');
-                } else {
-                    successEl.textContent = message;
-                    successEl.classList.remove('hidden');
-                    errorEl.classList.add('hidden');
+            validateFixedDueDate(day) {
+                const dayNum = parseInt(day);
+                if (isNaN(dayNum) || dayNum < 1 || dayNum > 31) {
+                    return { valid: false, error: 'Ngày phải từ 1 đến 31' };
                 }
-                
-                setTimeout(() => {
-                    errorEl.classList.add('hidden');
-                    successEl.classList.add('hidden');
-                }, 5000);
+                return { valid: true };
             },
 
-            // Authentication
-            showLogin() {
-                document.getElementById('loginForm').classList.remove('hidden');
-                document.getElementById('registerForm').classList.add('hidden');
-            },
-
-            showRegister() {
-                document.getElementById('loginForm').classList.add('hidden');
-                document.getElementById('registerForm').classList.remove('hidden');
-            },
-
-            async register() {
-                const email = document.getElementById('registerEmail').value.trim();
-                const password = document.getElementById('registerPassword').value.trim();
-                const confirmPassword = document.getElementById('confirmPassword').value.trim();
-
-                if (!email || !password) {
-                    this.showMessage('Vui lòng điền đầy đủ thông tin', true);
-                    return;
+            validateTransactionDate(dateStr) {
+                if (!dateStr) {
+                    return { valid: false, error: 'Vui lòng chọn ngày giao dịch' };
                 }
-
-                if (password.length < 6) {
-                    this.showMessage('Mật khẩu phải có ít nhất 6 ký tự', true);
-                    return;
-                }
-
-                if (password !== confirmPassword) {
-                    this.showMessage('Mật khẩu xác nhận không khớp', true);
-                    return;
-                }
-
-                try {
-                    await createUserWithEmailAndPassword(auth, email, password);
-                    this.showMessage('Đăng ký thành công! 🎉');
-                } catch (error) {
-                    console.error('Registration error:', error);
-                    let message = 'Đăng ký thất bại';
-                    if (error.code === 'auth/email-already-in-use') {
-                        message = 'Email đã được sử dụng';
-                    } else if (error.code === 'auth/weak-password') {
-                        message = 'Mật khẩu quá yếu';
-                    } else if (error.code === 'auth/invalid-email') {
-                        message = 'Email không hợp lệ';
-                    }
-                    this.showMessage(message, true);
-                }
-            },
-
-            async login() {
-                const email = document.getElementById('loginEmail').value;
-                const password = document.getElementById('loginPassword').value;
-
-                if (!email || !password) {
-                    this.showMessage('Vui lòng điền đầy đủ thông tin', true);
-                    return;
-                }
-
-                try {
-                    await signInWithEmailAndPassword(auth, email, password);
-                    this.showMessage('Đăng nhập thành công! ✨');
-                } catch (error) {
-                    console.error('Login error:', error);
-                    let message = 'Đăng nhập thất bại';
-                    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                        message = 'Email hoặc mật khẩu không đúng';
-                    } else if (error.code === 'auth/invalid-email') {
-                        message = 'Email không hợp lệ';
-                    }
-                    this.showMessage(message, true);
-                }
-            },
-
-            async logout() {
-                try {
-                    await signOut(auth);
-                } catch (error) {
-                    console.error('Logout error:', error);
-                }
-            },
-
-            // Card Management
-            async loadCards() {
-                if (!this.currentUser) return;
-
-                try {
-                    const q = query(
-                        collection(db, 'cards'),
-                        where('userId', '==', this.currentUser.uid),
-                        orderBy('nextDueDate', 'asc')
-                    );
-                    
-                    const querySnapshot = await getDocs(q);
-                    this.cards = [];
-                    
-                    querySnapshot.forEach((doc) => {
-                        this.cards.push({
-                            id: doc.id,
-                            ...doc.data()
-                        });
-                    });
-                    
-                    this.renderCards();
-                    this.updateStats();
-                } catch (error) {
-                    console.error('Error loading cards:', error);
-                    this.showMessage('Lỗi khi tải dữ liệu', true);
-                }
-            },
-
-            async saveCard(cardData) {
-                if (!this.currentUser) return;
-
-                try {
-                    cardData.userId = this.currentUser.uid;
-                    await addDoc(collection(db, 'cards'), cardData);
-                    this.loadCards();
-                } catch (error) {
-                    console.error('Error saving card:', error);
-                    this.showMessage('Lỗi khi lưu thẻ', true);
-                }
-            },
-
-            async updateCard(cardId, updateData) {
-                try {
-                    const cardRef = doc(db, 'cards', cardId);
-                    await updateDoc(cardRef, updateData);
-                    this.loadCards();
-                } catch (error) {
-                    console.error('Error updating card:', error);
-                    this.showMessage('Lỗi khi cập nhật thẻ', true);
-                }
-            },
-
-            async deleteCard(cardId) {
-                if (!confirm('Bạn có chắc muốn xóa thẻ này?')) return;
-
-                try {
-                    await deleteDoc(doc(db, 'cards', cardId));
-                    this.loadCards();
-                } catch (error) {
-                    console.error('Error deleting card:', error);
-                    this.showMessage('Lỗi khi xóa thẻ', true);
-                }
-            },
-
-            // Card Logic
-            getNextDueDateFixed(dueDate) {
+                const date = new Date(dateStr);
                 const today = new Date();
-                const cardDueDay = new Date(dueDate).getDate();
-                
-                let nextDue = new Date(today.getFullYear(), today.getMonth(), cardDueDay);
-                
-                if (nextDue <= today) {
-                    nextDue = new Date(today.getFullYear(), today.getMonth() + 1, cardDueDay);
+                today.setHours(0, 0, 0, 0);
+                if (date > today) {
+                    return { valid: false, error: 'Ngày giao dịch không được trong tương lai' };
                 }
-                
-                if (nextDue.getDate() !== cardDueDay) {
-                    nextDue = new Date(nextDue.getFullYear(), nextDue.getMonth() + 1, 0);
-                }
-                
-                return nextDue;
+                return { valid: true };
             },
 
-            getDueDateVariable(transactionDate, daysToAdd) {
-                const txDate = new Date(transactionDate);
-                const dueDate = new Date(txDate);
-                dueDate.setDate(txDate.getDate() + parseInt(daysToAdd));
-                return dueDate;
+            validateDaysToAdd(days) {
+                const daysNum = parseInt(days);
+                if (isNaN(daysNum) || daysNum < 1 || daysNum > 60) {
+                    return { valid: false, error: 'Số ngày phải từ 1 đến 60' };
+                }
+                return { valid: true };
             },
 
-            getDaysUntilDue(dueDate) {
-                const today = new Date();
-                const due = new Date(dueDate);
-                const diffTime = due - today;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                return diffDays;
-            },
-
-            getCardStatus(daysUntil, isPaid) {
-                if (isPaid) {
-                    return { status: 'Đã thanh toán', class: 'paid', badge: 'status-paid' };
+            validateEstimatedCycle(days) {
+                const daysNum = parseInt(days);
+                if (isNaN(daysNum) || daysNum < 1 || daysNum > 365) {
+                    return { valid: false, error: 'Chu kỳ phải từ 1 đến 365 ngày' };
                 }
-                if (daysUntil < 0) {
-                    return { status: 'Quá hạn', class: 'overdue', badge: 'status-overdue' };
-                }
-                if (daysUntil <= 3) {
-                    return { status: 'Sắp đến hạn', class: 'due-soon', badge: 'status-due-soon' };
-                }
-                return { status: 'Sắp tới', class: 'upcoming', badge: 'status-upcoming' };
+                return { valid: true };
             },
 
             // Form Management
             showAddForm() {
-                document.getElementById('addForm').classList.remove('hidden');
-                document.getElementById('cardName').focus();
-            },
-
-            hideAddForm() {
-                document.getElementById('addForm').classList.add('hidden');
-                this.clearAddForm();
-            },
-
-            clearAddForm() {
-                document.getElementById('cardName').value = '';
-                document.getElementById('dueDate').value = '';
-                document.getElementById('transactionDate').value = '';
-                document.getElementById('daysToAdd').value = '20';
-                this.selectCardType('fixed');
-            },
-
-            selectCardType(type) {
-                this.currentCardType = type;
-                
-                document.querySelectorAll('#addForm .card-type-option').forEach(option => {
-                    option.classList.remove('active');
-                });
-                
-                if (type === 'fixed') {
-                    document.querySelectorAll('#addForm .card-type-option')[0].classList.add('active');
-                    document.getElementById('fixedDateInput').classList.remove('hidden');
-                    document.getElementById('variableDateInput').classList.add('hidden');
-                } else {
-                    document.querySelectorAll('#addForm .card-type-option')[1].classList.add('active');
-                    document.getElementById('fixedDateInput').classList.add('hidden');
-                    document.getElementById('variableDateInput').classList.remove('hidden');
-                }
-            },
-
-            selectEditCardType(type) {
-                this.currentEditCardType = type;
-                
-                document.querySelectorAll('#editForm .card-type-option').forEach(option => {
-                    option.classList.remove('active');
-                });
-                
-                if (type === 'fixed') {
-                    document.querySelectorAll('#editForm .card-type-option')[0].classList.add('active');
-                    document.getElementById('editFixedDateInput').classList.remove('hidden');
-                    document.getElementById('editVariableDateInput').classList.add('hidden');
-                } else {
-                    document.querySelectorAll('#editForm .card-type-option')[1].classList.add('active');
-                    document.getElementById('editFixedDateInput').classList.add('hidden');
-                    document.getElementById('editVariableDateInput').classList.remove('hidden');
-                }
-            },
-
-            async addCard() {
-                const name = document.getElementById('cardName').value.trim();
-                
-                if (!name) {
-                    alert('Vui lòng nhập tên thẻ');
-                    return;
-                }
-                
-                let nextDue;
-                let cardData = {
-                    name: name,
-                    type: this.currentCardType,
-                    isPaid: false,
-                    lastPaidDate: null,
-                    paymentHistory: [],
-                    createdAt: new Date().toISOString()
-                };
-                
-                if (this.currentCardType === 'fixed') {
-                    const dueDate = document.getElementById('dueDate').value;
-                    if (!dueDate) {
-                        alert('Vui lòng chọn ngày đến hạn');
-                        return;
-                    }
-                    cardData.originalDueDate = dueDate;
-                    nextDue = this.getNextDueDateFixed(dueDate);
-                } else {
-                    const transactionDate = document.getElementById('transactionDate').value;
-                    const daysToAdd = document.getElementById('daysToAdd').value;
-                    
-                    if (!transactionDate || !daysToAdd) {
-                        alert('Vui lòng điền đầy đủ thông tin');
-                        return;
-                    }
-                    
-                    cardData.transactionDate = transactionDate;
-                    cardData.daysToAdd = parseInt(daysToAdd);
-                    cardData.estimatedCycleDays = 30;
-                    nextDue = this.getDueDateVariable(transactionDate, daysToAdd);
-                }
-                
-                cardData.nextDueDate = nextDue.toISOString();
-                
-                await this.saveCard(cardData);
-                this.hideAddForm();
+                this.editingCardId = null;
+                this.currentCardType = 'fixed';
+                document.getElementById('formTitle').textContent = 'Thêm thẻ tín dụng';
+                this.resetForm();
+                this.setCardType('fixed');
+                document.getElementById('formModal').classList.add('active');
             },
 
             startEdit(cardId) {
                 const card = this.cards.find(c => c.id === cardId);
                 if (!card) return;
-                
+
                 this.editingCardId = cardId;
+                this.currentCardType = card.type;
+                document.getElementById('formTitle').textContent = 'Chỉnh sửa thẻ tín dụng';
                 
-                document.getElementById('editCardName').value = card.name;
-                document.getElementById('editDueDate').value = card.originalDueDate || '';
-                document.getElementById('editTransactionDate').value = card.transactionDate || '';
-                document.getElementById('editDaysToAdd').value = card.daysToAdd || 20;
+                document.getElementById('cardName').value = card.name;
                 
-                this.selectEditCardType(card.type);
-                document.getElementById('editForm').classList.remove('hidden');
+                if (card.type === 'fixed') {
+                    this.setCardType('fixed');
+                    document.getElementById('fixedDueDate').value = card.originalDueDate;
+                } else {
+                    this.setCardType('variable');
+                    document.getElementById('transactionDate').value = card.transactionDate;
+                    document.getElementById('daysToAdd').value = card.daysToAdd;
+                    document.getElementById('estimatedCycleDays').value = card.estimatedCycleDays || 30;
+                }
+                
+                document.getElementById('formModal').classList.add('active');
             },
 
-            async saveEditCard() {
-                const name = document.getElementById('editCardName').value.trim();
-                
-                if (!name) {
-                    alert('Vui lòng nhập tên thẻ');
+            cancelForm() {
+                this.editingCardId = null;
+                this.resetForm();
+                document.getElementById('formModal').classList.remove('active');
+                this.clearErrors();
+            },
+
+            resetForm() {
+                document.getElementById('cardForm').reset();
+                document.getElementById('estimatedCycleDays').value = '30';
+                this.clearErrors();
+            },
+
+            clearErrors() {
+                document.querySelectorAll('.error-message').forEach(el => {
+                    el.classList.add('hidden');
+                    el.textContent = '';
+                });
+                document.querySelectorAll('input, select').forEach(el => {
+                    el.classList.remove('error');
+                });
+            },
+
+            showError(elementId, message) {
+                const errorEl = document.getElementById(elementId);
+                const inputEl = errorEl.previousElementSibling;
+                if (inputEl && (inputEl.tagName === 'INPUT' || inputEl.tagName === 'SELECT')) {
+                    inputEl.classList.add('error');
+                } else {
+                    const input = errorEl.closest('.form-group')?.querySelector('input, select');
+                    if (input) input.classList.add('error');
+                }
+                errorEl.textContent = message;
+                errorEl.classList.remove('hidden');
+            },
+
+            setCardType(type) {
+                this.currentCardType = type;
+                const buttons = document.querySelectorAll('.toggle-btn');
+                buttons.forEach((btn, i) => {
+                    if ((i === 0 && type === 'fixed') || (i === 1 && type === 'variable')) {
+                        btn.classList.add('active');
+                        btn.setAttribute('aria-pressed', 'true');
+                    } else {
+                        btn.classList.remove('active');
+                        btn.setAttribute('aria-pressed', 'false');
+                    }
+                });
+
+                if (type === 'fixed') {
+                    document.getElementById('fixedSection').classList.remove('hidden');
+                    document.getElementById('variableSection').classList.add('hidden');
+                } else {
+                    document.getElementById('fixedSection').classList.add('hidden');
+                    document.getElementById('variableSection').classList.remove('hidden');
+                }
+            },
+
+            handleFormSubmit(event) {
+                event.preventDefault();
+                this.clearErrors();
+
+                const name = document.getElementById('cardName').value.trim();
+                const nameValidation = this.validateCardName(name);
+                if (!nameValidation.valid) {
+                    this.showError('cardNameError', nameValidation.error);
                     return;
                 }
-                
-                let nextDue;
-                let updateData = {
+
+                let cardData = {
+                    id: this.editingCardId || Date.now().toString(),
                     name: name,
-                    type: this.currentEditCardType,
+                    type: this.currentCardType,
+                    createdAt: this.editingCardId ? 
+                        this.cards.find(c => c.id === this.editingCardId).createdAt : 
+                        new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
                     isPaid: false,
-                    lastPaidDate: null,
-                    updatedAt: new Date().toISOString()
+                    lastPaidDate: null
                 };
-                
-                if (this.currentEditCardType === 'fixed') {
-                    const dueDate = document.getElementById('editDueDate').value;
-                    if (!dueDate) {
-                        alert('Vui lòng chọn ngày đến hạn');
+
+                if (this.currentCardType === 'fixed') {
+                    const dueDateStr = document.getElementById('fixedDueDate').value;
+                    const dueDateValidation = this.validateFixedDueDate(dueDateStr);
+                    if (!dueDateValidation.valid) {
+                        this.showError('fixedDueDateError', dueDateValidation.error);
                         return;
                     }
-                    updateData.originalDueDate = dueDate;
-                    updateData.transactionDate = null;
-                    updateData.daysToAdd = null;
-                    updateData.estimatedCycleDays = null;
-                    nextDue = this.getNextDueDateFixed(dueDate);
+                    cardData.originalDueDate = parseInt(dueDateStr);
+                    cardData.transactionDate = null;
+                    cardData.daysToAdd = null;
+                    cardData.estimatedCycleDays = null;
                 } else {
-                    const transactionDate = document.getElementById('editTransactionDate').value;
-                    const daysToAdd = document.getElementById('editDaysToAdd').value;
-                    
-                    if (!transactionDate || !daysToAdd) {
-                        alert('Vui lòng điền đầy đủ thông tin');
+                    const txDate = document.getElementById('transactionDate').value;
+                    const daysToAdd = document.getElementById('daysToAdd').value;
+                    const estimatedCycle = document.getElementById('estimatedCycleDays').value;
+
+                    const txDateValidation = this.validateTransactionDate(txDate);
+                    if (!txDateValidation.valid) {
+                        this.showError('transactionDateError', txDateValidation.error);
                         return;
                     }
-                    
-                    updateData.originalDueDate = null;
-                    updateData.transactionDate = transactionDate;
-                    updateData.daysToAdd = parseInt(daysToAdd);
-                    updateData.estimatedCycleDays = 30;
-                    nextDue = this.getDueDateVariable(transactionDate, daysToAdd);
+
+                    const daysValidation = this.validateDaysToAdd(daysToAdd);
+                    if (!daysValidation.valid) {
+                        this.showError('daysToAddError', daysValidation.error);
+                        return;
+                    }
+
+                    const cycleValidation = this.validateEstimatedCycle(estimatedCycle);
+                    if (!cycleValidation.valid) {
+                        this.showError('estimatedCycleDaysError', cycleValidation.error);
+                        return;
+                    }
+
+                    cardData.transactionDate = txDate;
+                    cardData.daysToAdd = parseInt(daysToAdd);
+                    cardData.estimatedCycleDays = parseInt(estimatedCycle);
+                    cardData.originalDueDate = null;
                 }
-                
-                updateData.nextDueDate = nextDue.toISOString();
-                
-                await this.updateCard(this.editingCardId, updateData);
-                this.cancelEdit();
+
+                cardData.nextDueDate = this.calculateNextDueDate(cardData).toISOString();
+
+                if (this.editingCardId) {
+                    const index = this.cards.findIndex(c => c.id === this.editingCardId);
+                    if (index !== -1) {
+                        this.cards[index] = { ...this.cards[index], ...cardData };
+                    }
+                } else {
+                    this.cards.push(cardData);
+                }
+
+                this.saveData();
+                this.cancelForm();
+                this.render();
+                this.showNotification('✅ Đã lưu thẻ tín dụng', 'success');
             },
 
-            cancelEdit() {
-                this.editingCardId = null;
-                document.getElementById('editForm').classList.add('hidden');
+            // Date Calculations (IMPROVED)
+            calculateNextDueDate(cardData) {
+                if (cardData.type === 'fixed') {
+                    return this.getNextDueDateFixed(cardData.originalDueDate);
+                } else {
+                    return this.getDueDateVariable(cardData.transactionDate, cardData.daysToAdd);
+                }
             },
 
-            async markAsPaid(cardId) {
+            getNextDueDateFixed(dayOfMonth) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                let nextDue = new Date(today);
+                nextDue.setDate(dayOfMonth);
+
+                // If the due date has passed this month, move to next month
+                if (nextDue <= today) {
+                    nextDue.setMonth(nextDue.getMonth() + 1);
+                    nextDue.setDate(dayOfMonth);
+                }
+
+                // Handle months with fewer days (e.g., Feb, April, June, etc.)
+                while (nextDue.getDate() !== dayOfMonth) {
+                    nextDue.setDate(nextDue.getDate() - 1);
+                }
+
+                return nextDue;
+            },
+
+            getDueDateVariable(transactionDateStr, daysToAdd) {
+                const txDate = new Date(transactionDateStr);
+                const dueDate = new Date(txDate);
+                dueDate.setDate(dueDate.getDate() + daysToAdd);
+                return dueDate;
+            },
+
+            getDaysUntilDue(dueDateStr) {
+                const dueDate = new Date(dueDateStr);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                dueDate.setHours(0, 0, 0, 0);
+                const diff = dueDate.getTime() - today.getTime();
+                return Math.ceil(diff / (1000 * 60 * 60 * 24));
+            },
+
+            getCardStatus(daysUntil, isPaid) {
+                if (isPaid) {
+                    return { status: '✅ Đã thanh toán', class: 'status-paid', badge: 'paid' };
+                }
+                if (daysUntil < 0) {
+                    return { status: '⚠️ Quá hạn', class: 'status-overdue', badge: 'overdue' };
+                }
+                if (daysUntil <= 3) {
+                    return { status: '⏰ Sắp đến hạn', class: 'status-due-soon', badge: 'due-soon' };
+                }
+                return { status: '✓ Còn thời gian', class: 'status-on-time', badge: 'on-time' };
+            },
+
+            // Card Actions
+            markAsPaid(cardId) {
                 const card = this.cards.find(c => c.id === cardId);
                 if (!card) return;
+
                 const today = new Date();
-                let nextDue;
-                let updateData = {
-                    isPaid: false, // Đặt về false để tính lại kỳ tới
+                const updateData = {
+                    isPaid: false, // Reset for next cycle
                     lastPaidDate: today.toISOString(),
-                    updatedAt: today.toISOString(),
+                    updatedAt: today.toISOString()
                 };
-            
-                if (card.type === "fixed") {
-                    nextDue = this.getNextDueDateFixed(card.originalDueDate);
-                    updateData.nextDueDate = nextDue.toISOString();
+
+                if (card.type === 'fixed') {
+                    updateData.nextDueDate = this.getNextDueDateFixed(card.originalDueDate).toISOString();
                 } else {
                     const estimatedCycleDays = card.estimatedCycleDays || 30;
                     const currentTxDate = new Date(card.transactionDate);
                     const nextTxDate = new Date(currentTxDate);
                     nextTxDate.setDate(currentTxDate.getDate() + estimatedCycleDays);
-                    nextDue = this.getDueDateVariable(nextTxDate.toISOString().split('T')[0], card.daysToAdd);
+                    
                     updateData.transactionDate = nextTxDate.toISOString().split('T')[0];
-                    updateData.nextDueDate = nextDue.toISOString();
+                    updateData.nextDueDate = this.getDueDateVariable(
+                        updateData.transactionDate, 
+                        card.daysToAdd
+                    ).toISOString();
                 }
-            
-                // LƯU Ý: Không được đặt isPaid = true, phải cho cycle kế tiếp
-                await this.updateCard(cardId, updateData);
-            }
 
+                const index = this.cards.findIndex(c => c.id === cardId);
+                if (index !== -1) {
+                    this.cards[index] = { ...this.cards[index], ...updateData };
+                    this.saveData();
+                    this.render();
+                    this.showNotification('✅ Đã đánh dấu thanh toán', 'success');
+                }
+            },
 
-            // Render functions
+            deleteCard(cardId) {
+                const card = this.cards.find(c => c.id === cardId);
+                if (!card) return;
+
+                this.confirmAction = () => {
+                    this.cards = this.cards.filter(c => c.id !== cardId);
+                    this.saveData();
+                    this.cancelConfirm();
+                    this.render();
+                    this.showNotification('✅ Đã xóa thẻ', 'success');
+                };
+
+                document.getElementById('confirmTitle').textContent = 'Xác nhận xóa';
+                document.getElementById('confirmMessage').textContent = `Bạn có chắc chắn muốn xóa thẻ "${card.name}"? Hành động này không thể hoàn tác.`;
+                document.getElementById('confirmBtn').textContent = '🗑️ Xóa';
+                document.getElementById('confirmBtn').onclick = this.confirmAction;
+                document.getElementById('confirmModal').classList.add('active');
+            },
+
+            cancelConfirm() {
+                this.confirmAction = null;
+                document.getElementById('confirmModal').classList.remove('active');
+            },
+
+            // Filter & Search
+            filterCards() {
+                const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+                const filterStatus = document.getElementById('filterSelect').value;
+
+                this.filteredCards = this.cards.filter(card => {
+                    const matchesSearch = card.name.toLowerCase().includes(searchTerm);
+                    
+                    if (!filterStatus) return matchesSearch;
+
+                    const daysUntil = this.getDaysUntilDue(card.nextDueDate);
+                    let cardStatus;
+                    
+                    if (card.isPaid) cardStatus = 'paid';
+                    else if (daysUntil < 0) cardStatus = 'overdue';
+                    else if (daysUntil <= 3) cardStatus = 'due-soon';
+                    else cardStatus = 'on-time';
+
+                    return matchesSearch && cardStatus === filterStatus;
+                });
+
+                this.renderCards();
+            },
+
+            // Export/Import
+            showExportDialog() {
+                const dataStr = JSON.stringify(this.cards, null, 2);
+                const dataBlob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(dataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `pingpay-backup-${new Date().toISOString().split('T')[0]}.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                this.showNotification('✅ Đã xuất dữ liệu', 'success');
+            },
+
+            showImportDialog() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const imported = JSON.parse(event.target.result);
+                            if (!Array.isArray(imported)) {
+                                this.showNotification('❌ Định dạng tệp không hợp lệ', 'error');
+                                return;
+                            }
+                            this.cards = imported;
+                            this.saveData();
+                            this.render();
+                            this.showNotification('✅ Đã nhập dữ liệu', 'success');
+                        } catch (error) {
+                            this.showNotification('❌ Lỗi khi đọc tệp', 'error');
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            },
+
+            // Notifications
+            checkNotifications() {
+                const overdueCards = this.cards.filter(card => 
+                    !card.isPaid && this.getDaysUntilDue(card.nextDueDate) < 0
+                );
+                
+                const dueSoonCards = this.cards.filter(card => 
+                    !card.isPaid && this.getDaysUntilDue(card.nextDueDate) <= 1 && 
+                    this.getDaysUntilDue(card.nextDueDate) >= 0
+                );
+
+                if (overdueCards.length > 0) {
+                    const names = overdueCards.map(c => c.name).join(', ');
+                    console.log(`⚠️ Thẻ quá hạn: ${names}`);
+                }
+
+                if (dueSoonCards.length > 0 && dueSoonCards.length <= 3) {
+                    const names = dueSoonCards.map(c => c.name).join(', ');
+                    console.log(`⏰ Thẻ sắp đến hạn: ${names}`);
+                }
+            },
+
+            showNotification(message, type = 'success') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.animation = 'slideUp 0.3s ease-in forwards';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            },
+
+            // Render
+            render() {
+                this.renderCards();
+                this.updateStats();
+            },
+
             renderCards() {
                 const cardsList = document.getElementById('cardsList');
-                
-                if (this.cards.length === 0) {
+                const cardsToDisplay = this.filteredCards.length > 0 ? this.filteredCards : this.cards;
+
+                if (cardsToDisplay.length === 0) {
                     cardsList.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon">💳</div>
-                            <h3>Chưa có thẻ nào</h3>
-                            <p>Thêm thẻ tín dụng đầu tiên để bắt đầu theo dõi ngày đến hạn</p>
-                            <button class="btn btn-success" onclick="app.showAddForm()">Thêm thẻ đầu tiên</button>
+                        <div style="grid-column: 1 / -1;">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">💳</div>
+                                <h3>Chưa có thẻ nào</h3>
+                                <p>Thêm thẻ tín dụng đầu tiên để bắt đầu theo dõi ngày đến hạn</p>
+                                <button class="btn btn-success" onclick="app.showAddForm()">
+                                    + Thêm thẻ đầu tiên
+                                </button>
+                            </div>
                         </div>
                     `;
                     return;
                 }
-                
-                const sortedCards = [...this.cards].sort((a, b) => {
+
+                const sortedCards = [...cardsToDisplay].sort((a, b) => {
                     const aDays = this.getDaysUntilDue(a.nextDueDate);
                     const bDays = this.getDaysUntilDue(b.nextDueDate);
                     return aDays - bDays;
                 });
-                
+
                 cardsList.innerHTML = sortedCards.map(card => {
                     const daysUntil = this.getDaysUntilDue(card.nextDueDate);
                     const { status, class: cardClass, badge } = this.getCardStatus(daysUntil, card.isPaid);
                     const dueDate = new Date(card.nextDueDate);
-                    
+
                     let daysText;
                     if (daysUntil === 0) daysText = 'Đến hạn hôm nay';
                     else if (daysUntil === 1) daysText = 'Đến hạn ngày mai';
                     else if (daysUntil < 0) daysText = `Quá hạn ${Math.abs(daysUntil)} ngày`;
                     else daysText = `Còn ${daysUntil} ngày`;
-                    
+
                     let typeInfo = '';
                     if (card.type === 'variable') {
                         const estimatedText = card.estimatedCycleDays ? 
-                            ` (Chu kỳ ước tính: ${card.estimatedCycleDays} ngày)` : '';
-                        typeInfo = `<div style="font-size: 12px; color: var(--gray); margin-top: 8px;">
-                            Ngày GD: ${new Date(card.transactionDate).toLocaleDateString('vi-VN')} + ${card.daysToAdd} ngày${estimatedText}
-                        </div>`;
+                            ` (Chu kỳ: ${card.estimatedCycleDays} ngày)` : '';
+                        typeInfo = `
+                            <div class="card-info-row">
+                                <span class="card-info-label">Ngày GD:</span>
+                                <span class="card-info-value">${new Date(card.transactionDate).toLocaleDateString('vi-VN')} + ${card.daysToAdd} ngày${estimatedText}</span>
+                            </div>
+                        `;
                     }
-                    
+
                     let actionButtons = '';
                     if (!card.isPaid) {
-                        actionButtons += `<button class="btn btn-sm btn-success" onclick="app.markAsPaid('${card.id}')">✅ Đã thanh toán</button>`;
+                        actionButtons += `
+                            <button class="btn btn-sm btn-success" onclick="app.markAsPaid('${card.id}')" aria-label="Đánh dấu đã thanh toán">
+                                ✅ Đã thanh toán
+                            </button>
+                        `;
                     }
-                    
+
                     actionButtons += `
-                        <button class="btn btn-sm btn-warning" onclick="app.startEdit('${card.id}')">✏️ Sửa</button>
-                        <button class="btn btn-sm btn-danger" onclick="app.deleteCard('${card.id}')">🗑️ Xóa</button>
+                        <button class="btn btn-sm btn-warning" onclick="app.startEdit('${card.id}')" aria-label="Chỉnh sửa">
+                            ✏️ Sửa
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="app.deleteCard('${card.id}')" aria-label="Xóa">
+                            🗑️ Xóa
+                        </button>
                     `;
-                    
+
                     return `
                         <div class="card-item ${cardClass}">
                             <div class="card-header">
-                                <div class="card-info">
-                                    <h3>${card.name}</h3>
-                                    <div class="card-meta">
-                                        <span class="card-type-badge">
-                                            ${card.type === 'fixed' ? '📅 Ngày cố định' : '🔄 Ngày biến động'}
-                                        </span>
-                                        <span>
-                                            Đến hạn: ${dueDate.toLocaleDateString('vi-VN', { 
-                                                weekday: 'short', 
-                                                year: 'numeric', 
-                                                month: 'short', 
-                                                day: 'numeric' 
-                                            })}
-                                        </span>
-                                    </div>
-                                    ${typeInfo}
+                                <h3>${this.escapeHtml(card.name)}</h3>
+                                <div class="card-meta">
+                                    <span class="card-type-badge">
+                                        ${card.type === 'fixed' ? '📅 Cố định' : '🔄 Biến động'}
+                                    </span>
                                 </div>
-                                <div class="card-status">
-                                    <div class="status-badge ${badge}">${status}</div>
-                                    <div style="color: var(--gray); font-size: 14px; margin-top: 8px;">${daysText}</div>
+                            </div>
+                            <div class="card-info">
+                                <div class="card-info-row">
+                                    <span class="card-info-label">Đến hạn:</span>
+                                    <span class="card-info-value">${dueDate.toLocaleDateString('vi-VN', { 
+                                        weekday: 'short', 
+                                        year: 'numeric', 
+                                        month: 'short', 
+                                        day: 'numeric' 
+                                    })}</span>
+                                </div>
+                                ${typeInfo}
+                                <div class="card-info-row">
+                                    <span class="card-info-label">Trạng thái:</span>
+                                    <span class="card-info-value">
+                                        <span class="status-badge ${badge}">${status}</span>
+                                    </span>
+                                </div>
+                                <div class="card-info-row">
+                                    <span class="card-days-text">${daysText}</span>
                                 </div>
                             </div>
                             <div class="card-actions">
@@ -1534,13 +1560,6 @@
             },
 
             updateStats() {
-                if (this.cards.length === 0) {
-                    document.getElementById('stats').classList.add('hidden');
-                    return;
-                }
-                
-                document.getElementById('stats').classList.remove('hidden');
-                
                 const totalCards = this.cards.length;
                 const paidCards = this.cards.filter(card => card.isPaid).length;
                 const dueSoonCards = this.cards.filter(card => 
@@ -1552,21 +1571,31 @@
                     !card.isPaid && 
                     this.getDaysUntilDue(card.nextDueDate) < 0
                 ).length;
-                
+
+                if (totalCards === 0) {
+                    document.getElementById('stats').classList.add('hidden');
+                    return;
+                }
+
+                document.getElementById('stats').classList.remove('hidden');
                 document.getElementById('totalCards').textContent = totalCards;
                 document.getElementById('paidCards').textContent = paidCards;
                 document.getElementById('dueSoonCards').textContent = dueSoonCards;
                 document.getElementById('overdueCards').textContent = overdueCards;
+            },
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
             }
         };
 
-        // Make app globally available
+        // Global access
         window.app = app;
 
-        // Initialize app when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            app.init();
-        });
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => app.init());
     </script>
 </body>
 </html>
