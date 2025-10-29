@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PingPay - Nhắc nhở thanh toán thẻ tín dụng</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23764ba2;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='6' fill='url(%23grad)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='20' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'%3EP%3C/text%3E%3C/svg%3E">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
     <style>
         * {
             margin: 0;
@@ -132,6 +138,16 @@
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .user-info {
+            color: white;
+            font-size: 14px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 8px;
         }
 
         /* Search & Filter */
@@ -180,7 +196,7 @@
             border-color: var(--primary);
         }
 
-        /* Glassmorphism Auth Container */
+        /* Auth Container */
         .auth-container {
             max-width: 420px;
             margin: 80px auto;
@@ -263,15 +279,6 @@
 
         .error-message {
             color: var(--danger);
-            font-size: 12px;
-            margin-top: 6px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .success-message {
-            color: var(--success);
             font-size: 12px;
             margin-top: 6px;
             display: flex;
@@ -481,10 +488,6 @@
             border-color: var(--primary);
         }
 
-        .card-header {
-            margin-bottom: 16px;
-        }
-
         .card-header h3 {
             font-size: 18px;
             font-weight: 700;
@@ -509,7 +512,7 @@
         }
 
         .card-info {
-            margin-bottom: 12px;
+            margin: 12px 0;
         }
 
         .card-info-row {
@@ -533,16 +536,6 @@
         .card-info-value {
             font-weight: 600;
             color: var(--dark);
-        }
-
-        .card-status {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid #f1f5f9;
         }
 
         .status-badge {
@@ -720,6 +713,20 @@
             background: rgba(245, 158, 11, 0.95);
         }
 
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .header {
@@ -779,67 +786,120 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div>
-                <h1>💳 PingPay</h1>
-                <p style="color: rgba(255,255,255,0.8); margin-top: 4px; font-size: 14px;">Quản lý ngày thanh toán thẻ tín dụng</p>
+    <!-- Auth Screen -->
+    <div id="authScreen" class="modal active">
+        <div class="auth-container">
+            <h2 id="authTitle">Đăng nhập</h2>
+            
+            <div id="loginForm" class="form-group">
+                <label for="loginEmail">Email</label>
+                <input type="email" id="loginEmail" placeholder="email@example.com">
+                
+                <label for="loginPassword" style="margin-top: 16px;">Mật khẩu</label>
+                <input type="password" id="loginPassword" placeholder="Nhập mật khẩu">
+                
+                <button class="btn btn-success" style="width: 100%; margin-top: 24px;" onclick="app.login()">
+                    🔓 Đăng nhập
+                </button>
+                
+                <p style="text-align: center; margin-top: 20px; color: var(--gray); font-size: 14px;">
+                    Chưa có tài khoản? 
+                    <button style="background: none; border: none; color: var(--primary); cursor: pointer; font-weight: 600; text-decoration: underline;" onclick="app.toggleAuthMode()">
+                        Tạo tài khoản
+                    </button>
+                </p>
             </div>
-            <div class="header-actions">
-                <button class="btn btn-secondary" onclick="app.showExportDialog()" aria-label="Xuất dữ liệu">
-                    ⬇️ Xuất
+
+            <div id="signupForm" class="form-group hidden">
+                <label for="signupEmail">Email</label>
+                <input type="email" id="signupEmail" placeholder="email@example.com">
+                
+                <label for="signupPassword" style="margin-top: 16px;">Mật khẩu</label>
+                <input type="password" id="signupPassword" placeholder="Ít nhất 6 ký tự">
+                
+                <label for="signupConfirm" style="margin-top: 16px;">Xác nhận mật khẩu</label>
+                <input type="password" id="signupConfirm" placeholder="Nhập lại mật khẩu">
+                
+                <button class="btn btn-success" style="width: 100%; margin-top: 24px;" onclick="app.signup()">
+                    ✓ Tạo tài khoản
                 </button>
-                <button class="btn btn-secondary" onclick="app.showImportDialog()" aria-label="Nhập dữ liệu">
-                    ⬆️ Nhập
-                </button>
+                
+                <p style="text-align: center; margin-top: 20px; color: var(--gray); font-size: 14px;">
+                    Đã có tài khoản? 
+                    <button style="background: none; border: none; color: var(--primary); cursor: pointer; font-weight: 600; text-decoration: underline;" onclick="app.toggleAuthMode()">
+                        Đăng nhập
+                    </button>
+                </p>
+            </div>
+
+            <div class="error-message hidden" id="authError" style="margin-top: 16px; justify-content: center;"></div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="appScreen" class="hidden">
+        <div class="container">
+            <!-- Header -->
+            <div class="header">
+                <div>
+                    <h1>💳 PingPay</h1>
+                    <p style="color: rgba(255,255,255,0.8); margin-top: 4px; font-size: 14px;">Quản lý ngày thanh toán thẻ tín dụng</p>
+                </div>
+                <div class="header-actions">
+                    <div class="user-info">
+                        <span id="userEmail"></span>
+                    </div>
+                    <button class="btn btn-secondary" onclick="app.logout()" aria-label="Đăng xuất">
+                        🚪 Đăng xuất
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search & Filter -->
+            <div class="search-filter">
+                <input 
+                    type="text" 
+                    class="search-input" 
+                    id="searchInput" 
+                    placeholder="Tìm kiếm thẻ..." 
+                    onkeyup="app.filterCards()"
+                    aria-label="Tìm kiếm thẻ tín dụng"
+                >
+                <select class="filter-select" id="filterSelect" onchange="app.filterCards()" aria-label="Lọc theo trạng thái">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="on-time">Còn thời gian</option>
+                    <option value="due-soon">Sắp đến hạn</option>
+                    <option value="overdue">Quá hạn</option>
+                    <option value="paid">Đã thanh toán</option>
+                </select>
                 <button class="btn btn-success" onclick="app.showAddForm()" aria-label="Thêm thẻ tín dụng mới">
                     + Thêm thẻ
                 </button>
             </div>
-        </div>
 
-        <!-- Search & Filter -->
-        <div class="search-filter">
-            <input 
-                type="text" 
-                class="search-input" 
-                id="searchInput" 
-                placeholder="Tìm kiếm thẻ..." 
-                onkeyup="app.filterCards()"
-                aria-label="Tìm kiếm thẻ tín dụng"
-            >
-            <select class="filter-select" id="filterSelect" onchange="app.filterCards()" aria-label="Lọc theo trạng thái">
-                <option value="">Tất cả trạng thái</option>
-                <option value="on-time">Còn thời gian</option>
-                <option value="due-soon">Sắp đến hạn</option>
-                <option value="overdue">Quá hạn</option>
-                <option value="paid">Đã thanh toán</option>
-            </select>
-        </div>
+            <!-- Stats -->
+            <div id="stats" class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-label">Tổng thẻ</div>
+                    <div class="stat-value" id="totalCards">0</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-label">Đã thanh toán</div>
+                    <div class="stat-value" id="paidCards">0</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-label">Sắp đến hạn</div>
+                    <div class="stat-value" id="dueSoonCards">0</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-label">Quá hạn</div>
+                    <div class="stat-value" id="overdueCards">0</div>
+                </div>
+            </div>
 
-        <!-- Stats -->
-        <div id="stats" class="stats-container">
-            <div class="stat-card">
-                <div class="stat-label">Tổng thẻ</div>
-                <div class="stat-value" id="totalCards">0</div>
-            </div>
-            <div class="stat-card success">
-                <div class="stat-label">Đã thanh toán</div>
-                <div class="stat-value" id="paidCards">0</div>
-            </div>
-            <div class="stat-card warning">
-                <div class="stat-label">Sắp đến hạn</div>
-                <div class="stat-value" id="dueSoonCards">0</div>
-            </div>
-            <div class="stat-card danger">
-                <div class="stat-label">Quá hạn</div>
-                <div class="stat-value" id="overdueCards">0</div>
-            </div>
+            <!-- Cards List -->
+            <div id="cardsList" class="cards-container"></div>
         </div>
-
-        <!-- Cards List -->
-        <div id="cardsList" class="cards-container"></div>
     </div>
 
     <!-- Add/Edit Modal -->
@@ -897,7 +957,7 @@
                         aria-label="Ngày đến hạn cố định"
                     >
                     <small style="color: var(--gray); display: block; margin-top: 4px;">
-                        Nhập số từ 1 đến 31 (nếu chọn ngày > số ngày trong tháng, sẽ dùng ngày cuối cùng)
+                        Nhập số từ 1 đến 31
                     </small>
                     <div class="error-message hidden" id="fixedDueDateError"></div>
                 </div>
@@ -939,9 +999,6 @@
                                 placeholder="Ví dụ: 30"
                                 aria-label="Chu kỳ ước tính"
                             >
-                            <small style="color: var(--gray); display: block; margin-top: 4px;">
-                                Khoảng thời gian dự kiến giữa các giao dịch (dùng để tính ngày giao dịch tiếp theo)
-                            </small>
                             <div class="error-message hidden" id="estimatedCycleDaysError"></div>
                         </div>
                     </div>
@@ -979,30 +1036,178 @@
     </div>
 
     <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA1234567890abcdefghijklmnopqrstuv", // REPLACE with your Firebase API key
+            authDomain: "pingpay-16a26.firebaseapp.com",
+            projectId: "pingpay-16a26",
+            storageBucket: "pingpay-16a26.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890abcdef"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
         const app = {
             cards: [],
             editingCardId: null,
             currentCardType: 'fixed',
             confirmAction: null,
             filteredCards: [],
+            currentUser: null,
+            isAuthMode: 'login',
 
             // Initialize
-            init() {
-                this.loadData();
-                this.render();
-                // Check for notifications daily
-                this.checkNotifications();
-                setInterval(() => this.checkNotifications(), 60 * 60 * 1000); // Check every hour
+            async init() {
+                // Listen for auth state changes
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        this.currentUser = user;
+                        document.getElementById('authScreen').classList.remove('active');
+                        document.getElementById('appScreen').classList.remove('hidden');
+                        document.getElementById('userEmail').textContent = user.email;
+                        this.loadCards();
+                    } else {
+                        this.currentUser = null;
+                        document.getElementById('authScreen').classList.add('active');
+                        document.getElementById('appScreen').classList.add('hidden');
+                    }
+                });
             },
 
-            // Data Management
-            loadData() {
-                const saved = localStorage.getItem('pingpayCards');
-                this.cards = saved ? JSON.parse(saved) : [];
+            // Authentication
+            toggleAuthMode() {
+                this.isAuthMode = this.isAuthMode === 'login' ? 'signup' : 'login';
+                document.getElementById('loginForm').classList.toggle('hidden');
+                document.getElementById('signupForm').classList.toggle('hidden');
+                document.getElementById('authTitle').textContent = 
+                    this.isAuthMode === 'login' ? 'Đăng nhập' : 'Tạo tài khoản';
+                document.getElementById('authError').classList.add('hidden');
             },
 
-            saveData() {
-                localStorage.setItem('pingpayCards', JSON.stringify(this.cards));
+            async login() {
+                const email = document.getElementById('loginEmail').value.trim();
+                const password = document.getElementById('loginPassword').value;
+                const errorEl = document.getElementById('authError');
+
+                if (!email || !password) {
+                    errorEl.textContent = 'Vui lòng điền email và mật khẩu';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+                    errorEl.classList.add('hidden');
+                } catch (error) {
+                    errorEl.textContent = error.message;
+                    errorEl.classList.remove('hidden');
+                }
+            },
+
+            async signup() {
+                const email = document.getElementById('signupEmail').value.trim();
+                const password = document.getElementById('signupPassword').value;
+                const confirm = document.getElementById('signupConfirm').value;
+                const errorEl = document.getElementById('authError');
+
+                if (!email || !password || !confirm) {
+                    errorEl.textContent = 'Vui lòng điền đủ thông tin';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                if (password !== confirm) {
+                    errorEl.textContent = 'Mật khẩu không khớp';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    errorEl.textContent = 'Mật khẩu ít nhất 6 ký tự';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                try {
+                    await auth.createUserWithEmailAndPassword(email, password);
+                    errorEl.classList.add('hidden');
+                } catch (error) {
+                    errorEl.textContent = error.message;
+                    errorEl.classList.remove('hidden');
+                }
+            },
+
+            async logout() {
+                try {
+                    await auth.signOut();
+                } catch (error) {
+                    this.showNotification('❌ Lỗi khi đăng xuất', 'error');
+                }
+            },
+
+            // Firebase Data Management
+            async loadCards() {
+                if (!this.currentUser) return;
+
+                try {
+                    const querySnapshot = await db.collection('cards')
+                        .where('userId', '==', this.currentUser.uid)
+                        .orderBy('createdAt', 'desc')
+                        .get();
+
+                    this.cards = [];
+                    querySnapshot.forEach(doc => {
+                        this.cards.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+
+                    this.render();
+                } catch (error) {
+                    console.error('Error loading cards:', error);
+                    this.showNotification('❌ Lỗi khi tải dữ liệu', 'error');
+                }
+            },
+
+            async saveCard(cardData) {
+                if (!this.currentUser) return;
+
+                try {
+                    cardData.userId = this.currentUser.uid;
+                    await db.collection('cards').add(cardData);
+                    await this.loadCards();
+                    this.showNotification('✅ Đã lưu thẻ tín dụng', 'success');
+                } catch (error) {
+                    console.error('Error saving card:', error);
+                    this.showNotification('❌ Lỗi khi lưu thẻ', 'error');
+                }
+            },
+
+            async updateCard(cardId, updateData) {
+                try {
+                    await db.collection('cards').doc(cardId).update(updateData);
+                    await this.loadCards();
+                    this.showNotification('✅ Đã cập nhật thẻ', 'success');
+                } catch (error) {
+                    console.error('Error updating card:', error);
+                    this.showNotification('❌ Lỗi khi cập nhật', 'error');
+                }
+            },
+
+            async deleteCardDB(cardId) {
+                try {
+                    await db.collection('cards').doc(cardId).delete();
+                    await this.loadCards();
+                    this.showNotification('✅ Đã xóa thẻ', 'success');
+                } catch (error) {
+                    console.error('Error deleting card:', error);
+                    this.showNotification('❌ Lỗi khi xóa', 'error');
+                }
             },
 
             // Validation Functions
@@ -1013,7 +1218,6 @@
                 if (name.length > 50) {
                     return { valid: false, error: 'Tên thẻ tối đa 50 ký tự' };
                 }
-                // Check for duplicates (excluding current editing card)
                 if (this.cards.some(c => c.id !== this.editingCardId && c.name.toLowerCase() === name.toLowerCase())) {
                     return { valid: false, error: 'Tên thẻ này đã tồn tại' };
                 }
@@ -1115,13 +1319,9 @@
 
             showError(elementId, message) {
                 const errorEl = document.getElementById(elementId);
-                const inputEl = errorEl.previousElementSibling;
-                if (inputEl && (inputEl.tagName === 'INPUT' || inputEl.tagName === 'SELECT')) {
-                    inputEl.classList.add('error');
-                } else {
-                    const input = errorEl.closest('.form-group')?.querySelector('input, select');
-                    if (input) input.classList.add('error');
-                }
+                const formGroup = errorEl.closest('.form-group');
+                const input = formGroup?.querySelector('input, select');
+                if (input) input.classList.add('error');
                 errorEl.textContent = message;
                 errorEl.classList.remove('hidden');
             },
@@ -1148,7 +1348,7 @@
                 }
             },
 
-            handleFormSubmit(event) {
+            async handleFormSubmit(event) {
                 event.preventDefault();
                 this.clearErrors();
 
@@ -1160,7 +1360,6 @@
                 }
 
                 let cardData = {
-                    id: this.editingCardId || Date.now().toString(),
                     name: name,
                     type: this.currentCardType,
                     createdAt: this.editingCardId ? 
@@ -1214,21 +1413,15 @@
                 cardData.nextDueDate = this.calculateNextDueDate(cardData).toISOString();
 
                 if (this.editingCardId) {
-                    const index = this.cards.findIndex(c => c.id === this.editingCardId);
-                    if (index !== -1) {
-                        this.cards[index] = { ...this.cards[index], ...cardData };
-                    }
+                    await this.updateCard(this.editingCardId, cardData);
                 } else {
-                    this.cards.push(cardData);
+                    await this.saveCard(cardData);
                 }
 
-                this.saveData();
                 this.cancelForm();
-                this.render();
-                this.showNotification('✅ Đã lưu thẻ tín dụng', 'success');
             },
 
-            // Date Calculations (IMPROVED)
+            // Date Calculations
             calculateNextDueDate(cardData) {
                 if (cardData.type === 'fixed') {
                     return this.getNextDueDateFixed(cardData.originalDueDate);
@@ -1244,13 +1437,11 @@
                 let nextDue = new Date(today);
                 nextDue.setDate(dayOfMonth);
 
-                // If the due date has passed this month, move to next month
                 if (nextDue <= today) {
                     nextDue.setMonth(nextDue.getMonth() + 1);
                     nextDue.setDate(dayOfMonth);
                 }
 
-                // Handle months with fewer days (e.g., Feb, April, June, etc.)
                 while (nextDue.getDate() !== dayOfMonth) {
                     nextDue.setDate(nextDue.getDate() - 1);
                 }
@@ -1288,13 +1479,13 @@
             },
 
             // Card Actions
-            markAsPaid(cardId) {
+            async markAsPaid(cardId) {
                 const card = this.cards.find(c => c.id === cardId);
                 if (!card) return;
 
                 const today = new Date();
                 const updateData = {
-                    isPaid: false, // Reset for next cycle
+                    isPaid: false,
                     lastPaidDate: today.toISOString(),
                     updatedAt: today.toISOString()
                 };
@@ -1314,25 +1505,16 @@
                     ).toISOString();
                 }
 
-                const index = this.cards.findIndex(c => c.id === cardId);
-                if (index !== -1) {
-                    this.cards[index] = { ...this.cards[index], ...updateData };
-                    this.saveData();
-                    this.render();
-                    this.showNotification('✅ Đã đánh dấu thanh toán', 'success');
-                }
+                await this.updateCard(cardId, updateData);
             },
 
             deleteCard(cardId) {
                 const card = this.cards.find(c => c.id === cardId);
                 if (!card) return;
 
-                this.confirmAction = () => {
-                    this.cards = this.cards.filter(c => c.id !== cardId);
-                    this.saveData();
+                this.confirmAction = async () => {
+                    await this.deleteCardDB(cardId);
                     this.cancelConfirm();
-                    this.render();
-                    this.showNotification('✅ Đã xóa thẻ', 'success');
                 };
 
                 document.getElementById('confirmTitle').textContent = 'Xác nhận xóa';
@@ -1371,70 +1553,7 @@
                 this.renderCards();
             },
 
-            // Export/Import
-            showExportDialog() {
-                const dataStr = JSON.stringify(this.cards, null, 2);
-                const dataBlob = new Blob([dataStr], { type: 'application/json' });
-                const url = URL.createObjectURL(dataBlob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `pingpay-backup-${new Date().toISOString().split('T')[0]}.json`;
-                link.click();
-                URL.revokeObjectURL(url);
-                this.showNotification('✅ Đã xuất dữ liệu', 'success');
-            },
-
-            showImportDialog() {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.json';
-                input.onchange = (e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        try {
-                            const imported = JSON.parse(event.target.result);
-                            if (!Array.isArray(imported)) {
-                                this.showNotification('❌ Định dạng tệp không hợp lệ', 'error');
-                                return;
-                            }
-                            this.cards = imported;
-                            this.saveData();
-                            this.render();
-                            this.showNotification('✅ Đã nhập dữ liệu', 'success');
-                        } catch (error) {
-                            this.showNotification('❌ Lỗi khi đọc tệp', 'error');
-                        }
-                    };
-                    reader.readAsText(file);
-                };
-                input.click();
-            },
-
             // Notifications
-            checkNotifications() {
-                const overdueCards = this.cards.filter(card => 
-                    !card.isPaid && this.getDaysUntilDue(card.nextDueDate) < 0
-                );
-                
-                const dueSoonCards = this.cards.filter(card => 
-                    !card.isPaid && this.getDaysUntilDue(card.nextDueDate) <= 1 && 
-                    this.getDaysUntilDue(card.nextDueDate) >= 0
-                );
-
-                if (overdueCards.length > 0) {
-                    const names = overdueCards.map(c => c.name).join(', ');
-                    console.log(`⚠️ Thẻ quá hạn: ${names}`);
-                }
-
-                if (dueSoonCards.length > 0 && dueSoonCards.length <= 3) {
-                    const names = dueSoonCards.map(c => c.name).join(', ');
-                    console.log(`⏰ Thẻ sắp đến hạn: ${names}`);
-                }
-            },
-
             showNotification(message, type = 'success') {
                 const notification = document.createElement('div');
                 notification.className = `notification ${type}`;
