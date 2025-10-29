@@ -1036,20 +1036,29 @@
     </div>
 
     <script>
-        // Firebase Configuration
+        // Firebase Configuration - REPLACE with your actual Firebase config
+        // Your web app's Firebase configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyA1234567890abcdefghijklmnopqrstuv", // REPLACE with your Firebase API key
-            authDomain: "pingpay-16a26.firebaseapp.com",
-            projectId: "pingpay-16a26",
-            storageBucket: "pingpay-16a26.appspot.com",
-            messagingSenderId: "123456789012",
-            appId: "1:123456789012:web:abcdef1234567890abcdef"
+          apiKey: "AIzaSyBEtdEz6RJF1_eLoCNE9_Pp0oZLqDzaLuk",
+          authDomain: "pingpay-16a26.firebaseapp.com",
+          databaseURL: "https://pingpay-16a26-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "pingpay-16a26",
+          storageBucket: "pingpay-16a26.firebasestorage.app",
+          messagingSenderId: "533740183343",
+          appId: "1:533740183343:web:9a9a0b4ea709e34ec28bda"
         };
 
         // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        let auth, db;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            db = firebase.firestore();
+            console.log('Firebase initialized successfully');
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+            console.log('IMPORTANT: Replace Firebase config in the code with your actual Firebase project settings');
+        }
 
         const app = {
             cards: [],
@@ -1063,6 +1072,13 @@
             // Initialize
             async init() {
                 // Listen for auth state changes
+                if (!auth) {
+                    console.error('Firebase not initialized. Please check your Firebase configuration.');
+                    document.getElementById('authError').textContent = 'Firebase configuration is missing. Please check the console.';
+                    document.getElementById('authError').classList.remove('hidden');
+                    return;
+                }
+
                 auth.onAuthStateChanged((user) => {
                     if (user) {
                         this.currentUser = user;
@@ -1070,11 +1086,14 @@
                         document.getElementById('appScreen').classList.remove('hidden');
                         document.getElementById('userEmail').textContent = user.email;
                         this.loadCards();
+                        console.log('User logged in:', user.email);
                     } else {
                         this.currentUser = null;
                         document.getElementById('authScreen').classList.add('active');
                         document.getElementById('appScreen').classList.add('hidden');
                     }
+                }, (error) => {
+                    console.error('Auth state change error:', error);
                 });
             },
 
@@ -1099,11 +1118,41 @@
                     return;
                 }
 
+                if (!email.includes('@')) {
+                    errorEl.textContent = 'Email không hợp lệ';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
                 try {
-                    await auth.signInWithEmailAndPassword(email, password);
+                    if (!auth) {
+                        throw new Error('Firebase chưa được khởi tạo. Vui lòng kiểm tra cấu hình Firebase.');
+                    }
+                    
+                    const result = await auth.signInWithEmailAndPassword(email, password);
+                    console.log('Login success:', result.user.email);
                     errorEl.classList.add('hidden');
+                    document.getElementById('loginEmail').value = '';
+                    document.getElementById('loginPassword').value = '';
                 } catch (error) {
-                    errorEl.textContent = error.message;
+                    console.error('Login error:', error);
+                    let message = 'Đăng nhập thất bại';
+                    
+                    if (error.code === 'auth/user-not-found') {
+                        message = 'Tài khoản không tồn tại. Vui lòng tạo tài khoản mới.';
+                    } else if (error.code === 'auth/wrong-password') {
+                        message = 'Mật khẩu không đúng.';
+                    } else if (error.code === 'auth/invalid-email') {
+                        message = 'Email không hợp lệ.';
+                    } else if (error.code === 'auth/user-disabled') {
+                        message = 'Tài khoản này đã bị vô hiệu hóa.';
+                    } else if (error.code === 'auth/too-many-requests') {
+                        message = 'Quá nhiều lần đăng nhập sai. Vui lòng thử lại sau.';
+                    } else if (error.message) {
+                        message = error.message;
+                    }
+                    
+                    errorEl.textContent = message;
                     errorEl.classList.remove('hidden');
                 }
             },
@@ -1116,6 +1165,12 @@
 
                 if (!email || !password || !confirm) {
                     errorEl.textContent = 'Vui lòng điền đủ thông tin';
+                    errorEl.classList.remove('hidden');
+                    return;
+                }
+
+                if (!email.includes('@')) {
+                    errorEl.textContent = 'Email không hợp lệ';
                     errorEl.classList.remove('hidden');
                     return;
                 }
@@ -1133,10 +1188,38 @@
                 }
 
                 try {
-                    await auth.createUserWithEmailAndPassword(email, password);
+                    if (!auth) {
+                        throw new Error('Firebase chưa được khởi tạo. Vui lòng kiểm tra cấu hình Firebase.');
+                    }
+                    
+                    const result = await auth.createUserWithEmailAndPassword(email, password);
+                    console.log('Signup success:', result.user.email);
                     errorEl.classList.add('hidden');
+                    document.getElementById('signupEmail').value = '';
+                    document.getElementById('signupPassword').value = '';
+                    document.getElementById('signupConfirm').value = '';
+                    
+                    // Auto-switch to login after successful signup
+                    setTimeout(() => {
+                        this.isAuthMode = 'signup'; // Force toggle to work
+                        this.toggleAuthMode();
+                    }, 500);
+                    
                 } catch (error) {
-                    errorEl.textContent = error.message;
+                    console.error('Signup error:', error);
+                    let message = 'Tạo tài khoản thất bại';
+                    
+                    if (error.code === 'auth/email-already-in-use') {
+                        message = 'Email này đã được sử dụng. Vui lòng dùng email khác hoặc đăng nhập.';
+                    } else if (error.code === 'auth/weak-password') {
+                        message = 'Mật khẩu quá yếu. Vui lòng chọn mật khẩu mạnh hơn.';
+                    } else if (error.code === 'auth/invalid-email') {
+                        message = 'Email không hợp lệ.';
+                    } else if (error.message) {
+                        message = error.message;
+                    }
+                    
+                    errorEl.textContent = message;
                     errorEl.classList.remove('hidden');
                 }
             },
