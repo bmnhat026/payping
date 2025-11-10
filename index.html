@@ -18,27 +18,27 @@
         }
         
         :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --primary-light: #818cf8;
-            --secondary: #8b5cf6;
+            --primary: #dc2626;
+            --primary-dark: #b91c1c;
+            --primary-light: #ef4444;
+            --secondary: #991b1b;
             --success: #10b981;
             --warning: #f59e0b;
-            --danger: #ef4444;
-            --dark: #1e293b;
-            --gray: #64748b;
-            --light: #f1f5f9;
+            --danger: #dc2626;
+            --dark: #000000;
+            --gray: #4b5563;
+            --light: #f9fafb;
             --white: #ffffff;
-            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-1: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            --gradient-2: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            --gradient-3: linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%);
             --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
             --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #dc2626 100%);
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 30px rgba(0,0,0,0.15);
-            --shadow-xl: 0 20px 50px rgba(0,0,0,0.2);
-            --border-radius: 16px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-lg: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-xl: 0 8px 24px rgba(0,0,0,0.12);
+            --border-radius: 12px;
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -80,9 +80,7 @@
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+            background: #ffffff;
             min-height: 100vh;
             color: var(--dark);
             position: relative;
@@ -96,7 +94,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23dc2626' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
             pointer-events: none;
             z-index: 1;
         }
@@ -109,16 +107,15 @@
             z-index: 2;
         }
 
-        /* Glassmorphism Auth Container */
+        /* Modern Auth Container */
         .auth-container {
             max-width: 420px;
             margin: 80px auto;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 48px;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
             animation: fadeIn 0.6s ease-out;
             position: relative;
             overflow: hidden;
@@ -127,12 +124,11 @@
         .auth-container::before {
             content: '';
             position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
-            animation: float 6s ease-in-out infinite;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-1);
         }
 
         .auth-container h2 {
@@ -274,13 +270,13 @@
 
         /* Main App Header */
         .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 32px;
-            border-radius: 24px;
-            box-shadow: var(--shadow-xl);
-            margin-bottom: 32px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #ffffff;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 24px;
+            border: 1px solid #e5e7eb;
+            border-top: 4px solid var(--primary);
             animation: fadeIn 0.6s ease-out;
         }
 
@@ -309,16 +305,15 @@
 
         /* User Info Bar */
         .user-info {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 20px 24px;
-            border-radius: 16px;
-            margin-bottom: 24px;
+            background: #ffffff;
+            padding: 18px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: var(--shadow-md);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
             animation: fadeIn 0.5s ease-out;
         }
 
@@ -344,13 +339,12 @@
 
         /* Form Section */
         .form-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 36px;
-            border-radius: 24px;
-            box-shadow: var(--shadow-xl);
-            margin-bottom: 32px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #ffffff;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 24px;
+            border: 1px solid #e5e7eb;
             animation: fadeIn 0.6s ease-out;
             position: relative;
             overflow: hidden;
@@ -361,8 +355,8 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 4px;
-            height: 100%;
+            width: 100%;
+            height: 4px;
             background: var(--gradient-1);
         }
 
@@ -443,13 +437,12 @@
 
         /* Card Items */
         .card-item {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 28px;
-            border-radius: 20px;
-            box-shadow: var(--shadow-lg);
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 16px;
+            border: 1px solid #e5e7eb;
             position: relative;
             overflow: hidden;
             transition: var(--transition);
@@ -461,23 +454,23 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 5px;
-            height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transition: width 0.3s;
+            width: 100%;
+            height: 4px;
+            background: var(--gradient-1);
+            transition: height 0.2s;
         }
 
         .card-item:hover {
-            transform: translateX(8px);
-            box-shadow: var(--shadow-xl);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
         }
 
         .card-item:hover::before {
-            width: 8px;
+            height: 5px;
         }
 
         .card-item.paid {
-            background: rgba(255, 255, 255, 0.95);
+            background: #ffffff;
         }
 
         .card-item.paid::before {
@@ -485,7 +478,7 @@
         }
 
         .card-item.due-soon {
-            background: rgba(255, 255, 255, 0.95);
+            background: #ffffff;
         }
 
         .card-item.due-soon::before {
@@ -493,12 +486,12 @@
         }
 
         .card-item.overdue {
-            background: rgba(255, 255, 255, 0.95);
+            background: #ffffff;
             animation: pulse 2s infinite;
         }
 
         .card-item.overdue::before {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            background: var(--gradient-1);
         }
 
         .card-header {
@@ -579,13 +572,13 @@
 
         /* Stats Section */
         .stats {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 36px;
-            border-radius: 24px;
-            box-shadow: var(--shadow-xl);
-            margin-top: 32px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #ffffff;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-top: 24px;
+            border: 1px solid #e5e7eb;
+            border-top: 4px solid var(--primary);
             animation: fadeIn 0.7s ease-out;
         }
 
@@ -655,12 +648,11 @@
         /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 80px 20px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            box-shadow: var(--shadow-xl);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 60px 20px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e7eb;
             animation: fadeIn 0.6s ease-out;
         }
 
@@ -765,13 +757,13 @@
 
         /* Notes Section */
         .notes-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 36px;
-            border-radius: 24px;
-            box-shadow: var(--shadow-xl);
-            margin-bottom: 32px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #ffffff;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 24px;
+            border: 1px solid #e5e7eb;
+            border-top: 4px solid var(--primary);
             animation: fadeIn 0.6s ease-out;
         }
 
@@ -800,12 +792,11 @@
         }
 
         .note-item {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 24px;
-            border-radius: 16px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid rgba(99, 102, 241, 0.1);
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
             transition: var(--transition);
             position: relative;
             overflow: hidden;
@@ -817,19 +808,19 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 4px;
-            height: 100%;
+            width: 100%;
+            height: 3px;
             background: var(--gradient-1);
-            transition: width 0.3s;
+            transition: height 0.2s;
         }
 
         .note-item:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
         }
 
         .note-item:hover::before {
-            width: 6px;
+            height: 4px;
         }
 
         .note-header {
@@ -869,13 +860,12 @@
         }
 
         .note-form {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            padding: 36px;
-            border-radius: 24px;
-            box-shadow: var(--shadow-xl);
-            margin-bottom: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 20px;
+            border: 1px solid #e5e7eb;
             animation: fadeIn 0.6s ease-out;
             position: relative;
             overflow: hidden;
@@ -886,8 +876,8 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 4px;
-            height: 100%;
+            width: 100%;
+            height: 4px;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
 
@@ -1031,22 +1021,88 @@
             animation: float 3s ease-in-out infinite;
         }
 
+        /* Card Notes Section */
+        .card-notes-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .card-notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .card-notes-header h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .card-note-item {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .card-note-content {
+            font-size: 13px;
+            color: var(--dark);
+            margin-bottom: 6px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .card-note-date {
+            font-size: 11px;
+            color: var(--gray);
+        }
+
+        .card-note-form {
+            margin-top: 12px;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px dashed #d1d5db;
+        }
+
+        .card-note-form textarea {
+            width: 100%;
+            min-height: 60px;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 8px;
+        }
+
+        .card-note-form textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
-            width: 10px;
+            width: 8px;
         }
 
         ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
+            background: #f1f5f9;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: rgba(99, 102, 241, 0.5);
-            border-radius: 5px;
+            background: #cbd5e1;
+            border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(99, 102, 241, 0.7);
+            background: #94a3b8;
         }
     </style>
 </head>
@@ -1321,6 +1377,7 @@
             currentUser: null,
             cards: [],
             notes: [],
+            cardNotes: {},
             editingCardId: null,
             editingNoteId: null,
             currentCardType: 'fixed',
@@ -1481,17 +1538,22 @@
                         where('userId', '==', this.currentUser.uid),
                         orderBy('nextDueDate', 'asc')
                     );
-                    
+
                     const querySnapshot = await getDocs(q);
                     this.cards = [];
-                    
+
                     querySnapshot.forEach((doc) => {
                         this.cards.push({
                             id: doc.id,
                             ...doc.data()
                         });
                     });
-                    
+
+                    // Load notes for all cards
+                    for (const card of this.cards) {
+                        await this.loadCardNotes(card.id);
+                    }
+
                     this.renderCards();
                     this.updateStats();
                 } catch (error) {
@@ -1834,7 +1896,52 @@
                         <button class="btn btn-sm btn-warning" onclick="app.startEdit('${card.id}')">✏️ Sửa</button>
                         <button class="btn btn-sm btn-danger" onclick="app.deleteCard('${card.id}')">🗑️ Xóa</button>
                     `;
-                    
+
+                    // Render card notes
+                    const cardNotes = this.cardNotes[card.id] || [];
+                    let notesHtml = '';
+                    if (cardNotes.length > 0 || true) {
+                        notesHtml = `
+                            <div class="card-notes-section">
+                                <div class="card-notes-header">
+                                    <h4>📝 Ghi chú</h4>
+                                    <button class="btn btn-sm" style="padding: 4px 12px; font-size: 12px;" onclick="app.toggleCardNoteForm('${card.id}')">
+                                        ➕ Thêm ghi chú
+                                    </button>
+                                </div>
+
+                                <div id="card-note-form-${card.id}" class="card-note-form hidden">
+                                    <textarea id="card-note-input-${card.id}" placeholder="Nhập nội dung ghi chú..."></textarea>
+                                    <div style="display: flex; gap: 8px;">
+                                        <button class="btn btn-sm btn-success" onclick="app.addCardNote('${card.id}')">💾 Lưu</button>
+                                        <button class="btn btn-sm btn-secondary" onclick="app.toggleCardNoteForm('${card.id}')">Hủy</button>
+                                    </div>
+                                </div>
+
+                                ${cardNotes.map(note => {
+                                    const noteDate = new Date(note.createdAt);
+                                    return `
+                                        <div class="card-note-item">
+                                            <div class="card-note-content">${note.content}</div>
+                                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                                <div class="card-note-date">${noteDate.toLocaleDateString('vi-VN', {
+                                                    year: 'numeric',
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                })}</div>
+                                                <button class="btn btn-sm btn-danger" style="padding: 2px 8px; font-size: 11px;" onclick="app.deleteCardNote('${note.id}', '${card.id}')">
+                                                    🗑️
+                                                </button>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        `;
+                    }
+
                     return `
                         <div class="card-item ${cardClass}">
                             <div class="card-header">
@@ -1845,11 +1952,11 @@
                                             ${card.type === 'fixed' ? '📅 Ngày cố định' : '🔄 Ngày biến động'}
                                         </span>
                                         <span>
-                                            Đến hạn: ${dueDate.toLocaleDateString('vi-VN', { 
-                                                weekday: 'short', 
-                                                year: 'numeric', 
-                                                month: 'short', 
-                                                day: 'numeric' 
+                                            Đến hạn: ${dueDate.toLocaleDateString('vi-VN', {
+                                                weekday: 'short',
+                                                year: 'numeric',
+                                                month: 'short',
+                                                day: 'numeric'
                                             })}
                                         </span>
                                     </div>
@@ -1863,6 +1970,7 @@
                             <div class="card-actions">
                                 ${actionButtons}
                             </div>
+                            ${notesHtml}
                         </div>
                     `;
                 }).join('');
@@ -1988,6 +2096,95 @@
 
             async deleteNote(noteId) {
                 await this.deleteNoteFromDb(noteId);
+            },
+
+            // Card Notes Management
+            async loadCardNotes(cardId) {
+                if (!this.currentUser || !cardId) return [];
+
+                try {
+                    const q = query(
+                        collection(db, 'cardNotes'),
+                        where('userId', '==', this.currentUser.uid),
+                        where('cardId', '==', cardId),
+                        orderBy('createdAt', 'desc')
+                    );
+
+                    const querySnapshot = await getDocs(q);
+                    const notes = [];
+
+                    querySnapshot.forEach((doc) => {
+                        notes.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+
+                    this.cardNotes[cardId] = notes;
+                    return notes;
+                } catch (error) {
+                    console.error('Error loading card notes:', error);
+                    return [];
+                }
+            },
+
+            async saveCardNote(cardId, content) {
+                if (!this.currentUser || !cardId || !content.trim()) return;
+
+                try {
+                    const noteData = {
+                        userId: this.currentUser.uid,
+                        cardId: cardId,
+                        content: content.trim(),
+                        createdAt: new Date().toISOString()
+                    };
+
+                    await addDoc(collection(db, 'cardNotes'), noteData);
+                    await this.loadCardNotes(cardId);
+                    this.renderCards();
+                } catch (error) {
+                    console.error('Error saving card note:', error);
+                    alert('Lỗi khi lưu ghi chú');
+                }
+            },
+
+            async deleteCardNote(noteId, cardId) {
+                if (!confirm('Bạn có chắc muốn xóa ghi chú này?')) return;
+
+                try {
+                    await deleteDoc(doc(db, 'cardNotes', noteId));
+                    await this.loadCardNotes(cardId);
+                    this.renderCards();
+                } catch (error) {
+                    console.error('Error deleting card note:', error);
+                    alert('Lỗi khi xóa ghi chú');
+                }
+            },
+
+            toggleCardNoteForm(cardId) {
+                const form = document.getElementById(`card-note-form-${cardId}`);
+                if (form) {
+                    form.classList.toggle('hidden');
+                    if (!form.classList.contains('hidden')) {
+                        const textarea = form.querySelector('textarea');
+                        if (textarea) textarea.focus();
+                    }
+                }
+            },
+
+            async addCardNote(cardId) {
+                const textarea = document.getElementById(`card-note-input-${cardId}`);
+                if (!textarea) return;
+
+                const content = textarea.value.trim();
+                if (!content) {
+                    alert('Vui lòng nhập nội dung ghi chú');
+                    return;
+                }
+
+                await this.saveCardNote(cardId, content);
+                textarea.value = '';
+                this.toggleCardNoteForm(cardId);
             },
 
             renderNotes() {
