@@ -920,6 +920,42 @@
             color: var(--gray);
         }
 
+        /* Notification Settings */
+        .notification-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .notification-toggle:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .notification-toggle.enabled {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+            border-color: var(--success);
+        }
+
+        .notification-toggle.disabled {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--danger);
+        }
+
+        .notification-icon {
+            font-size: 20px;
+        }
+
         .notes-empty-icon {
             font-size: 64px;
             margin-bottom: 16px;
@@ -998,7 +1034,13 @@
                 <div class="user-avatar" id="userAvatar">U</div>
                 <span>Xin chào, <strong id="userEmail"></strong></span>
             </div>
-            <button class="btn btn-sm" onclick="app.logout()">Đăng xuất</button>
+            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                <div id="notificationToggle" class="notification-toggle" onclick="app.toggleNotifications()">
+                    <span class="notification-icon">🔔</span>
+                    <span id="notificationStatus">Bật thông báo</span>
+                </div>
+                <button class="btn btn-sm" onclick="app.logout()">Đăng xuất</button>
+            </div>
         </div>
 
         <!-- Header -->
@@ -1201,6 +1243,9 @@
             editingNoteId: null,
             currentCardType: 'fixed',
             currentEditCardType: 'fixed',
+            notificationsEnabled: false,
+            notificationCheckInterval: null,
+            lastNotificationCheck: null,
 
             // Initialize app
             async init() {
@@ -1238,6 +1283,8 @@
                 if (email) {
                     document.getElementById('userAvatar').textContent = email[0].toUpperCase();
                 }
+                // Load notification settings
+                this.loadNotificationSettings();
             },
 
             showMessage(message, isError = false) {
@@ -1334,6 +1381,8 @@
 
             async logout() {
                 try {
+                    // Dừng kiểm tra thông báo khi đăng xuất
+                    this.stopNotificationCheck();
                     await signOut(auth);
                 } catch (error) {
                     console.error('Logout error:', error);
@@ -1931,6 +1980,151 @@
                 document.getElementById('paidCards').textContent = paidCards;
                 document.getElementById('dueSoonCards').textContent = dueSoonCards;
                 document.getElementById('overdueCards').textContent = overdueCards;
+            },
+
+            // Notification Management
+            async requestNotificationPermission() {
+                if (!('Notification' in window)) {
+                    alert('Trình duyệt của bạn không hỗ trợ thông báo');
+                    return false;
+                }
+
+                if (Notification.permission === 'granted') {
+                    return true;
+                }
+
+                if (Notification.permission !== 'denied') {
+                    const permission = await Notification.requestPermission();
+                    return permission === 'granted';
+                }
+
+                return false;
+            },
+
+            async toggleNotifications() {
+                if (!this.notificationsEnabled) {
+                    // Bật thông báo
+                    const granted = await this.requestNotificationPermission();
+                    if (granted) {
+                        this.notificationsEnabled = true;
+                        localStorage.setItem('notificationsEnabled', 'true');
+                        this.startNotificationCheck();
+                        this.updateNotificationUI();
+
+                        // Gửi thông báo thử nghiệm
+                        new Notification('PingPay - Thông báo đã được bật', {
+                            body: 'Bạn sẽ nhận được thông báo về các giao dịch sắp đến hạn, đến hạn và trễ hạn.',
+                            icon: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'%3E%3Cdefs%3E%3ClinearGradient id=\'grad\' x1=\'0%25\' y1=\'0%25\' x2=\'100%25\' y2=\'100%25\'%3E%3Cstop offset=\'0%25\' style=\'stop-color:%23667eea;stop-opacity:1\' /%3E%3Cstop offset=\'100%25\' style=\'stop-color:%23764ba2;stop-opacity:1\' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=\'32\' height=\'32\' rx=\'6\' fill=\'url(%23grad)\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' font-family=\'Arial\' font-size=\'20\' font-weight=\'bold\' fill=\'white\' text-anchor=\'middle\' dominant-baseline=\'middle\'%3EP%3C/text%3E%3C/svg%3E',
+                            tag: 'pingpay-enabled'
+                        });
+                    } else {
+                        alert('Vui lòng cho phép thông báo trong cài đặt trình duyệt');
+                    }
+                } else {
+                    // Tắt thông báo
+                    this.notificationsEnabled = false;
+                    localStorage.setItem('notificationsEnabled', 'false');
+                    this.stopNotificationCheck();
+                    this.updateNotificationUI();
+                }
+            },
+
+            updateNotificationUI() {
+                const toggle = document.getElementById('notificationToggle');
+                const status = document.getElementById('notificationStatus');
+
+                if (this.notificationsEnabled) {
+                    toggle.classList.add('enabled');
+                    toggle.classList.remove('disabled');
+                    status.textContent = 'Thông báo: Bật';
+                } else {
+                    toggle.classList.remove('enabled');
+                    toggle.classList.add('disabled');
+                    status.textContent = 'Thông báo: Tắt';
+                }
+            },
+
+            checkAndSendNotifications() {
+                if (!this.notificationsEnabled || !this.currentUser) return;
+
+                const now = new Date();
+                const today = now.toDateString();
+
+                // Chỉ kiểm tra một lần mỗi ngày
+                if (this.lastNotificationCheck === today) return;
+
+                this.lastNotificationCheck = today;
+
+                const unpaidCards = this.cards.filter(card => !card.isPaid);
+
+                // Kiểm tra thẻ quá hạn
+                const overdueCards = unpaidCards.filter(card =>
+                    this.getDaysUntilDue(card.nextDueDate) < 0
+                );
+
+                if (overdueCards.length > 0) {
+                    new Notification('⚠️ Thẻ quá hạn thanh toán!', {
+                        body: `Bạn có ${overdueCards.length} thẻ đã quá hạn: ${overdueCards.map(c => c.name).join(', ')}`,
+                        icon: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'%3E%3Cdefs%3E%3ClinearGradient id=\'grad\' x1=\'0%25\' y1=\'0%25\' x2=\'100%25\' y2=\'100%25\'%3E%3Cstop offset=\'0%25\' style=\'stop-color:%23667eea;stop-opacity:1\' /%3E%3Cstop offset=\'100%25\' style=\'stop-color:%23764ba2;stop-opacity:1\' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=\'32\' height=\'32\' rx=\'6\' fill=\'url(%23grad)\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' font-family=\'Arial\' font-size=\'20\' font-weight=\'bold\' fill=\'white\' text-anchor=\'middle\' dominant-baseline=\'middle\'%3EP%3C/text%3E%3C/svg%3E',
+                        tag: 'pingpay-overdue',
+                        requireInteraction: true
+                    });
+                }
+
+                // Kiểm tra thẻ đến hạn hôm nay
+                const dueTodayCards = unpaidCards.filter(card =>
+                    this.getDaysUntilDue(card.nextDueDate) === 0
+                );
+
+                if (dueTodayCards.length > 0) {
+                    new Notification('🔔 Thẻ đến hạn hôm nay!', {
+                        body: `Bạn có ${dueTodayCards.length} thẻ đến hạn hôm nay: ${dueTodayCards.map(c => c.name).join(', ')}`,
+                        icon: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'%3E%3Cdefs%3E%3ClinearGradient id=\'grad\' x1=\'0%25\' y1=\'0%25\' x2=\'100%25\' y2=\'100%25\'%3E%3Cstop offset=\'0%25\' style=\'stop-color:%23667eea;stop-opacity:1\' /%3E%3Cstop offset=\'100%25\' style=\'stop-color:%23764ba2;stop-opacity:1\' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=\'32\' height=\'32\' rx=\'6\' fill=\'url(%23grad)\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' font-family=\'Arial\' font-size=\'20\' font-weight=\'bold\' fill=\'white\' text-anchor=\'middle\' dominant-baseline=\'middle\'%3EP%3C/text%3E%3C/svg%3E',
+                        tag: 'pingpay-due-today',
+                        requireInteraction: true
+                    });
+                }
+
+                // Kiểm tra thẻ sắp đến hạn (1-3 ngày)
+                const dueSoonCards = unpaidCards.filter(card => {
+                    const days = this.getDaysUntilDue(card.nextDueDate);
+                    return days > 0 && days <= 3;
+                });
+
+                if (dueSoonCards.length > 0) {
+                    new Notification('⏰ Thẻ sắp đến hạn!', {
+                        body: `Bạn có ${dueSoonCards.length} thẻ sắp đến hạn trong 3 ngày tới: ${dueSoonCards.map(c => c.name).join(', ')}`,
+                        icon: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'%3E%3Cdefs%3E%3ClinearGradient id=\'grad\' x1=\'0%25\' y1=\'0%25\' x2=\'100%25\' y2=\'100%25\'%3E%3Cstop offset=\'0%25\' style=\'stop-color:%23667eea;stop-opacity:1\' /%3E%3Cstop offset=\'100%25\' style=\'stop-color:%23764ba2;stop-opacity:1\' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=\'32\' height=\'32\' rx=\'6\' fill=\'url(%23grad)\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' font-family=\'Arial\' font-size=\'20\' font-weight=\'bold\' fill=\'white\' text-anchor=\'middle\' dominant-baseline=\'middle\'%3EP%3C/text%3E%3C/svg%3E',
+                        tag: 'pingpay-due-soon'
+                    });
+                }
+            },
+
+            startNotificationCheck() {
+                // Kiểm tra ngay lập tức
+                this.checkAndSendNotifications();
+
+                // Thiết lập kiểm tra định kỳ mỗi 30 phút
+                this.notificationCheckInterval = setInterval(() => {
+                    this.checkAndSendNotifications();
+                }, 30 * 60 * 1000); // 30 phút
+            },
+
+            stopNotificationCheck() {
+                if (this.notificationCheckInterval) {
+                    clearInterval(this.notificationCheckInterval);
+                    this.notificationCheckInterval = null;
+                }
+                this.lastNotificationCheck = null;
+            },
+
+            loadNotificationSettings() {
+                const enabled = localStorage.getItem('notificationsEnabled') === 'true';
+                if (enabled && Notification.permission === 'granted') {
+                    this.notificationsEnabled = true;
+                    this.startNotificationCheck();
+                }
+                this.updateNotificationUI();
             }
         };
 
