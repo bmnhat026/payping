@@ -1354,7 +1354,7 @@
         // Import Firebase
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, addDoc, updateDoc, deleteDoc, doc, query, where, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         // Firebase config
         const firebaseConfig = {
@@ -1370,7 +1370,10 @@
         // Initialize Firebase
         const firebaseApp = initializeApp(firebaseConfig);
         const auth = getAuth(firebaseApp);
-        const db = getFirestore(firebaseApp);
+        // Bật IndexedDB persistence — reload đầu render từ cache instant, listener vẫn sync
+        const db = initializeFirestore(firebaseApp, {
+            localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+        });
 
         // Main application
         const app = {
@@ -1385,23 +1388,91 @@
             notificationsEnabled: false,
             notificationCheckInterval: null,
             lastNotificationCheck: null,
+            // Unsubscribe handles cho realtime listeners (tránh duplicate khi auth re-fire)
+            unsubCards: null,
+            unsubCardNotes: null,
+            unsubNotes: null,
 
             // Initialize app
             async init() {
                 this.showLoading(true);
-                
+
                 // Listen for auth state changes
                 onAuthStateChanged(auth, (user) => {
                     this.currentUser = user;
                     if (user) {
                         this.showMainApp();
-                        this.loadCards();
-                        this.loadNotes();
+                        this.subscribeData();
                     } else {
+                        this.unsubscribeData();
                         this.showAuth();
                     }
                     this.showLoading(false);
                 });
+            },
+
+            // Realtime data subscriptions — thay cho polling getDocs + reload-after-write
+            subscribeData() {
+                this.unsubscribeData();
+                if (!this.currentUser) return;
+                const uid = this.currentUser.uid;
+
+                // 1 listener cho cards — tự cập nhật khi add/update/delete
+                this.unsubCards = onSnapshot(
+                    query(
+                        collection(db, 'cards'),
+                        where('userId', '==', uid),
+                        orderBy('nextDueDate', 'asc')
+                    ),
+                    (snap) => {
+                        this.cards = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        this.renderCards();
+                        this.updateStats();
+                    },
+                    (err) => console.error('cards listener error:', err)
+                );
+
+                // 1 listener cho TẤT CẢ cardNotes — diệt N+1 (1 query thay vì N query)
+                this.unsubCardNotes = onSnapshot(
+                    query(
+                        collection(db, 'cardNotes'),
+                        where('userId', '==', uid),
+                        orderBy('createdAt', 'desc')
+                    ),
+                    (snap) => {
+                        const grouped = {};
+                        snap.docs.forEach(d => {
+                            const note = { id: d.id, ...d.data() };
+                            (grouped[note.cardId] = grouped[note.cardId] || []).push(note);
+                        });
+                        this.cardNotes = grouped;
+                        this.renderCards();
+                    },
+                    (err) => console.error('cardNotes listener error:', err)
+                );
+
+                // 1 listener cho notes
+                this.unsubNotes = onSnapshot(
+                    query(
+                        collection(db, 'notes'),
+                        where('userId', '==', uid),
+                        orderBy('createdAt', 'desc')
+                    ),
+                    (snap) => {
+                        this.notes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        this.renderNotes();
+                    },
+                    (err) => console.error('notes listener error:', err)
+                );
+            },
+
+            unsubscribeData() {
+                if (this.unsubCards) { this.unsubCards(); this.unsubCards = null; }
+                if (this.unsubCardNotes) { this.unsubCardNotes(); this.unsubCardNotes = null; }
+                if (this.unsubNotes) { this.unsubNotes(); this.unsubNotes = null; }
+                this.cards = [];
+                this.notes = [];
+                this.cardNotes = {};
             },
 
             // UI Management
@@ -1528,47 +1599,12 @@
                 }
             },
 
-            // Card Management
-            async loadCards() {
-                if (!this.currentUser) return;
-
-                try {
-                    const q = query(
-                        collection(db, 'cards'),
-                        where('userId', '==', this.currentUser.uid),
-                        orderBy('nextDueDate', 'asc')
-                    );
-
-                    const querySnapshot = await getDocs(q);
-                    this.cards = [];
-
-                    querySnapshot.forEach((doc) => {
-                        this.cards.push({
-                            id: doc.id,
-                            ...doc.data()
-                        });
-                    });
-
-                    // Load notes for all cards
-                    for (const card of this.cards) {
-                        await this.loadCardNotes(card.id);
-                    }
-
-                    this.renderCards();
-                    this.updateStats();
-                } catch (error) {
-                    console.error('Error loading cards:', error);
-                    this.showMessage('Lỗi khi tải dữ liệu', true);
-                }
-            },
-
+            // Card Management — listener tự cập nhật UI sau write, không cần reload thủ công
             async saveCard(cardData) {
                 if (!this.currentUser) return;
-
                 try {
                     cardData.userId = this.currentUser.uid;
                     await addDoc(collection(db, 'cards'), cardData);
-                    this.loadCards();
                 } catch (error) {
                     console.error('Error saving card:', error);
                     this.showMessage('Lỗi khi lưu thẻ', true);
@@ -1577,9 +1613,7 @@
 
             async updateCard(cardId, updateData) {
                 try {
-                    const cardRef = doc(db, 'cards', cardId);
-                    await updateDoc(cardRef, updateData);
-                    this.loadCards();
+                    await updateDoc(doc(db, 'cards', cardId), updateData);
                 } catch (error) {
                     console.error('Error updating card:', error);
                     this.showMessage('Lỗi khi cập nhật thẻ', true);
@@ -1588,10 +1622,8 @@
 
             async deleteCard(cardId) {
                 if (!confirm('Bạn có chắc muốn xóa thẻ này?')) return;
-
                 try {
                     await deleteDoc(doc(db, 'cards', cardId));
-                    this.loadCards();
                 } catch (error) {
                     console.error('Error deleting card:', error);
                     this.showMessage('Lỗi khi xóa thẻ', true);
@@ -1624,11 +1656,12 @@
             },
 
             getDaysUntilDue(dueDate) {
-                const today = new Date();
-                const due = new Date(dueDate);
-                const diffTime = due - today;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                return diffDays;
+                // Normalize cả 2 ngày về midnight LOCAL — tránh off-by-one do timezone (toISOString lưu UTC)
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const d = new Date(dueDate);
+                const due = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+                return Math.round((due - today) / 86400000);
             },
 
             getCardStatus(daysUntil, isPaid) {
@@ -1899,9 +1932,7 @@
 
                     // Render card notes
                     const cardNotes = this.cardNotes[card.id] || [];
-                    let notesHtml = '';
-                    if (cardNotes.length > 0 || true) {
-                        notesHtml = `
+                    const notesHtml = `
                             <div class="card-notes-section">
                                 <div class="card-notes-header">
                                     <h4>📝 Ghi chú</h4>
@@ -1940,7 +1971,6 @@
                                 }).join('')}
                             </div>
                         `;
-                    }
 
                     return `
                         <div class="card-item ${cardClass}">
@@ -1976,40 +2006,12 @@
                 }).join('');
             },
 
-            // Notes Management
-            async loadNotes() {
-                if (!this.currentUser) return;
-
-                try {
-                    const q = query(
-                        collection(db, 'notes'),
-                        where('userId', '==', this.currentUser.uid),
-                        orderBy('createdAt', 'desc')
-                    );
-
-                    const querySnapshot = await getDocs(q);
-                    this.notes = [];
-
-                    querySnapshot.forEach((doc) => {
-                        this.notes.push({
-                            id: doc.id,
-                            ...doc.data()
-                        });
-                    });
-
-                    this.renderNotes();
-                } catch (error) {
-                    console.error('Error loading notes:', error);
-                }
-            },
-
+            // Notes Management — listener tự cập nhật, không reload thủ công
             async saveNoteToDb(noteData) {
                 if (!this.currentUser) return;
-
                 try {
                     noteData.userId = this.currentUser.uid;
                     await addDoc(collection(db, 'notes'), noteData);
-                    this.loadNotes();
                 } catch (error) {
                     console.error('Error saving note:', error);
                     alert('Lỗi khi lưu ghi chú');
@@ -2018,9 +2020,7 @@
 
             async updateNoteInDb(noteId, updateData) {
                 try {
-                    const noteRef = doc(db, 'notes', noteId);
-                    await updateDoc(noteRef, updateData);
-                    this.loadNotes();
+                    await updateDoc(doc(db, 'notes', noteId), updateData);
                 } catch (error) {
                     console.error('Error updating note:', error);
                     alert('Lỗi khi cập nhật ghi chú');
@@ -2029,10 +2029,8 @@
 
             async deleteNoteFromDb(noteId) {
                 if (!confirm('Bạn có chắc muốn xóa ghi chú này?')) return;
-
                 try {
                     await deleteDoc(doc(db, 'notes', noteId));
-                    this.loadNotes();
                 } catch (error) {
                     console.error('Error deleting note:', error);
                     alert('Lỗi khi xóa ghi chú');
@@ -2098,50 +2096,16 @@
                 await this.deleteNoteFromDb(noteId);
             },
 
-            // Card Notes Management
-            async loadCardNotes(cardId) {
-                if (!this.currentUser || !cardId) return [];
-
-                try {
-                    const q = query(
-                        collection(db, 'cardNotes'),
-                        where('userId', '==', this.currentUser.uid),
-                        where('cardId', '==', cardId),
-                        orderBy('createdAt', 'desc')
-                    );
-
-                    const querySnapshot = await getDocs(q);
-                    const notes = [];
-
-                    querySnapshot.forEach((doc) => {
-                        notes.push({
-                            id: doc.id,
-                            ...doc.data()
-                        });
-                    });
-
-                    this.cardNotes[cardId] = notes;
-                    return notes;
-                } catch (error) {
-                    console.error('Error loading card notes:', error);
-                    return [];
-                }
-            },
-
+            // Card Notes Management — listener tự cập nhật
             async saveCardNote(cardId, content) {
                 if (!this.currentUser || !cardId || !content.trim()) return;
-
                 try {
-                    const noteData = {
+                    await addDoc(collection(db, 'cardNotes'), {
                         userId: this.currentUser.uid,
                         cardId: cardId,
                         content: content.trim(),
                         createdAt: new Date().toISOString()
-                    };
-
-                    await addDoc(collection(db, 'cardNotes'), noteData);
-                    await this.loadCardNotes(cardId);
-                    this.renderCards();
+                    });
                 } catch (error) {
                     console.error('Error saving card note:', error);
                     alert('Lỗi khi lưu ghi chú');
@@ -2150,11 +2114,8 @@
 
             async deleteCardNote(noteId, cardId) {
                 if (!confirm('Bạn có chắc muốn xóa ghi chú này?')) return;
-
                 try {
                     await deleteDoc(doc(db, 'cardNotes', noteId));
-                    await this.loadCardNotes(cardId);
-                    this.renderCards();
                 } catch (error) {
                     console.error('Error deleting card note:', error);
                     alert('Lỗi khi xóa ghi chú');
