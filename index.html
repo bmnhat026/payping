@@ -1769,12 +1769,13 @@
                     
                     cardData.transactionDate = transactionDate;
                     cardData.daysToAdd = parseInt(daysToAdd);
-                    cardData.estimatedCycleDays = 30;
+                    // Cycle dùng chính daysToAdd — match mental model user: "đặt 7 ngày → kỳ kế cũng 7 ngày"
+                    cardData.estimatedCycleDays = parseInt(daysToAdd);
                     nextDue = this.getDueDateVariable(transactionDate, daysToAdd);
                 }
-                
+
                 cardData.nextDueDate = nextDue.toISOString();
-                
+
                 await this.saveCard(cardData);
                 this.hideAddForm();
             },
@@ -1782,16 +1783,20 @@
             startEdit(cardId) {
                 const card = this.cards.find(c => c.id === cardId);
                 if (!card) return;
-                
+
                 this.editingCardId = cardId;
-                
+
                 document.getElementById('editCardName').value = card.name;
                 document.getElementById('editDueDate').value = card.originalDueDate || '';
                 document.getElementById('editTransactionDate').value = card.transactionDate || '';
                 document.getElementById('editDaysToAdd').value = card.daysToAdd || 20;
-                
+
                 this.selectEditCardType(card.type);
-                document.getElementById('editForm').classList.remove('hidden');
+                const form = document.getElementById('editForm');
+                form.classList.remove('hidden');
+                // Scroll form vào viewport + focus ô tên — tránh bắt user tự cuộn lên đầu trang
+                form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => document.getElementById('editCardName').focus({ preventScroll: true }), 350);
             },
 
             async saveEditCard() {
@@ -1834,7 +1839,8 @@
                     updateData.originalDueDate = null;
                     updateData.transactionDate = transactionDate;
                     updateData.daysToAdd = parseInt(daysToAdd);
-                    updateData.estimatedCycleDays = 30;
+                    // Cycle = daysToAdd để kỳ tiếp theo dùng đúng số ngày user nhập
+                    updateData.estimatedCycleDays = parseInt(daysToAdd);
                     nextDue = this.getDueDateVariable(transactionDate, daysToAdd);
                 }
                 
@@ -1864,12 +1870,15 @@
                     nextDue = this.getNextDueDateFixed(card.originalDueDate);
                     updateData.nextDueDate = nextDue.toISOString();
                 } else {
-                    const estimatedCycleDays = card.estimatedCycleDays || 30;
+                    // Ưu tiên daysToAdd làm chu kỳ; estimatedCycleDays giữ làm fallback cho thẻ cũ
+                    const cycleDays = card.daysToAdd || card.estimatedCycleDays || 30;
                     const currentTxDate = new Date(card.transactionDate);
                     const nextTxDate = new Date(currentTxDate);
-                    nextTxDate.setDate(currentTxDate.getDate() + estimatedCycleDays);
-                    nextDue = this.getDueDateVariable(nextTxDate.toISOString().split('T')[0], card.daysToAdd);
-                    updateData.transactionDate = nextTxDate.toISOString().split('T')[0];
+                    nextTxDate.setDate(currentTxDate.getDate() + cycleDays);
+                    const nextTxStr = nextTxDate.toISOString().split('T')[0];
+                    nextDue = this.getDueDateVariable(nextTxStr, card.daysToAdd);
+                    updateData.transactionDate = nextTxStr;
+                    updateData.estimatedCycleDays = cycleDays; // chuẩn hoá luôn về daysToAdd
                     updateData.nextDueDate = nextDue.toISOString();
                 }
             
@@ -1913,10 +1922,8 @@
                     
                     let typeInfo = '';
                     if (card.type === 'variable') {
-                        const estimatedText = card.estimatedCycleDays ? 
-                            ` (Chu kỳ ước tính: ${card.estimatedCycleDays} ngày)` : '';
                         typeInfo = `<div style="font-size: 12px; color: var(--gray); margin-top: 8px;">
-                            Ngày GD: ${new Date(card.transactionDate).toLocaleDateString('vi-VN')} + ${card.daysToAdd} ngày${estimatedText}
+                            Ngày GD: ${new Date(card.transactionDate).toLocaleDateString('vi-VN')} + ${card.daysToAdd} ngày (lặp mỗi ${card.daysToAdd} ngày)
                         </div>`;
                     }
                     
