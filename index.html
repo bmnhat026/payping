@@ -1246,7 +1246,7 @@
                 const category = document.getElementById('txCategory').value;
                 const description = document.getElementById('txDescription').value.trim();
                 const date = document.getElementById('txDate').value || new Date().toISOString().split('T')[0];
-                if (!amount) return alert('Vui lòng nhập số tiền giao dịch');
+                if (!amount || amount <= 0) return alert('Vui lòng nhập số tiền giao dịch hợp lệ');
 
                 const { cashback } = this.computeCashback(card, category, amount);
                 if (this.availableCredit(card) < amount) {
@@ -1453,9 +1453,11 @@
 
             async addRepayment(loanId) {
                 const amount = num(document.getElementById(`repay-amount-${loanId}`).value);
-                const interestPortion = num(document.getElementById(`repay-interest-${loanId}`).value);
+                // Clamp interest into [0, amount] so principal portion can't go negative
+                // and "lãi đã thu" never exceeds the total paid.
+                const interestPortion = Math.min(amount, Math.max(0, num(document.getElementById(`repay-interest-${loanId}`).value)));
                 const date = document.getElementById(`repay-date-${loanId}`).value || new Date().toISOString().split('T')[0];
-                if (!amount) return alert('Vui lòng nhập số tiền đã trả');
+                if (!amount || amount <= 0) return alert('Vui lòng nhập số tiền đã trả hợp lệ');
                 const principalPortion = Math.max(0, amount - interestPortion);
                 try {
                     await addDoc(collection(db, 'loanRepayments'), {
