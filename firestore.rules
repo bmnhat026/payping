@@ -20,6 +20,27 @@ service cloud.firestore {
       allow update, delete: if isOwner(resource.data.userId);
     }
 
+    // transactions (giao dịch chi tiêu, ghi nợ vào thẻ)
+    match /transactions/{txId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
+      allow update, delete: if isOwner(resource.data.userId);
+    }
+
+    // loans (khoản cho vay)
+    match /loans/{loanId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
+      allow update, delete: if isOwner(resource.data.userId);
+    }
+
+    // loanRepayments (lịch sử trả của từng khoản vay)
+    match /loanRepayments/{repId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
+      allow update, delete: if isOwner(resource.data.userId);
+    }
+
     // notes (ghi chú độc lập)
     match /notes/{noteId} {
       allow read: if isOwner(resource.data.userId);

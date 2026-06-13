@@ -6,1120 +6,261 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="PingPay">
-    <title>PingPay - Nhắc nhở thanh toán thẻ tín dụng</title>
+    <title>PingPay - Quản lý thẻ tín dụng & tài chính</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23764ba2;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='6' fill='url(%23grad)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='20' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'%3EP%3C/text%3E%3C/svg%3E">
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%23667eea;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23764ba2;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='180' height='180' rx='40' fill='url(%23grad)'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='100' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'%3EP%3C/text%3E%3C/svg%3E">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         :root {
             --primary: #dc2626;
             --primary-dark: #b91c1c;
             --primary-light: #ef4444;
-            --secondary: #991b1b;
             --success: #10b981;
+            --success-dark: #059669;
             --warning: #f59e0b;
             --danger: #dc2626;
-            --dark: #000000;
-            --gray: #4b5563;
+            --info: #6366f1;
+            --dark: #111827;
+            --gray: #6b7280;
             --light: #f9fafb;
             --white: #ffffff;
+            --border: #e5e7eb;
             --gradient-1: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            --gradient-2: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-            --gradient-3: linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%);
             --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #dc2626 100%);
+            --gradient-info: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
             --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
             --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
             --shadow-lg: 0 4px 12px rgba(0,0,0,0.1);
-            --shadow-xl: 0 8px 24px rgba(0,0,0,0.12);
-            --border-radius: 12px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 12px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(30px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
-            50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.5); }
-        }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #ffffff;
+            background: #f3f4f6;
             min-height: 100vh;
             color: var(--dark);
-            position: relative;
-            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23dc2626' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            pointer-events: none;
-            z-index: 1;
-        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 16px; }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Modern Auth Container */
+        /* ---------- Auth ---------- */
         .auth-container {
-            max-width: 420px;
-            margin: 80px auto;
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            border: 1px solid #e5e7eb;
-            animation: fadeIn 0.6s ease-out;
-            position: relative;
-            overflow: hidden;
+            max-width: 420px; margin: 60px auto; background: var(--white);
+            padding: 40px; border-radius: 16px; box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border); animation: fadeIn 0.5s ease-out;
+            position: relative; overflow: hidden;
         }
-
-        .auth-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--gradient-1);
-        }
-
+        .auth-container::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--gradient-1); }
         .auth-container h2 {
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 36px;
-            text-align: center;
-            position: relative;
-            z-index: 1;
+            background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; font-size: 32px; font-weight: 700; margin-bottom: 32px; text-align: center;
         }
 
-        .form-group {
-            margin-bottom: 24px;
-            position: relative;
-            z-index: 1;
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark); font-size: 13px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px 14px; border: 2px solid var(--border); border-radius: 10px;
+            font-size: 15px; transition: var(--transition); background: var(--white); font-family: inherit;
         }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 600;
-            color: var(--dark);
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
         }
+        .form-group small { color: var(--gray); display: block; margin-top: 6px; font-size: 12px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
 
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: var(--transition);
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-            transform: translateY(-2px);
-        }
-
-        /* Modern Buttons */
+        /* ---------- Buttons ---------- */
         .btn {
-            background: var(--gradient-1);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn:hover::before {
-            left: 100%;
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .btn-success {
-            background: var(--gradient-success);
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-warning {
-            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
-        }
-
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 14px;
-        }
-
-        /* Messages */
-        .message {
-            padding: 16px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            animation: slideInRight 0.4s ease-out;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .error-message {
-            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
-            color: var(--danger);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-        }
-
-        .success-message {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
-            color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-        }
-
-        /* Main App Header */
-        .header {
-            background: #ffffff;
-            padding: 28px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            margin-bottom: 24px;
-            border: 1px solid #e5e7eb;
-            border-top: 4px solid var(--primary);
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 24px;
-        }
-
-        .header h1 {
-            font-size: 36px;
-            font-weight: 800;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 8px;
-        }
-
-        .header-subtitle {
-            color: var(--gray);
-            font-size: 18px;
-        }
-
-        /* User Info Bar */
-        .user-info {
-            background: #ffffff;
-            padding: 18px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e5e7eb;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .user-info-text {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 500;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--gradient-1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
-        }
-
-        /* Form Section */
-        .form-section {
-            background: #ffffff;
-            padding: 28px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            margin-bottom: 24px;
-            border: 1px solid #e5e7eb;
-            animation: fadeIn 0.6s ease-out;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .form-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--gradient-1);
-        }
-
-        .form-section.edit::before {
-            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
-        }
-
-        .form-section h2 {
-            color: var(--dark);
-            margin-bottom: 28px;
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        /* Card Type Selector */
-        .card-type-selector {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .card-type-option {
-            padding: 24px;
-            border: 2px solid #e2e8f0;
-            border-radius: 16px;
-            cursor: pointer;
-            transition: var(--transition);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-        .card-type-option::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--gradient-1);
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 0;
-        }
-
-        .card-type-option:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .card-type-option.active {
-            border-color: var(--primary);
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-        }
-
-        .card-type-option.active::before {
-            opacity: 0.1;
-        }
-
-        .card-type-option h3,
-        .card-type-option p {
-            position: relative;
-            z-index: 1;
-        }
-
-        .card-type-option h3 {
-            font-size: 20px;
-            margin-bottom: 8px;
-            color: var(--dark);
-        }
-
-        .card-type-option p {
-            color: var(--gray);
-            font-size: 14px;
-        }
-
-        /* Card Items */
-        .card-item {
-            background: #ffffff;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            margin-bottom: 16px;
-            border: 1px solid #e5e7eb;
-            position: relative;
-            overflow: hidden;
-            transition: var(--transition);
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .card-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--gradient-1);
-            transition: height 0.2s;
-        }
-
-        .card-item:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .card-item:hover::before {
-            height: 5px;
-        }
-
-        .card-item.paid {
-            background: #ffffff;
-        }
-
-        .card-item.paid::before {
-            background: var(--gradient-success);
-        }
-
-        .card-item.due-soon {
-            background: #ffffff;
-        }
-
-        .card-item.due-soon::before {
-            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
-        }
-
-        .card-item.overdue {
-            background: #ffffff;
-            animation: pulse 2s infinite;
-        }
-
-        .card-item.overdue::before {
-            background: var(--gradient-1);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 20px;
-        }
-
-        .card-info h3 {
-            color: var(--dark);
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .card-meta {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--gray);
-            font-size: 14px;
-        }
-
-        .card-type-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-            color: var(--primary);
-        }
-
-        .card-status {
-            text-align: right;
-        }
-
-        .status-badge {
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            display: inline-block;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .status-paid {
-            background: var(--gradient-success);
-            color: white;
-        }
-
-        .status-due-soon {
-            background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
-            color: white;
-            animation: pulse 2s infinite;
-        }
-
-        .status-overdue {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-            color: white;
-            animation: pulse 1s infinite;
-        }
-
-        .status-upcoming {
-            background: var(--gradient-3);
-            color: white;
-        }
-
-        .card-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-        }
-
-        /* Stats Section */
-        .stats {
-            background: #ffffff;
-            padding: 28px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            margin-top: 24px;
-            border: 1px solid #e5e7eb;
-            border-top: 4px solid var(--primary);
-            animation: fadeIn 0.7s ease-out;
-        }
-
-        .stats h3 {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 24px;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 24px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
-            border: 1px solid rgba(99, 102, 241, 0.1);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-item::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
-            animation: float 5s ease-in-out infinite;
-        }
-
-        .stat-item:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-lg);
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-        }
-
-        .stat-number {
-            font-size: 36px;
-            font-weight: 800;
-            margin-bottom: 8px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .stat-label {
-            color: var(--gray);
-            font-size: 14px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            border: 1px solid #e5e7eb;
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        .empty-state-icon {
-            font-size: 80px;
-            margin-bottom: 24px;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        .empty-state h3 {
-            color: var(--dark);
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .empty-state p {
-            color: var(--gray);
-            font-size: 16px;
-            margin-bottom: 32px;
-        }
-
-        /* Loading State */
-        .loading {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            color: white;
-        }
-
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(255, 255, 255, 0.2);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 24px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading h3 {
-            font-size: 24px;
-            font-weight: 600;
-            animation: pulse 2s infinite;
-        }
-
-        /* Utilities */
-        .hidden {
-            display: none !important;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .header h1 {
-                font-size: 28px;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .card-type-selector {
-                grid-template-columns: 1fr;
-            }
-
-            .card-header {
-                flex-direction: column;
-                gap: 16px;
-            }
-
-            .card-actions {
-                justify-content: center;
-            }
-
-            .user-info {
-                flex-direction: column;
-                gap: 16px;
-                text-align: center;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Notes Section */
-        .notes-section {
-            background: #ffffff;
-            padding: 28px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            margin-bottom: 24px;
-            border: 1px solid #e5e7eb;
-            border-top: 4px solid var(--primary);
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        .notes-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 28px;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .notes-header h2 {
-            font-size: 24px;
-            font-weight: 700;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .notes-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .note-item {
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e5e7eb;
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        .note-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: var(--gradient-1);
-            transition: height 0.2s;
-        }
-
-        .note-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-        }
-
-        .note-item:hover::before {
-            height: 4px;
-        }
-
-        .note-header {
-            margin-bottom: 16px;
-        }
-
-        .note-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 8px;
-            word-wrap: break-word;
-        }
-
-        .note-date {
-            font-size: 12px;
-            color: var(--gray);
-            font-weight: 500;
-        }
-
-        .note-content {
-            color: var(--dark);
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 16px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            max-height: 150px;
-            overflow-y: auto;
-        }
-
-        .note-actions {
-            display: flex;
-            gap: 8px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        .note-form {
-            background: #ffffff;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            margin-bottom: 20px;
-            border: 1px solid #e5e7eb;
-            animation: fadeIn 0.6s ease-out;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .note-form::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-
-        .note-form h2 {
-            color: var(--dark);
-            margin-bottom: 28px;
-            font-size: 24px;
-            font-weight: 700;
-        }
-
-        .note-form textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 14px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: var(--transition);
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            font-family: inherit;
-            resize: vertical;
-        }
-
-        .note-form textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-            transform: translateY(-2px);
-        }
-
-        .notes-empty {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--gray);
-        }
+            background: var(--gradient-1); color: white; border: none; padding: 12px 22px;
+            border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 600;
+            transition: var(--transition); box-shadow: var(--shadow-sm);
+        }
+        .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .btn:active { transform: translateY(0); }
+        .btn-secondary { background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); }
+        .btn-success { background: var(--gradient-success); }
+        .btn-warning { background: var(--gradient-warning); }
+        .btn-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+        .btn-info { background: var(--gradient-info); }
+        .btn-sm { padding: 7px 14px; font-size: 13px; }
+        .btn-block { width: 100%; }
+
+        /* ---------- Messages ---------- */
+        .message { padding: 14px; border-radius: 10px; margin-bottom: 16px; animation: fadeIn 0.3s ease-out; font-size: 14px; }
+        .error-message { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .success-message { background: rgba(16, 185, 129, 0.1); color: var(--success-dark); border: 1px solid rgba(16, 185, 129, 0.3); }
+
+        /* ---------- Top bar ---------- */
+        .topbar {
+            background: var(--white); padding: 14px 20px; border-radius: var(--radius);
+            margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border); flex-wrap: wrap; gap: 12px;
+        }
+        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand-logo {
+            width: 42px; height: 42px; border-radius: 10px; background: var(--gradient-1);
+            display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 22px;
+        }
+        .brand h1 { font-size: 22px; font-weight: 800; }
+        .brand p { font-size: 12px; color: var(--gray); }
+        .topbar-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .user-chip { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray); }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--gradient-1); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px; }
 
-        /* Notification Settings */
         .notification-toggle {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 20px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            border: 2px solid #e2e8f0;
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 14px;
-            font-weight: 600;
+            display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--white);
+            border-radius: 10px; border: 2px solid var(--border); cursor: pointer; transition: var(--transition);
+            font-size: 13px; font-weight: 600;
         }
+        .notification-toggle.enabled { background: rgba(16, 185, 129, 0.1); border-color: var(--success); }
 
-        .notification-toggle:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
+        /* ---------- Tabs ---------- */
+        .tabs {
+            display: flex; gap: 6px; background: var(--white); padding: 6px; border-radius: var(--radius);
+            margin-bottom: 16px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); overflow-x: auto;
         }
-
-        .notification-toggle.enabled {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
-            border-color: var(--success);
+        .tab-btn {
+            flex: 1; min-width: max-content; padding: 12px 16px; border: none; background: transparent;
+            border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--gray);
+            transition: var(--transition); white-space: nowrap;
         }
+        .tab-btn:hover { background: var(--light); color: var(--dark); }
+        .tab-btn.active { background: var(--gradient-1); color: white; box-shadow: var(--shadow-sm); }
 
-        .notification-toggle.disabled {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: var(--danger);
+        .tab-content { display: none; animation: fadeIn 0.4s ease-out; }
+        .tab-content.active { display: block; }
+
+        /* ---------- Panels ---------- */
+        .panel {
+            background: var(--white); padding: 22px; border-radius: var(--radius); margin-bottom: 16px;
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border);
         }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
+        .panel-header h2 { font-size: 20px; font-weight: 700; }
+        .section-title { font-size: 16px; font-weight: 700; margin: 18px 0 10px; color: var(--dark); }
 
-        .notification-icon {
-            font-size: 20px;
+        /* ---------- Stat grid ---------- */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+        .stat-item {
+            padding: 18px; border-radius: var(--radius); background: var(--light);
+            border: 1px solid var(--border); transition: var(--transition);
         }
+        .stat-item:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+        .stat-number { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+        .stat-label { color: var(--gray); font-size: 13px; font-weight: 600; }
+        .stat-sub { color: var(--gray); font-size: 12px; margin-top: 4px; }
 
-        /* iOS Install Banner */
-        .ios-install-banner {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
-            backdrop-filter: blur(20px);
-            color: white;
-            padding: 20px;
-            border-radius: 16px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow-xl);
-            animation: slideInRight 0.5s ease-out;
+        /* ---------- Progress bar ---------- */
+        .progress-bar { height: 8px; background: #e5e7eb; border-radius: 6px; overflow: hidden; margin-top: 6px; }
+        .progress-fill { height: 100%; border-radius: 6px; transition: width 0.4s ease; }
+
+        /* ---------- Item cards ---------- */
+        .item-card {
+            background: var(--white); padding: 20px; border-radius: var(--radius); margin-bottom: 14px;
+            border: 1px solid var(--border); box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+            transition: var(--transition); animation: fadeIn 0.4s ease-out;
         }
+        .item-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--gradient-1); }
+        .item-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .item-card.paid::before { background: var(--gradient-success); }
+        .item-card.due-soon::before { background: var(--gradient-warning); }
+        .item-card.overdue { animation: pulse 2.5s infinite; }
+        .item-card.overdue::before { background: var(--gradient-1); }
 
-        .ios-install-banner h3 {
-            font-size: 18px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .item-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; gap: 12px; }
+        .item-title { font-size: 19px; font-weight: 700; margin-bottom: 6px; }
+        .item-meta { display: flex; align-items: center; gap: 8px; color: var(--gray); font-size: 13px; flex-wrap: wrap; }
+        .item-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; }
+        .badge-info { background: rgba(99, 102, 241, 0.1); color: var(--info); }
+        .badge-success { background: rgba(16, 185, 129, 0.12); color: var(--success-dark); }
+        .badge-gray { background: #f3f4f6; color: var(--gray); }
+
+        .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; color: white; display: inline-block; }
+        .status-paid { background: var(--gradient-success); }
+        .status-due-soon { background: var(--gradient-warning); }
+        .status-overdue { background: var(--gradient-1); animation: pulse 1.5s infinite; }
+        .status-upcoming { background: var(--gradient-info); }
+
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 10px; }
+        .info-box { background: var(--light); padding: 10px 12px; border-radius: 8px; }
+        .info-box .label { font-size: 11px; color: var(--gray); font-weight: 600; }
+        .info-box .value { font-size: 15px; font-weight: 700; margin-top: 2px; }
+
+        .cashback-tag { font-size: 12px; padding: 6px 10px; border-radius: 8px; background: rgba(16,185,129,0.1); color: var(--success-dark); margin: 3px 3px 0 0; display: inline-block; font-weight: 600; }
+        .cashback-row {
+            display: grid; grid-template-columns: 1.4fr 0.7fr 1fr auto; gap: 8px; align-items: center;
+            background: var(--light); padding: 8px; border-radius: 8px; margin-bottom: 8px;
         }
+        .cashback-row.header { background: transparent; font-size: 11px; color: var(--gray); font-weight: 700; padding: 2px 8px; }
 
-        .ios-install-banner p {
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 8px;
-            opacity: 0.95;
+        .suggest-card {
+            border: 2px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 10px;
+            transition: var(--transition); cursor: pointer; background: var(--white);
         }
+        .suggest-card:hover { border-color: var(--primary); box-shadow: var(--shadow-md); }
+        .suggest-card.best { border-color: var(--success); background: rgba(16,185,129,0.04); }
+        .suggest-card.disabled { opacity: 0.55; }
+        .suggest-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+        .suggest-cashback { font-size: 22px; font-weight: 800; color: var(--success-dark); }
 
-        .ios-install-banner ul {
-            list-style: none;
-            padding-left: 0;
-            margin: 12px 0;
-        }
+        .empty-state { text-align: center; padding: 50px 20px; color: var(--gray); }
+        .empty-state-icon { font-size: 64px; margin-bottom: 16px; }
+        .empty-state h3 { color: var(--dark); font-size: 20px; margin-bottom: 8px; }
 
-        .ios-install-banner li {
-            padding: 6px 0;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        .loading-spinner { width: 56px; height: 56px; border: 4px solid rgba(220,38,38,0.15); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        .loading h3 { font-size: 20px; font-weight: 600; color: var(--gray); }
 
-        .ios-install-banner li::before {
-            content: '→';
-            font-weight: bold;
-            font-size: 16px;
-        }
+        .hidden { display: none !important; }
+        .text-success { color: var(--success-dark); }
+        .text-danger { color: var(--danger); }
+        .text-warning { color: #b45309; }
+        .text-gray { color: var(--gray); }
+        .mt-8 { margin-top: 8px; }
+        .row-flex { display: flex; gap: 12px; flex-wrap: wrap; }
 
-        .close-banner {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            margin-top: 12px;
-            transition: var(--transition);
-        }
+        .ios-install-banner { background: var(--gradient-info); color: white; padding: 18px; border-radius: var(--radius); margin-bottom: 16px; }
+        .ios-install-banner h3 { font-size: 16px; margin-bottom: 10px; }
+        .ios-install-banner ul { list-style: none; margin: 10px 0; }
+        .ios-install-banner li { padding: 4px 0; font-size: 13px; }
+        .ios-install-banner li::before { content: '→ '; font-weight: bold; }
+        .close-banner { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 14px; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: 600; }
 
-        .close-banner:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
-        .notes-empty-icon {
-            font-size: 64px;
-            margin-bottom: 16px;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        /* Card Notes Section */
-        .card-notes-section {
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .card-notes-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .card-notes-header h4 {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .card-note-item {
-            background: #f9fafb;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            border-left: 3px solid var(--primary);
-        }
-
-        .card-note-content {
-            font-size: 13px;
-            color: var(--dark);
-            margin-bottom: 6px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-
-        .card-note-date {
-            font-size: 11px;
-            color: var(--gray);
-        }
-
-        .card-note-form {
-            margin-top: 12px;
-            padding: 12px;
-            background: #f9fafb;
-            border-radius: 8px;
-            border: 1px dashed #d1d5db;
-        }
-
-        .card-note-form textarea {
-            width: 100%;
-            min-height: 60px;
-            padding: 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 13px;
-            font-family: inherit;
-            resize: vertical;
-            margin-bottom: 8px;
-        }
-
-        .card-note-form textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+        @media (max-width: 768px) {
+            .form-row, .form-row-3 { grid-template-columns: 1fr; }
+            .brand h1 { font-size: 18px; }
+            .cashback-row { grid-template-columns: 1fr 1fr; }
+            .cashback-row.header { display: none; }
         }
     </style>
 </head>
 <body>
-    <!-- Loading State -->
+    <!-- Loading -->
     <div id="loadingState" class="loading">
         <div class="loading-spinner"></div>
         <h3>Đang tải PingPay...</h3>
     </div>
 
-    <!-- Authentication Form -->
+    <!-- Auth -->
     <div id="authContainer" class="auth-container hidden">
         <h2>✨ PingPay</h2>
-        
         <div id="errorMessage" class="message error-message hidden"></div>
         <div id="successMessage" class="message success-message hidden"></div>
-        
+
         <div id="loginForm">
             <div class="form-group">
                 <label>Email</label>
@@ -1129,10 +270,10 @@
                 <label>Mật khẩu</label>
                 <input type="password" id="loginPassword" placeholder="Nhập mật khẩu">
             </div>
-            <button class="btn" onclick="app.login()" style="width: 100%; margin-bottom: 12px;">Đăng nhập</button>
-            <button class="btn btn-secondary" onclick="app.showRegister()" style="width: 100%;">Tạo tài khoản mới</button>
+            <button class="btn btn-block" onclick="app.login()" style="margin-bottom: 10px;">Đăng nhập</button>
+            <button class="btn btn-secondary btn-block" onclick="app.showRegister()">Tạo tài khoản mới</button>
         </div>
-        
+
         <div id="registerForm" class="hidden">
             <div class="form-group">
                 <label>Email</label>
@@ -1146,217 +287,277 @@
                 <label>Xác nhận mật khẩu</label>
                 <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu">
             </div>
-            <button class="btn" onclick="app.register()" style="width: 100%; margin-bottom: 12px;">Đăng ký</button>
-            <button class="btn btn-secondary" onclick="app.showLogin()" style="width: 100%;">Đã có tài khoản</button>
+            <button class="btn btn-block" onclick="app.register()" style="margin-bottom: 10px;">Đăng ký</button>
+            <button class="btn btn-secondary btn-block" onclick="app.showLogin()">Đã có tài khoản</button>
         </div>
     </div>
 
     <!-- Main App -->
     <div id="mainApp" class="container hidden">
-        <!-- iOS Install Banner -->
+        <!-- iOS install banner -->
         <div id="iosInstallBanner" class="ios-install-banner hidden">
             <h3>📱 Cài đặt PingPay trên iPhone</h3>
-            <p>Để nhận thông báo trên iPhone, bạn cần thêm PingPay vào màn hình chính:</p>
+            <p style="font-size:13px;">Để nhận thông báo trên iPhone, hãy thêm PingPay vào màn hình chính:</p>
             <ul>
-                <li>Nhấn nút <strong>Chia sẻ</strong> (Share) ở dưới cùng Safari</li>
-                <li>Chọn <strong>"Thêm vào Màn hình chính"</strong> (Add to Home Screen)</li>
-                <li>Nhấn <strong>"Thêm"</strong></li>
+                <li>Nhấn nút <strong>Chia sẻ</strong> trong Safari</li>
+                <li>Chọn <strong>"Thêm vào Màn hình chính"</strong></li>
                 <li>Mở PingPay từ màn hình chính và bật thông báo</li>
             </ul>
             <button class="close-banner" onclick="app.closeIOSBanner()">Đã hiểu</button>
         </div>
 
-        <!-- User Info -->
-        <div class="user-info">
-            <div class="user-info-text">
-                <div class="user-avatar" id="userAvatar">U</div>
-                <span>Xin chào, <strong id="userEmail"></strong></span>
-            </div>
-            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-                <div id="notificationToggle" class="notification-toggle" onclick="app.toggleNotifications()">
-                    <span class="notification-icon">🔔</span>
-                    <span id="notificationStatus">Bật thông báo</span>
-                </div>
-                <button class="btn btn-sm" onclick="app.logout()">Đăng xuất</button>
-            </div>
-        </div>
-
-        <!-- Header -->
-        <div class="header">
-            <div class="header-content">
+        <!-- Top bar -->
+        <div class="topbar">
+            <div class="brand">
+                <div class="brand-logo">P</div>
                 <div>
-                    <h1>💳 PingPay</h1>
-                    <p class="header-subtitle">Không bao giờ bỏ lỡ thanh toán</p>
+                    <h1>PingPay</h1>
+                    <p>Quản lý thẻ & tài chính cá nhân</p>
                 </div>
-                <button class="btn btn-success" onclick="app.showAddForm()">
-                    ➕ Thêm thẻ mới
-                </button>
+            </div>
+            <div class="topbar-actions">
+                <div class="user-chip">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <span id="userEmail"></span>
+                </div>
+                <div id="notificationToggle" class="notification-toggle" onclick="app.toggleNotifications()">
+                    <span>🔔</span><span id="notificationStatus">Bật thông báo</span>
+                </div>
+                <button class="btn btn-sm btn-secondary" onclick="app.logout()">Đăng xuất</button>
             </div>
         </div>
 
-        <!-- Add Card Form -->
-        <div id="addForm" class="form-section hidden">
-            <h2>Thêm thẻ tín dụng mới</h2>
-            
-            <div class="form-group">
-                <label>Tên thẻ</label>
-                <input type="text" id="cardName" placeholder="VD: Techcombank Visa, VPBank Mastercard">
-            </div>
-            
-            <div class="form-group">
-                <label>Loại ngày đến hạn</label>
-                <div class="card-type-selector">
-                    <div class="card-type-option active" onclick="app.selectCardType('fixed')">
-                        <h3>📅 Ngày cố định</h3>
-                        <p>VD: Ngày 15 hàng tháng</p>
-                    </div>
-                    <div class="card-type-option" onclick="app.selectCardType('variable')">
-                        <h3>🔄 Ngày biến động</h3>
-                        <p>Dựa trên ngày thông báo + số ngày</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="fixedDateInput" class="form-group">
-                <label>Ngày đến hạn hàng tháng</label>
-                <input type="date" id="dueDate">
-                <small style="color: var(--gray); display: block; margin-top: 8px;">
-                    Chỉ cần chọn một ngày bất kỳ, ứng dụng sẽ lấy ngày trong tháng đó làm ngày cố định
-                </small>
-            </div>
-            
-            <div id="variableDateInput" class="form-row hidden">
-                <div class="form-group">
-                    <label>Ngày thông báo giao dịch</label>
-                    <input type="date" id="transactionDate">
-                </div>
-                <div class="form-group">
-                    <label>Số ngày cộng thêm</label>
-                    <input type="number" id="daysToAdd" value="20" min="1" max="365">
-                </div>
-            </div>
-            
-            <div style="display: flex; gap: 12px;">
-                <button class="btn btn-success" onclick="app.addCard()">Thêm thẻ</button>
-                <button class="btn btn-secondary" onclick="app.hideAddForm()">Hủy</button>
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="dashboard" onclick="app.switchTab('dashboard')">📊 Tổng quan</button>
+            <button class="tab-btn" data-tab="cards" onclick="app.switchTab('cards')">💳 Thẻ tín dụng</button>
+            <button class="tab-btn" data-tab="transactions" onclick="app.switchTab('transactions')">💸 Giao dịch</button>
+            <button class="tab-btn" data-tab="loans" onclick="app.switchTab('loans')">🤝 Cho vay</button>
+            <button class="tab-btn" data-tab="notes" onclick="app.switchTab('notes')">📝 Ghi chú</button>
+        </div>
+
+        <!-- ============ TAB: DASHBOARD ============ -->
+        <div id="tab-dashboard" class="tab-content active">
+            <div class="panel">
+                <div class="panel-header"><h2>📊 Tổng quan tài chính</h2></div>
+                <div id="dashboardContent"></div>
             </div>
         </div>
 
-        <!-- Edit Card Form -->
-        <div id="editForm" class="form-section edit hidden">
-            <h2 style="color: var(--warning);">Chỉnh sửa thẻ tín dụng</h2>
-            
-            <div class="form-group">
-                <label>Tên thẻ</label>
-                <input type="text" id="editCardName" placeholder="VD: Techcombank Visa, VPBank Mastercard">
-            </div>
-            
-            <div class="form-group">
-                <label>Loại ngày đến hạn</label>
-                <div class="card-type-selector">
-                    <div class="card-type-option" onclick="app.selectEditCardType('fixed')">
-                        <h3>📅 Ngày cố định</h3>
-                        <p>VD: Ngày 15 hàng tháng</p>
+        <!-- ============ TAB: CARDS ============ -->
+        <div id="tab-cards" class="tab-content">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>💳 Thẻ tín dụng</h2>
+                    <button class="btn btn-success" onclick="app.showCardForm()">➕ Thêm thẻ</button>
+                </div>
+
+                <!-- Card form (add + edit) -->
+                <div id="cardForm" class="hidden" style="border:2px dashed var(--border); border-radius:var(--radius); padding:20px; margin-bottom:18px;">
+                    <h3 id="cardFormTitle" class="section-title" style="margin-top:0;">Thêm thẻ tín dụng</h3>
+                    <div class="form-group">
+                        <label>Tên thẻ</label>
+                        <input type="text" id="cardName" placeholder="VD: Techcombank Visa, VPBank Mastercard">
                     </div>
-                    <div class="card-type-option" onclick="app.selectEditCardType('variable')">
-                        <h3>🔄 Ngày biến động</h3>
-                        <p>Dựa trên ngày thông báo + số ngày</p>
+
+                    <div class="form-group">
+                        <label>Loại ngày đến hạn</label>
+                        <select id="cardType" onchange="app.onCardTypeChange()">
+                            <option value="fixed">📅 Ngày cố định hàng tháng</option>
+                            <option value="variable">🔄 Ngày biến động (ngày thông báo + số ngày)</option>
+                        </select>
+                    </div>
+
+                    <div id="fixedDateInput" class="form-group">
+                        <label>Ngày đến hạn hàng tháng</label>
+                        <input type="date" id="dueDate">
+                        <small>Chọn một ngày bất kỳ, app lấy ngày trong tháng làm ngày cố định.</small>
+                    </div>
+                    <div id="variableDateInput" class="form-row hidden">
+                        <div class="form-group">
+                            <label>Ngày thông báo giao dịch</label>
+                            <input type="date" id="transactionDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Số ngày cộng thêm</label>
+                            <input type="number" id="daysToAdd" value="20" min="1" max="365">
+                        </div>
+                    </div>
+
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label>Hạn mức (₫)</label>
+                            <input type="number" id="creditLimit" placeholder="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Dư nợ hiện tại (₫)</label>
+                            <input type="number" id="currentBalance" placeholder="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Cần thanh toán kỳ này (₫)</label>
+                            <input type="number" id="statementAmount" placeholder="0" min="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Thanh toán tối thiểu (₫)</label>
+                            <input type="number" id="minimumPayment" placeholder="0" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Hoàn tiền mặc định (% cho danh mục khác)</label>
+                            <input type="number" id="cashbackDefaultRate" placeholder="0" min="0" step="0.1">
+                        </div>
+                    </div>
+
+                    <div class="section-title">Quyền lợi hoàn tiền theo danh mục</div>
+                    <div class="cashback-row header">
+                        <div>Danh mục</div><div>Tỷ lệ %</div><div>Cap/tháng (₫)</div><div></div>
+                    </div>
+                    <div id="cashbackEditor"></div>
+                    <button class="btn btn-sm btn-info mt-8" onclick="app.addCashbackRow()">➕ Thêm danh mục hoàn tiền</button>
+
+                    <div class="row-flex" style="margin-top:18px;">
+                        <button class="btn btn-success" onclick="app.saveCard()">💾 Lưu thẻ</button>
+                        <button class="btn btn-secondary" onclick="app.hideCardForm()">Hủy</button>
                     </div>
                 </div>
-            </div>
-            
-            <div id="editFixedDateInput" class="form-group">
-                <label>Ngày đến hạn hàng tháng</label>
-                <input type="date" id="editDueDate">
-                <small style="color: var(--gray); display: block; margin-top: 8px;">
-                    Chỉ cần chọn một ngày bất kỳ, ứng dụng sẽ lấy ngày trong tháng đó làm ngày cố định
-                </small>
-            </div>
-            
-            <div id="editVariableDateInput" class="form-row hidden">
-                <div class="form-group">
-                    <label>Ngày thông báo giao dịch</label>
-                    <input type="date" id="editTransactionDate">
-                </div>
-                <div class="form-group">
-                    <label>Số ngày cộng thêm</label>
-                    <input type="number" id="editDaysToAdd" value="20" min="1" max="365">
-                </div>
-            </div>
-            
-            <div style="display: flex; gap: 12px;">
-                <button class="btn btn-warning" onclick="app.saveEditCard()">💾 Lưu thay đổi</button>
-                <button class="btn btn-secondary" onclick="app.cancelEdit()">Hủy</button>
+
+                <div id="cardsList"></div>
             </div>
         </div>
 
-        <!-- Cards List -->
-        <div id="cardsList"></div>
+        <!-- ============ TAB: TRANSACTIONS ============ -->
+        <div id="tab-transactions" class="tab-content">
+            <div class="panel">
+                <div class="panel-header"><h2>💸 Ghi giao dịch & gợi ý thẻ</h2></div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Số tiền giao dịch (₫)</label>
+                        <input type="number" id="txAmount" placeholder="0" min="0" oninput="app.refreshSuggestions()">
+                    </div>
+                    <div class="form-group">
+                        <label>Danh mục chi tiêu</label>
+                        <select id="txCategory" onchange="app.refreshSuggestions()"></select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Mô tả (tùy chọn)</label>
+                        <input type="text" id="txDescription" placeholder="VD: Siêu thị Aeon, Grab...">
+                    </div>
+                    <div class="form-group">
+                        <label>Ngày giao dịch</label>
+                        <input type="date" id="txDate">
+                    </div>
+                </div>
 
-        <!-- Stats -->
-        <div id="stats" class="stats hidden">
-            <h3>📊 Tổng quan</h3>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-number" id="totalCards">0</div>
-                    <div class="stat-label">Tổng số thẻ</div>
+                <div class="section-title">💡 Gợi ý thẻ cho hoàn tiền tốt nhất</div>
+                <div id="suggestionList"><p class="text-gray" style="font-size:14px;">Nhập số tiền và chọn danh mục để xem gợi ý.</p></div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>📜 Lịch sử giao dịch</h2>
+                    <select id="txFilterCard" onchange="app.renderTransactions()" style="width:auto; padding:8px 12px; border-radius:8px; border:2px solid var(--border);"></select>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-number" style="color: var(--success);" id="paidCards">0</div>
-                    <div class="stat-label">Đã thanh toán</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" style="color: var(--warning);" id="dueSoonCards">0</div>
-                    <div class="stat-label">Sắp đến hạn</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number" style="color: var(--danger);" id="overdueCards">0</div>
-                    <div class="stat-label">Quá hạn</div>
-                </div>
+                <div id="transactionsList"></div>
             </div>
         </div>
 
-        <!-- Notes Section -->
-        <div class="notes-section">
-            <div class="notes-header">
-                <h2>📝 Ghi chú</h2>
-                <button class="btn btn-success btn-sm" onclick="app.showNoteForm()">
-                    ➕ Thêm ghi chú
-                </button>
+        <!-- ============ TAB: LOANS ============ -->
+        <div id="tab-loans" class="tab-content">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>🤝 Khoản cho vay</h2>
+                    <button class="btn btn-success" onclick="app.showLoanForm()">➕ Thêm khoản vay</button>
+                </div>
+
+                <div id="loanForm" class="hidden" style="border:2px dashed var(--border); border-radius:var(--radius); padding:20px; margin-bottom:18px;">
+                    <h3 id="loanFormTitle" class="section-title" style="margin-top:0;">Thêm khoản cho vay</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Người vay</label>
+                            <input type="text" id="loanBorrower" placeholder="VD: Anh Tuấn">
+                        </div>
+                        <div class="form-group">
+                            <label>Số tiền cho vay (gốc, ₫)</label>
+                            <input type="number" id="loanPrincipal" placeholder="0" min="0">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Loại hình vay</label>
+                            <select id="loanType">
+                                <option value="installment">Trả góp (gốc + lãi cố định)</option>
+                                <option value="reducing">Dư nợ giảm dần</option>
+                                <option value="interest_only">Vay đứng (chỉ trả lãi)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Lãi suất (%/tháng)</label>
+                            <input type="number" id="loanRate" placeholder="0" min="0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label>Ngày cho vay</label>
+                            <input type="date" id="loanStartDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày hẹn trả</label>
+                            <input type="date" id="loanDueDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Kỳ hạn (tháng)</label>
+                            <input type="number" id="loanTerm" placeholder="0" min="0">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Ghi chú</label>
+                        <textarea id="loanNote" rows="2" placeholder="Ghi chú về khoản vay..."></textarea>
+                    </div>
+                    <div class="row-flex">
+                        <button class="btn btn-success" onclick="app.saveLoan()">💾 Lưu khoản vay</button>
+                        <button class="btn btn-secondary" onclick="app.hideLoanForm()">Hủy</button>
+                    </div>
+                </div>
+
+                <div id="loansList"></div>
             </div>
+        </div>
 
-            <!-- Add/Edit Note Form -->
-            <div id="noteForm" class="note-form hidden">
-                <h2 id="noteFormTitle">Thêm ghi chú mới</h2>
-
-                <div class="form-group">
-                    <label>Tiêu đề</label>
-                    <input type="text" id="noteTitle" placeholder="Nhập tiêu đề ghi chú">
+        <!-- ============ TAB: NOTES ============ -->
+        <div id="tab-notes" class="tab-content">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>📝 Ghi chú</h2>
+                    <button class="btn btn-success" onclick="app.showNoteForm()">➕ Thêm ghi chú</button>
                 </div>
-
-                <div class="form-group">
-                    <label>Nội dung</label>
-                    <textarea id="noteContent" placeholder="Nhập nội dung ghi chú..."></textarea>
+                <div id="noteForm" class="hidden" style="border:2px dashed var(--border); border-radius:var(--radius); padding:20px; margin-bottom:18px;">
+                    <h3 id="noteFormTitle" class="section-title" style="margin-top:0;">Thêm ghi chú mới</h3>
+                    <div class="form-group">
+                        <label>Tiêu đề</label>
+                        <input type="text" id="noteTitle" placeholder="Nhập tiêu đề ghi chú">
+                    </div>
+                    <div class="form-group">
+                        <label>Nội dung</label>
+                        <textarea id="noteContent" rows="4" placeholder="Nhập nội dung ghi chú..."></textarea>
+                    </div>
+                    <div class="row-flex">
+                        <button class="btn btn-success" onclick="app.saveNote()">💾 Lưu</button>
+                        <button class="btn btn-secondary" onclick="app.hideNoteForm()">Hủy</button>
+                    </div>
                 </div>
-
-                <div style="display: flex; gap: 12px;">
-                    <button class="btn btn-success" onclick="app.saveNote()">💾 Lưu</button>
-                    <button class="btn btn-secondary" onclick="app.hideNoteForm()">Hủy</button>
-                </div>
+                <div id="notesList"></div>
             </div>
-
-            <!-- Notes List -->
-            <div id="notesList"></div>
         </div>
     </div>
-    
+
     <script type="module">
-        // Import Firebase
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, addDoc, updateDoc, deleteDoc, doc, query, where, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, addDoc, updateDoc, deleteDoc, doc, query, where, orderBy, onSnapshot, writeBatch } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // Firebase config
         const firebaseConfig = {
             apiKey: "AIzaSyBEtdEz6RJF1_eLoCNE9_Pp0oZLqDzaLuk",
             authDomain: "pingpay-16a26.firebaseapp.com",
@@ -1367,37 +568,63 @@
             appId: "1:533740183343:web:9a9a0b4ea709e34ec28bda"
         };
 
-        // Initialize Firebase
         const firebaseApp = initializeApp(firebaseConfig);
         const auth = getAuth(firebaseApp);
-        // Bật IndexedDB persistence — reload đầu render từ cache instant, listener vẫn sync
+        // IndexedDB persistence: first paint renders from cache instantly, listeners keep syncing.
         const db = initializeFirestore(firebaseApp, {
             localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
         });
 
-        // Main application
+        // Spending categories shared between cards' cashback config and transactions.
+        const CATEGORIES = [
+            { key: 'dining',        label: 'Ăn uống',            icon: '🍜' },
+            { key: 'grocery',       label: 'Siêu thị',           icon: '🛒' },
+            { key: 'online',        label: 'Mua sắm online',     icon: '🛍️' },
+            { key: 'travel',        label: 'Du lịch',            icon: '✈️' },
+            { key: 'fuel',          label: 'Xăng dầu',           icon: '⛽' },
+            { key: 'bills',         label: 'Hóa đơn & tiện ích', icon: '🧾' },
+            { key: 'entertainment', label: 'Giải trí',           icon: '🎬' },
+            { key: 'health',        label: 'Sức khỏe',           icon: '💊' },
+            { key: 'education',     label: 'Giáo dục',           icon: '📚' },
+            { key: 'other',         label: 'Khác',               icon: '💰' },
+        ];
+        const catLabel = (key) => { const c = CATEGORIES.find(x => x.key === key); return c ? `${c.icon} ${c.label}` : key; };
+
+        const LOAN_TYPES = {
+            installment:   'Trả góp (gốc + lãi cố định)',
+            reducing:      'Dư nợ giảm dần',
+            interest_only: 'Vay đứng (chỉ trả lãi)',
+        };
+
+        // ---------- Formatting / number helpers ----------
+        const fmtVND = (n) => (Number(n) || 0).toLocaleString('vi-VN') + ' ₫';
+        const num = (v) => Number(v) || 0;
+        const escapeHtml = (s) => String(s == null ? '' : s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
         const app = {
             currentUser: null,
+            activeTab: 'dashboard',
             cards: [],
+            transactions: [],
+            loans: [],
+            loanRepayments: {},   // grouped by loanId
             notes: [],
             cardNotes: {},
             editingCardId: null,
+            editingLoanId: null,
             editingNoteId: null,
-            currentCardType: 'fixed',
-            currentEditCardType: 'fixed',
+            cashbackDraft: [],     // working list of cashback categories in the card form
             notificationsEnabled: false,
             notificationCheckInterval: null,
             lastNotificationCheck: null,
-            // Unsubscribe handles cho realtime listeners (tránh duplicate khi auth re-fire)
-            unsubCards: null,
-            unsubCardNotes: null,
-            unsubNotes: null,
+            unsub: {},             // realtime unsubscribe handles
 
-            // Initialize app
+            // ---------- Init / auth state ----------
             async init() {
                 this.showLoading(true);
-
-                // Listen for auth state changes
+                this.populateCategorySelects();
                 onAuthStateChanged(auth, (user) => {
                     this.currentUser = user;
                     if (user) {
@@ -1411,156 +638,136 @@
                 });
             },
 
-            // Realtime data subscriptions — thay cho polling getDocs + reload-after-write
+            // ---------- Realtime subscriptions ----------
             subscribeData() {
                 this.unsubscribeData();
                 if (!this.currentUser) return;
                 const uid = this.currentUser.uid;
 
-                // 1 listener cho cards — tự cập nhật khi add/update/delete
-                this.unsubCards = onSnapshot(
-                    query(
-                        collection(db, 'cards'),
-                        where('userId', '==', uid),
-                        orderBy('nextDueDate', 'asc')
-                    ),
+                this.unsub.cards = onSnapshot(
+                    query(collection(db, 'cards'), where('userId', '==', uid), orderBy('nextDueDate', 'asc')),
                     (snap) => {
                         this.cards = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                         this.renderCards();
-                        this.updateStats();
+                        this.renderDashboard();
+                        this.populateCardSelects();
+                        this.refreshSuggestions();
                     },
-                    (err) => console.error('cards listener error:', err)
+                    (err) => console.error('cards listener:', err)
                 );
 
-                // 1 listener cho TẤT CẢ cardNotes — diệt N+1 (1 query thay vì N query)
-                this.unsubCardNotes = onSnapshot(
-                    query(
-                        collection(db, 'cardNotes'),
-                        where('userId', '==', uid),
-                        orderBy('createdAt', 'desc')
-                    ),
+                this.unsub.transactions = onSnapshot(
+                    query(collection(db, 'transactions'), where('userId', '==', uid), orderBy('date', 'desc')),
+                    (snap) => {
+                        this.transactions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        this.renderTransactions();
+                        this.renderDashboard();
+                    },
+                    (err) => console.error('transactions listener:', err)
+                );
+
+                this.unsub.loans = onSnapshot(
+                    query(collection(db, 'loans'), where('userId', '==', uid), orderBy('createdAt', 'desc')),
+                    (snap) => {
+                        this.loans = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        this.renderLoans();
+                        this.renderDashboard();
+                    },
+                    (err) => console.error('loans listener:', err)
+                );
+
+                this.unsub.loanRepayments = onSnapshot(
+                    query(collection(db, 'loanRepayments'), where('userId', '==', uid), orderBy('createdAt', 'desc')),
                     (snap) => {
                         const grouped = {};
                         snap.docs.forEach(d => {
-                            const note = { id: d.id, ...d.data() };
-                            (grouped[note.cardId] = grouped[note.cardId] || []).push(note);
+                            const r = { id: d.id, ...d.data() };
+                            (grouped[r.loanId] = grouped[r.loanId] || []).push(r);
+                        });
+                        this.loanRepayments = grouped;
+                        this.renderLoans();
+                        this.renderDashboard();
+                    },
+                    (err) => console.error('loanRepayments listener:', err)
+                );
+
+                this.unsub.cardNotes = onSnapshot(
+                    query(collection(db, 'cardNotes'), where('userId', '==', uid), orderBy('createdAt', 'desc')),
+                    (snap) => {
+                        const grouped = {};
+                        snap.docs.forEach(d => {
+                            const n = { id: d.id, ...d.data() };
+                            (grouped[n.cardId] = grouped[n.cardId] || []).push(n);
                         });
                         this.cardNotes = grouped;
                         this.renderCards();
                     },
-                    (err) => console.error('cardNotes listener error:', err)
+                    (err) => console.error('cardNotes listener:', err)
                 );
 
-                // 1 listener cho notes
-                this.unsubNotes = onSnapshot(
-                    query(
-                        collection(db, 'notes'),
-                        where('userId', '==', uid),
-                        orderBy('createdAt', 'desc')
-                    ),
+                this.unsub.notes = onSnapshot(
+                    query(collection(db, 'notes'), where('userId', '==', uid), orderBy('createdAt', 'desc')),
                     (snap) => {
                         this.notes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                         this.renderNotes();
                     },
-                    (err) => console.error('notes listener error:', err)
+                    (err) => console.error('notes listener:', err)
                 );
             },
 
             unsubscribeData() {
-                if (this.unsubCards) { this.unsubCards(); this.unsubCards = null; }
-                if (this.unsubCardNotes) { this.unsubCardNotes(); this.unsubCardNotes = null; }
-                if (this.unsubNotes) { this.unsubNotes(); this.unsubNotes = null; }
-                this.cards = [];
-                this.notes = [];
-                this.cardNotes = {};
+                Object.values(this.unsub).forEach(fn => { if (typeof fn === 'function') fn(); });
+                this.unsub = {};
+                this.cards = []; this.transactions = []; this.loans = [];
+                this.loanRepayments = {}; this.notes = []; this.cardNotes = {};
             },
 
-            // UI Management
-            showLoading(show) {
-                document.getElementById('loadingState').classList.toggle('hidden', !show);
-            },
-
+            // ---------- UI plumbing ----------
+            showLoading(show) { document.getElementById('loadingState').classList.toggle('hidden', !show); },
             showAuth() {
                 document.getElementById('authContainer').classList.remove('hidden');
                 document.getElementById('mainApp').classList.add('hidden');
             },
-
             showMainApp() {
                 document.getElementById('authContainer').classList.add('hidden');
                 document.getElementById('mainApp').classList.remove('hidden');
                 const email = this.currentUser?.email || '';
                 document.getElementById('userEmail').textContent = email;
-                if (email) {
-                    document.getElementById('userAvatar').textContent = email[0].toUpperCase();
-                }
-                // Load notification settings
+                if (email) document.getElementById('userAvatar').textContent = email[0].toUpperCase();
                 this.loadNotificationSettings();
             },
-
+            switchTab(tab) {
+                this.activeTab = tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === `tab-${tab}`));
+            },
             showMessage(message, isError = false) {
                 const errorEl = document.getElementById('errorMessage');
                 const successEl = document.getElementById('successMessage');
-                
-                if (isError) {
-                    errorEl.textContent = message;
-                    errorEl.classList.remove('hidden');
-                    successEl.classList.add('hidden');
-                } else {
-                    successEl.textContent = message;
-                    successEl.classList.remove('hidden');
-                    errorEl.classList.add('hidden');
-                }
-                
-                setTimeout(() => {
-                    errorEl.classList.add('hidden');
-                    successEl.classList.add('hidden');
-                }, 5000);
+                if (isError) { errorEl.textContent = message; errorEl.classList.remove('hidden'); successEl.classList.add('hidden'); }
+                else { successEl.textContent = message; successEl.classList.remove('hidden'); errorEl.classList.add('hidden'); }
+                setTimeout(() => { errorEl.classList.add('hidden'); successEl.classList.add('hidden'); }, 5000);
             },
 
-            // Authentication
-            showLogin() {
-                document.getElementById('loginForm').classList.remove('hidden');
-                document.getElementById('registerForm').classList.add('hidden');
-            },
-
-            showRegister() {
-                document.getElementById('loginForm').classList.add('hidden');
-                document.getElementById('registerForm').classList.remove('hidden');
-            },
+            // ---------- Auth ----------
+            showLogin() { document.getElementById('loginForm').classList.remove('hidden'); document.getElementById('registerForm').classList.add('hidden'); },
+            showRegister() { document.getElementById('loginForm').classList.add('hidden'); document.getElementById('registerForm').classList.remove('hidden'); },
 
             async register() {
                 const email = document.getElementById('registerEmail').value.trim();
                 const password = document.getElementById('registerPassword').value.trim();
                 const confirmPassword = document.getElementById('confirmPassword').value.trim();
-
-                if (!email || !password) {
-                    this.showMessage('Vui lòng điền đầy đủ thông tin', true);
-                    return;
-                }
-
-                if (password.length < 6) {
-                    this.showMessage('Mật khẩu phải có ít nhất 6 ký tự', true);
-                    return;
-                }
-
-                if (password !== confirmPassword) {
-                    this.showMessage('Mật khẩu xác nhận không khớp', true);
-                    return;
-                }
-
+                if (!email || !password) return this.showMessage('Vui lòng điền đầy đủ thông tin', true);
+                if (password.length < 6) return this.showMessage('Mật khẩu phải có ít nhất 6 ký tự', true);
+                if (password !== confirmPassword) return this.showMessage('Mật khẩu xác nhận không khớp', true);
                 try {
                     await createUserWithEmailAndPassword(auth, email, password);
                     this.showMessage('Đăng ký thành công! 🎉');
                 } catch (error) {
-                    console.error('Registration error:', error);
                     let message = 'Đăng ký thất bại';
-                    if (error.code === 'auth/email-already-in-use') {
-                        message = 'Email đã được sử dụng';
-                    } else if (error.code === 'auth/weak-password') {
-                        message = 'Mật khẩu quá yếu';
-                    } else if (error.code === 'auth/invalid-email') {
-                        message = 'Email không hợp lệ';
-                    }
+                    if (error.code === 'auth/email-already-in-use') message = 'Email đã được sử dụng';
+                    else if (error.code === 'auth/weak-password') message = 'Mật khẩu quá yếu';
+                    else if (error.code === 'auth/invalid-email') message = 'Email không hợp lệ';
                     this.showMessage(message, true);
                 }
             },
@@ -1568,482 +775,854 @@
             async login() {
                 const email = document.getElementById('loginEmail').value;
                 const password = document.getElementById('loginPassword').value;
-
-                if (!email || !password) {
-                    this.showMessage('Vui lòng điền đầy đủ thông tin', true);
-                    return;
-                }
-
+                if (!email || !password) return this.showMessage('Vui lòng điền đầy đủ thông tin', true);
                 try {
                     await signInWithEmailAndPassword(auth, email, password);
                     this.showMessage('Đăng nhập thành công! ✨');
                 } catch (error) {
-                    console.error('Login error:', error);
                     let message = 'Đăng nhập thất bại';
-                    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                        message = 'Email hoặc mật khẩu không đúng';
-                    } else if (error.code === 'auth/invalid-email') {
-                        message = 'Email không hợp lệ';
-                    }
+                    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') message = 'Email hoặc mật khẩu không đúng';
+                    else if (error.code === 'auth/invalid-email') message = 'Email không hợp lệ';
                     this.showMessage(message, true);
                 }
             },
 
             async logout() {
-                try {
-                    // Dừng kiểm tra thông báo khi đăng xuất
-                    this.stopNotificationCheck();
-                    await signOut(auth);
-                } catch (error) {
-                    console.error('Logout error:', error);
-                }
+                try { this.stopNotificationCheck(); await signOut(auth); }
+                catch (error) { console.error('Logout error:', error); }
             },
 
-            // Card Management — listener tự cập nhật UI sau write, không cần reload thủ công
-            async saveCard(cardData) {
-                if (!this.currentUser) return;
-                try {
-                    cardData.userId = this.currentUser.uid;
-                    await addDoc(collection(db, 'cards'), cardData);
-                } catch (error) {
-                    console.error('Error saving card:', error);
-                    this.showMessage('Lỗi khi lưu thẻ', true);
-                }
-            },
-
-            async updateCard(cardId, updateData) {
-                try {
-                    await updateDoc(doc(db, 'cards', cardId), updateData);
-                } catch (error) {
-                    console.error('Error updating card:', error);
-                    this.showMessage('Lỗi khi cập nhật thẻ', true);
-                }
-            },
-
-            async deleteCard(cardId) {
-                if (!confirm('Bạn có chắc muốn xóa thẻ này?')) return;
-                try {
-                    await deleteDoc(doc(db, 'cards', cardId));
-                } catch (error) {
-                    console.error('Error deleting card:', error);
-                    this.showMessage('Lỗi khi xóa thẻ', true);
-                }
-            },
-
-            // Card Logic
+            // ============================================================
+            //  DATE / DUE-DATE LOGIC (credit cards)
+            // ============================================================
             getNextDueDateFixed(dueDate) {
                 const today = new Date();
                 const cardDueDay = new Date(dueDate).getDate();
-                
                 let nextDue = new Date(today.getFullYear(), today.getMonth(), cardDueDay);
-                
-                if (nextDue <= today) {
-                    nextDue = new Date(today.getFullYear(), today.getMonth() + 1, cardDueDay);
-                }
-                
-                if (nextDue.getDate() !== cardDueDay) {
-                    nextDue = new Date(nextDue.getFullYear(), nextDue.getMonth() + 1, 0);
-                }
-                
+                if (nextDue <= today) nextDue = new Date(today.getFullYear(), today.getMonth() + 1, cardDueDay);
+                if (nextDue.getDate() !== cardDueDay) nextDue = new Date(nextDue.getFullYear(), nextDue.getMonth() + 1, 0);
                 return nextDue;
             },
-
             getDueDateVariable(transactionDate, daysToAdd) {
                 const txDate = new Date(transactionDate);
                 const dueDate = new Date(txDate);
                 dueDate.setDate(txDate.getDate() + parseInt(daysToAdd));
                 return dueDate;
             },
-
-            getDaysUntilDue(dueDate) {
-                // Normalize cả 2 ngày về midnight LOCAL — tránh off-by-one do timezone (toISOString lưu UTC)
+            // Normalize both dates to local midnight to avoid timezone off-by-one (ISO strings are UTC).
+            getDaysUntil(dateStr) {
                 const now = new Date();
                 const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                const d = new Date(dueDate);
-                const due = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-                return Math.round((due - today) / 86400000);
+                const d = new Date(dateStr);
+                const target = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+                return Math.round((target - today) / 86400000);
             },
-
             getCardStatus(daysUntil, isPaid) {
-                if (isPaid) {
-                    return { status: 'Đã thanh toán', class: 'paid', badge: 'status-paid' };
-                }
-                if (daysUntil < 0) {
-                    return { status: 'Quá hạn', class: 'overdue', badge: 'status-overdue' };
-                }
-                if (daysUntil <= 3) {
-                    return { status: 'Sắp đến hạn', class: 'due-soon', badge: 'status-due-soon' };
-                }
+                if (isPaid) return { status: 'Đã thanh toán', class: 'paid', badge: 'status-paid' };
+                if (daysUntil < 0) return { status: 'Quá hạn', class: 'overdue', badge: 'status-overdue' };
+                if (daysUntil <= 3) return { status: 'Sắp đến hạn', class: 'due-soon', badge: 'status-due-soon' };
                 return { status: 'Sắp tới', class: 'upcoming', badge: 'status-upcoming' };
             },
-
-            // Form Management
-            showAddForm() {
-                document.getElementById('addForm').classList.remove('hidden');
-                document.getElementById('cardName').focus();
+            daysText(daysUntil) {
+                if (daysUntil === 0) return 'Đến hạn hôm nay';
+                if (daysUntil === 1) return 'Đến hạn ngày mai';
+                if (daysUntil < 0) return `Quá hạn ${Math.abs(daysUntil)} ngày`;
+                return `Còn ${daysUntil} ngày`;
             },
 
-            hideAddForm() {
-                document.getElementById('addForm').classList.add('hidden');
-                this.clearAddForm();
+            // ============================================================
+            //  CASHBACK LOGIC
+            // ============================================================
+            currentCycle() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; },
+
+            // Compute the cashback a given card would yield for a category + amount this cycle.
+            computeCashback(card, category, amount) {
+                const cycle = this.currentCycle();
+                const cats = card.cashbackCategories || [];
+                const match = cats.find(c => c.category === category);
+                const rate = match ? num(match.rate) : num(card.cashbackDefaultRate);
+                const cap = match ? num(match.cap) : 0;
+                // Earned counters reset each calendar month.
+                const earned = (card.cashbackCycle === cycle && match) ? num(match.earned) : 0;
+                const remainingCap = cap > 0 ? Math.max(0, cap - earned) : Infinity;
+                const raw = amount * rate / 100;
+                const cashback = Math.min(raw, remainingCap);
+                return { rate, cashback, capped: cap > 0 && raw > remainingCap, remainingCap: cap > 0 ? remainingCap : null };
             },
 
-            clearAddForm() {
+            availableCredit(card) {
+                const limit = num(card.creditLimit);
+                if (limit === 0) return Infinity;
+                return limit - num(card.currentBalance);
+            },
+
+            // Build the card update needed when a transaction is recorded on it.
+            buildCardUpdateForTransaction(card, category, amount, cashback) {
+                const cycle = this.currentCycle();
+                let cats = (card.cashbackCategories || []).map(c => ({ ...c }));
+                if (card.cashbackCycle !== cycle) cats = cats.map(c => ({ ...c, earned: 0 }));
+                const match = cats.find(c => c.category === category);
+                if (match) match.earned = num(match.earned) + cashback;
+                return {
+                    cashbackCategories: cats,
+                    cashbackCycle: cycle,
+                    currentBalance: num(card.currentBalance) + amount,
+                    statementAmount: num(card.statementAmount) + amount,
+                    updatedAt: new Date().toISOString(),
+                };
+            },
+
+            // ============================================================
+            //  CARD FORM + CRUD
+            // ============================================================
+            showCardForm() {
+                this.editingCardId = null;
+                this.cashbackDraft = [];
+                document.getElementById('cardFormTitle').textContent = 'Thêm thẻ tín dụng';
                 document.getElementById('cardName').value = '';
+                document.getElementById('cardType').value = 'fixed';
                 document.getElementById('dueDate').value = '';
                 document.getElementById('transactionDate').value = '';
                 document.getElementById('daysToAdd').value = '20';
-                this.selectCardType('fixed');
+                ['creditLimit', 'currentBalance', 'statementAmount', 'minimumPayment', 'cashbackDefaultRate'].forEach(id => document.getElementById(id).value = '');
+                this.onCardTypeChange();
+                this.renderCashbackEditor();
+                const form = document.getElementById('cardForm');
+                form.classList.remove('hidden');
+                form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            },
+            hideCardForm() {
+                document.getElementById('cardForm').classList.add('hidden');
+                this.editingCardId = null;
+            },
+            onCardTypeChange() {
+                const type = document.getElementById('cardType').value;
+                document.getElementById('fixedDateInput').classList.toggle('hidden', type !== 'fixed');
+                document.getElementById('variableDateInput').classList.toggle('hidden', type !== 'variable');
             },
 
-            selectCardType(type) {
-                this.currentCardType = type;
-                
-                document.querySelectorAll('#addForm .card-type-option').forEach(option => {
-                    option.classList.remove('active');
+            // ---- cashback editor rows ----
+            addCashbackRow() {
+                this.syncCashbackDraftFromDom();
+                this.cashbackDraft.push({ category: 'dining', rate: '', cap: '' });
+                this.renderCashbackEditor();
+            },
+            removeCashbackRow(idx) {
+                this.syncCashbackDraftFromDom();
+                this.cashbackDraft.splice(idx, 1);
+                this.renderCashbackEditor();
+            },
+            // Pull current DOM values back into the draft before any re-render or save.
+            syncCashbackDraftFromDom() {
+                this.cashbackDraft.forEach((row, i) => {
+                    const cat = document.getElementById(`cb-cat-${i}`);
+                    const rate = document.getElementById(`cb-rate-${i}`);
+                    const cap = document.getElementById(`cb-cap-${i}`);
+                    if (cat) row.category = cat.value;
+                    if (rate) row.rate = rate.value;
+                    if (cap) row.cap = cap.value;
                 });
-                
-                if (type === 'fixed') {
-                    document.querySelectorAll('#addForm .card-type-option')[0].classList.add('active');
-                    document.getElementById('fixedDateInput').classList.remove('hidden');
-                    document.getElementById('variableDateInput').classList.add('hidden');
-                } else {
-                    document.querySelectorAll('#addForm .card-type-option')[1].classList.add('active');
-                    document.getElementById('fixedDateInput').classList.add('hidden');
-                    document.getElementById('variableDateInput').classList.remove('hidden');
-                }
             },
-
-            selectEditCardType(type) {
-                this.currentEditCardType = type;
-                
-                document.querySelectorAll('#editForm .card-type-option').forEach(option => {
-                    option.classList.remove('active');
-                });
-                
-                if (type === 'fixed') {
-                    document.querySelectorAll('#editForm .card-type-option')[0].classList.add('active');
-                    document.getElementById('editFixedDateInput').classList.remove('hidden');
-                    document.getElementById('editVariableDateInput').classList.add('hidden');
-                } else {
-                    document.querySelectorAll('#editForm .card-type-option')[1].classList.add('active');
-                    document.getElementById('editFixedDateInput').classList.add('hidden');
-                    document.getElementById('editVariableDateInput').classList.remove('hidden');
-                }
-            },
-
-            async addCard() {
-                const name = document.getElementById('cardName').value.trim();
-                
-                if (!name) {
-                    alert('Vui lòng nhập tên thẻ');
+            renderCashbackEditor() {
+                const el = document.getElementById('cashbackEditor');
+                if (this.cashbackDraft.length === 0) {
+                    el.innerHTML = '<p class="text-gray" style="font-size:13px; margin-bottom:8px;">Chưa có danh mục hoàn tiền nào.</p>';
                     return;
                 }
-                
-                let nextDue;
-                let cardData = {
-                    name: name,
-                    type: this.currentCardType,
-                    isPaid: false,
-                    lastPaidDate: null,
-                    paymentHistory: [],
-                    createdAt: new Date().toISOString()
+                const opts = (sel) => CATEGORIES.map(c => `<option value="${c.key}" ${c.key === sel ? 'selected' : ''}>${c.icon} ${c.label}</option>`).join('');
+                el.innerHTML = this.cashbackDraft.map((row, i) => `
+                    <div class="cashback-row">
+                        <select id="cb-cat-${i}">${opts(row.category)}</select>
+                        <input type="number" id="cb-rate-${i}" placeholder="%" min="0" step="0.1" value="${row.rate ?? ''}">
+                        <input type="number" id="cb-cap-${i}" placeholder="0 = không giới hạn" min="0" value="${row.cap ?? ''}">
+                        <button class="btn btn-sm btn-danger" onclick="app.removeCashbackRow(${i})">✕</button>
+                    </div>
+                `).join('');
+            },
+
+            startEditCard(cardId) {
+                const card = this.cards.find(c => c.id === cardId);
+                if (!card) return;
+                this.editingCardId = cardId;
+                document.getElementById('cardFormTitle').textContent = 'Chỉnh sửa thẻ';
+                document.getElementById('cardName').value = card.name || '';
+                document.getElementById('cardType').value = card.type || 'fixed';
+                document.getElementById('dueDate').value = card.originalDueDate || '';
+                document.getElementById('transactionDate').value = card.transactionDate || '';
+                document.getElementById('daysToAdd').value = card.daysToAdd || 20;
+                document.getElementById('creditLimit').value = card.creditLimit || '';
+                document.getElementById('currentBalance').value = card.currentBalance || '';
+                document.getElementById('statementAmount').value = card.statementAmount || '';
+                document.getElementById('minimumPayment').value = card.minimumPayment || '';
+                document.getElementById('cashbackDefaultRate').value = card.cashbackDefaultRate || '';
+                this.cashbackDraft = (card.cashbackCategories || []).map(c => ({ category: c.category, rate: c.rate, cap: c.cap }));
+                this.onCardTypeChange();
+                this.renderCashbackEditor();
+                const form = document.getElementById('cardForm');
+                form.classList.remove('hidden');
+                form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            },
+
+            async saveCard() {
+                const name = document.getElementById('cardName').value.trim();
+                if (!name) return alert('Vui lòng nhập tên thẻ');
+                const type = document.getElementById('cardType').value;
+                this.syncCashbackDraftFromDom();
+
+                // Preserve existing per-cycle earned values when editing.
+                const existing = this.editingCardId ? this.cards.find(c => c.id === this.editingCardId) : null;
+                const existingCats = existing?.cashbackCategories || [];
+                const cashbackCategories = this.cashbackDraft.map(r => {
+                    const prev = existingCats.find(c => c.category === r.category);
+                    return { category: r.category, rate: num(r.rate), cap: num(r.cap), earned: prev ? num(prev.earned) : 0 };
+                });
+
+                const data = {
+                    name, type,
+                    creditLimit: num(document.getElementById('creditLimit').value),
+                    currentBalance: num(document.getElementById('currentBalance').value),
+                    statementAmount: num(document.getElementById('statementAmount').value),
+                    minimumPayment: num(document.getElementById('minimumPayment').value),
+                    cashbackDefaultRate: num(document.getElementById('cashbackDefaultRate').value),
+                    cashbackCategories,
+                    cashbackCycle: existing?.cashbackCycle || this.currentCycle(),
+                    updatedAt: new Date().toISOString(),
                 };
-                
-                if (this.currentCardType === 'fixed') {
+
+                let nextDue;
+                if (type === 'fixed') {
                     const dueDate = document.getElementById('dueDate').value;
-                    if (!dueDate) {
-                        alert('Vui lòng chọn ngày đến hạn');
-                        return;
-                    }
-                    cardData.originalDueDate = dueDate;
+                    if (!dueDate) return alert('Vui lòng chọn ngày đến hạn');
+                    data.originalDueDate = dueDate;
+                    data.transactionDate = null; data.daysToAdd = null; data.estimatedCycleDays = null;
                     nextDue = this.getNextDueDateFixed(dueDate);
                 } else {
                     const transactionDate = document.getElementById('transactionDate').value;
                     const daysToAdd = document.getElementById('daysToAdd').value;
-                    
-                    if (!transactionDate || !daysToAdd) {
-                        alert('Vui lòng điền đầy đủ thông tin');
-                        return;
-                    }
-                    
-                    cardData.transactionDate = transactionDate;
-                    cardData.daysToAdd = parseInt(daysToAdd);
-                    // Cycle dùng chính daysToAdd — match mental model user: "đặt 7 ngày → kỳ kế cũng 7 ngày"
-                    cardData.estimatedCycleDays = parseInt(daysToAdd);
+                    if (!transactionDate || !daysToAdd) return alert('Vui lòng điền đầy đủ thông tin ngày biến động');
+                    data.originalDueDate = null;
+                    data.transactionDate = transactionDate;
+                    data.daysToAdd = parseInt(daysToAdd);
+                    data.estimatedCycleDays = parseInt(daysToAdd);
                     nextDue = this.getDueDateVariable(transactionDate, daysToAdd);
                 }
+                data.nextDueDate = nextDue.toISOString();
 
-                cardData.nextDueDate = nextDue.toISOString();
-
-                await this.saveCard(cardData);
-                this.hideAddForm();
-            },
-
-            startEdit(cardId) {
-                const card = this.cards.find(c => c.id === cardId);
-                if (!card) return;
-
-                this.editingCardId = cardId;
-
-                document.getElementById('editCardName').value = card.name;
-                document.getElementById('editDueDate').value = card.originalDueDate || '';
-                document.getElementById('editTransactionDate').value = card.transactionDate || '';
-                document.getElementById('editDaysToAdd').value = card.daysToAdd || 20;
-
-                this.selectEditCardType(card.type);
-                const form = document.getElementById('editForm');
-                form.classList.remove('hidden');
-                // Scroll form vào viewport + focus ô tên — tránh bắt user tự cuộn lên đầu trang
-                form.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                setTimeout(() => document.getElementById('editCardName').focus({ preventScroll: true }), 350);
-            },
-
-            async saveEditCard() {
-                const name = document.getElementById('editCardName').value.trim();
-                
-                if (!name) {
-                    alert('Vui lòng nhập tên thẻ');
-                    return;
-                }
-                
-                let nextDue;
-                let updateData = {
-                    name: name,
-                    type: this.currentEditCardType,
-                    isPaid: false,
-                    lastPaidDate: null,
-                    updatedAt: new Date().toISOString()
-                };
-                
-                if (this.currentEditCardType === 'fixed') {
-                    const dueDate = document.getElementById('editDueDate').value;
-                    if (!dueDate) {
-                        alert('Vui lòng chọn ngày đến hạn');
-                        return;
+                try {
+                    if (this.editingCardId) {
+                        await updateDoc(doc(db, 'cards', this.editingCardId), data);
+                    } else {
+                        data.userId = this.currentUser.uid;
+                        data.isPaid = false;
+                        data.lastPaidDate = null;
+                        data.createdAt = new Date().toISOString();
+                        await addDoc(collection(db, 'cards'), data);
                     }
-                    updateData.originalDueDate = dueDate;
-                    updateData.transactionDate = null;
-                    updateData.daysToAdd = null;
-                    updateData.estimatedCycleDays = null;
-                    nextDue = this.getNextDueDateFixed(dueDate);
-                } else {
-                    const transactionDate = document.getElementById('editTransactionDate').value;
-                    const daysToAdd = document.getElementById('editDaysToAdd').value;
-                    
-                    if (!transactionDate || !daysToAdd) {
-                        alert('Vui lòng điền đầy đủ thông tin');
-                        return;
-                    }
-                    
-                    updateData.originalDueDate = null;
-                    updateData.transactionDate = transactionDate;
-                    updateData.daysToAdd = parseInt(daysToAdd);
-                    // Cycle = daysToAdd để kỳ tiếp theo dùng đúng số ngày user nhập
-                    updateData.estimatedCycleDays = parseInt(daysToAdd);
-                    nextDue = this.getDueDateVariable(transactionDate, daysToAdd);
+                    this.hideCardForm();
+                } catch (e) {
+                    console.error('save card error:', e);
+                    this.showMessage('Lỗi khi lưu thẻ', true);
                 }
-                
-                updateData.nextDueDate = nextDue.toISOString();
-                
-                await this.updateCard(this.editingCardId, updateData);
-                this.cancelEdit();
             },
 
-            cancelEdit() {
-                this.editingCardId = null;
-                document.getElementById('editForm').classList.add('hidden');
+            async deleteCard(cardId) {
+                if (!confirm('Bạn có chắc muốn xóa thẻ này?')) return;
+                try { await deleteDoc(doc(db, 'cards', cardId)); }
+                catch (e) { console.error('delete card:', e); this.showMessage('Lỗi khi xóa thẻ', true); }
             },
 
             async markAsPaid(cardId) {
                 const card = this.cards.find(c => c.id === cardId);
                 if (!card) return;
                 const today = new Date();
-                let nextDue;
-                let updateData = {
-                    isPaid: false, // Đặt về false để tính lại kỳ tới
+                const paidAmount = num(card.statementAmount);
+                const updateData = {
+                    isPaid: false, // keep rolling to the next cycle instead of a terminal paid state
                     lastPaidDate: today.toISOString(),
                     updatedAt: today.toISOString(),
+                    currentBalance: Math.max(0, num(card.currentBalance) - paidAmount),
+                    statementAmount: 0,
                 };
-            
-                if (card.type === "fixed") {
-                    nextDue = this.getNextDueDateFixed(card.originalDueDate);
-                    updateData.nextDueDate = nextDue.toISOString();
+                if (card.type === 'fixed') {
+                    updateData.nextDueDate = this.getNextDueDateFixed(card.originalDueDate).toISOString();
                 } else {
-                    // Ưu tiên daysToAdd làm chu kỳ; estimatedCycleDays giữ làm fallback cho thẻ cũ
                     const cycleDays = card.daysToAdd || card.estimatedCycleDays || 30;
-                    const currentTxDate = new Date(card.transactionDate);
-                    const nextTxDate = new Date(currentTxDate);
-                    nextTxDate.setDate(currentTxDate.getDate() + cycleDays);
+                    const nextTxDate = new Date(card.transactionDate);
+                    nextTxDate.setDate(nextTxDate.getDate() + cycleDays);
                     const nextTxStr = nextTxDate.toISOString().split('T')[0];
-                    nextDue = this.getDueDateVariable(nextTxStr, card.daysToAdd);
                     updateData.transactionDate = nextTxStr;
-                    updateData.estimatedCycleDays = cycleDays; // chuẩn hoá luôn về daysToAdd
-                    updateData.nextDueDate = nextDue.toISOString();
+                    updateData.estimatedCycleDays = cycleDays;
+                    updateData.nextDueDate = this.getDueDateVariable(nextTxStr, card.daysToAdd).toISOString();
                 }
-            
-                // LƯU Ý: Không được đặt isPaid = true, phải cho cycle kế tiếp
-                await this.updateCard(cardId, updateData);
+                try { await updateDoc(doc(db, 'cards', cardId), updateData); }
+                catch (e) { console.error('markAsPaid:', e); this.showMessage('Lỗi khi cập nhật thẻ', true); }
             },
 
-
-            // Render functions
             renderCards() {
-                const cardsList = document.getElementById('cardsList');
-                
+                const el = document.getElementById('cardsList');
+                if (!el) return;
                 if (this.cards.length === 0) {
-                    cardsList.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-state-icon">💳</div>
-                            <h3>Chưa có thẻ nào</h3>
-                            <p>Thêm thẻ tín dụng đầu tiên để bắt đầu theo dõi ngày đến hạn</p>
-                            <button class="btn btn-success" onclick="app.showAddForm()">Thêm thẻ đầu tiên</button>
-                        </div>
-                    `;
+                    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">💳</div><h3>Chưa có thẻ nào</h3><p>Thêm thẻ tín dụng đầu tiên để bắt đầu theo dõi.</p></div>`;
                     return;
                 }
-                
-                const sortedCards = [...this.cards].sort((a, b) => {
-                    const aDays = this.getDaysUntilDue(a.nextDueDate);
-                    const bDays = this.getDaysUntilDue(b.nextDueDate);
-                    return aDays - bDays;
-                });
-                
-                cardsList.innerHTML = sortedCards.map(card => {
-                    const daysUntil = this.getDaysUntilDue(card.nextDueDate);
-                    const { status, class: cardClass, badge } = this.getCardStatus(daysUntil, card.isPaid);
+                const sorted = [...this.cards].sort((a, b) => this.getDaysUntil(a.nextDueDate) - this.getDaysUntil(b.nextDueDate));
+                el.innerHTML = sorted.map(card => {
+                    const daysUntil = this.getDaysUntil(card.nextDueDate);
+                    const { status, class: cls, badge } = this.getCardStatus(daysUntil, card.isPaid);
                     const dueDate = new Date(card.nextDueDate);
-                    
-                    let daysText;
-                    if (daysUntil === 0) daysText = 'Đến hạn hôm nay';
-                    else if (daysUntil === 1) daysText = 'Đến hạn ngày mai';
-                    else if (daysUntil < 0) daysText = `Quá hạn ${Math.abs(daysUntil)} ngày`;
-                    else daysText = `Còn ${daysUntil} ngày`;
-                    
-                    let typeInfo = '';
-                    if (card.type === 'variable') {
-                        typeInfo = `<div style="font-size: 12px; color: var(--gray); margin-top: 8px;">
-                            Ngày GD: ${new Date(card.transactionDate).toLocaleDateString('vi-VN')} + ${card.daysToAdd} ngày (lặp mỗi ${card.daysToAdd} ngày)
-                        </div>`;
-                    }
-                    
-                    let actionButtons = '';
-                    if (!card.isPaid) {
-                        actionButtons += `<button class="btn btn-sm btn-success" onclick="app.markAsPaid('${card.id}')">✅ Đã thanh toán</button>`;
-                    }
-                    
-                    actionButtons += `
-                        <button class="btn btn-sm btn-warning" onclick="app.startEdit('${card.id}')">✏️ Sửa</button>
-                        <button class="btn btn-sm btn-danger" onclick="app.deleteCard('${card.id}')">🗑️ Xóa</button>
-                    `;
+                    const limit = num(card.creditLimit);
+                    const balance = num(card.currentBalance);
+                    const usagePct = limit > 0 ? Math.min(100, Math.round(balance / limit * 100)) : 0;
+                    const usageColor = usagePct >= 90 ? 'var(--danger)' : usagePct >= 70 ? 'var(--warning)' : 'var(--success)';
 
-                    // Render card notes
+                    let typeInfo = '';
+                    if (card.type === 'variable' && card.transactionDate) {
+                        typeInfo = `<div class="text-gray" style="font-size:12px; margin-top:6px;">Ngày GD: ${new Date(card.transactionDate).toLocaleDateString('vi-VN')} + ${card.daysToAdd} ngày</div>`;
+                    }
+
+                    const limitBox = limit > 0 ? `
+                        <div class="info-box" style="grid-column: 1 / -1;">
+                            <div class="label">Hạn mức sử dụng</div>
+                            <div class="value">${fmtVND(balance)} / ${fmtVND(limit)} (${usagePct}%)</div>
+                            <div class="progress-bar"><div class="progress-fill" style="width:${usagePct}%; background:${usageColor};"></div></div>
+                        </div>` : '';
+
+                    const cycle = this.currentCycle();
+                    const cashbackTags = (card.cashbackCategories || []).map(c => {
+                        const earned = (card.cashbackCycle === cycle) ? num(c.earned) : 0;
+                        const capTxt = num(c.cap) > 0 ? ` · đã hoàn ${fmtVND(earned)}/${fmtVND(c.cap)}` : '';
+                        return `<span class="cashback-tag">${catLabel(c.category)}: ${c.rate}%${capTxt}</span>`;
+                    }).join('');
+                    const hasCashback = (card.cashbackCategories || []).length || num(card.cashbackDefaultRate);
+                    const cashbackSection = hasCashback ? `
+                        <div class="mt-8">
+                            <div class="text-gray" style="font-size:11px; font-weight:600;">QUYỀN LỢI HOÀN TIỀN</div>
+                            <div class="mt-8">${cashbackTags}${num(card.cashbackDefaultRate) ? `<span class="cashback-tag">Khác: ${card.cashbackDefaultRate}%</span>` : ''}</div>
+                        </div>` : '';
+
                     const cardNotes = this.cardNotes[card.id] || [];
                     const notesHtml = `
-                            <div class="card-notes-section">
-                                <div class="card-notes-header">
-                                    <h4>📝 Ghi chú</h4>
-                                    <button class="btn btn-sm" style="padding: 4px 12px; font-size: 12px;" onclick="app.toggleCardNoteForm('${card.id}')">
-                                        ➕ Thêm ghi chú
-                                    </button>
-                                </div>
-
-                                <div id="card-note-form-${card.id}" class="card-note-form hidden">
-                                    <textarea id="card-note-input-${card.id}" placeholder="Nhập nội dung ghi chú..."></textarea>
-                                    <div style="display: flex; gap: 8px;">
-                                        <button class="btn btn-sm btn-success" onclick="app.addCardNote('${card.id}')">💾 Lưu</button>
-                                        <button class="btn btn-sm btn-secondary" onclick="app.toggleCardNoteForm('${card.id}')">Hủy</button>
-                                    </div>
-                                </div>
-
-                                ${cardNotes.map(note => {
-                                    const noteDate = new Date(note.createdAt);
-                                    return `
-                                        <div class="card-note-item">
-                                            <div class="card-note-content">${note.content}</div>
-                                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                                <div class="card-note-date">${noteDate.toLocaleDateString('vi-VN', {
-                                                    year: 'numeric',
-                                                    month: 'short',
-                                                    day: 'numeric',
-                                                    hour: '2-digit',
-                                                    minute: '2-digit'
-                                                })}</div>
-                                                <button class="btn btn-sm btn-danger" style="padding: 2px 8px; font-size: 11px;" onclick="app.deleteCardNote('${note.id}', '${card.id}')">
-                                                    🗑️
-                                                </button>
-                                            </div>
-                                        </div>
-                                    `;
-                                }).join('')}
+                        <div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                <strong style="font-size:13px;">📝 Ghi chú thẻ</strong>
+                                <button class="btn btn-sm" onclick="app.toggleCardNoteForm('${card.id}')">➕</button>
                             </div>
-                        `;
+                            <div id="card-note-form-${card.id}" class="hidden" style="margin-bottom:8px;">
+                                <textarea id="card-note-input-${card.id}" rows="2" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; font-family:inherit;" placeholder="Nội dung ghi chú..."></textarea>
+                                <div class="row-flex mt-8">
+                                    <button class="btn btn-sm btn-success" onclick="app.addCardNote('${card.id}')">💾 Lưu</button>
+                                    <button class="btn btn-sm btn-secondary" onclick="app.toggleCardNoteForm('${card.id}')">Hủy</button>
+                                </div>
+                            </div>
+                            ${cardNotes.map(n => `
+                                <div style="background:var(--light); padding:8px 10px; border-radius:6px; margin-bottom:6px; border-left:3px solid var(--primary);">
+                                    <div style="font-size:13px; white-space:pre-wrap;">${escapeHtml(n.content)}</div>
+                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                                        <span class="text-gray" style="font-size:11px;">${new Date(n.createdAt).toLocaleDateString('vi-VN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                                        <button class="btn btn-sm btn-danger" style="padding:2px 8px;" onclick="app.deleteCardNote('${n.id}')">🗑️</button>
+                                    </div>
+                                </div>`).join('')}
+                        </div>`;
 
                     return `
-                        <div class="card-item ${cardClass}">
-                            <div class="card-header">
-                                <div class="card-info">
-                                    <h3>${card.name}</h3>
-                                    <div class="card-meta">
-                                        <span class="card-type-badge">
-                                            ${card.type === 'fixed' ? '📅 Ngày cố định' : '🔄 Ngày biến động'}
-                                        </span>
-                                        <span>
-                                            Đến hạn: ${dueDate.toLocaleDateString('vi-VN', {
-                                                weekday: 'short',
-                                                year: 'numeric',
-                                                month: 'short',
-                                                day: 'numeric'
-                                            })}
-                                        </span>
+                        <div class="item-card ${cls}">
+                            <div class="item-head">
+                                <div>
+                                    <div class="item-title">${escapeHtml(card.name)}</div>
+                                    <div class="item-meta">
+                                        <span class="badge badge-info">${card.type === 'fixed' ? '📅 Ngày cố định' : '🔄 Ngày biến động'}</span>
+                                        <span>Đến hạn: ${dueDate.toLocaleDateString('vi-VN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</span>
                                     </div>
                                     ${typeInfo}
                                 </div>
-                                <div class="card-status">
+                                <div style="text-align:right;">
                                     <div class="status-badge ${badge}">${status}</div>
-                                    <div style="color: var(--gray); font-size: 14px; margin-top: 8px;">${daysText}</div>
+                                    <div class="text-gray" style="font-size:13px; margin-top:6px;">${this.daysText(daysUntil)}</div>
                                 </div>
                             </div>
-                            <div class="card-actions">
-                                ${actionButtons}
+                            <div class="info-grid">
+                                <div class="info-box"><div class="label">Cần thanh toán kỳ này</div><div class="value text-danger">${fmtVND(card.statementAmount)}</div></div>
+                                <div class="info-box"><div class="label">Dư nợ hiện tại</div><div class="value">${fmtVND(balance)}</div></div>
+                                ${num(card.minimumPayment) ? `<div class="info-box"><div class="label">Tối thiểu</div><div class="value">${fmtVND(card.minimumPayment)}</div></div>` : ''}
+                                ${limit > 0 ? `<div class="info-box"><div class="label">Hạn mức còn lại</div><div class="value text-success">${fmtVND(limit - balance)}</div></div>` : ''}
+                                ${limitBox}
+                            </div>
+                            ${cashbackSection}
+                            <div class="item-actions">
+                                <button class="btn btn-sm btn-success" onclick="app.markAsPaid('${card.id}')">✅ Đã thanh toán</button>
+                                <button class="btn btn-sm btn-warning" onclick="app.startEditCard('${card.id}')">✏️ Sửa</button>
+                                <button class="btn btn-sm btn-danger" onclick="app.deleteCard('${card.id}')">🗑️ Xóa</button>
                             </div>
                             ${notesHtml}
-                        </div>
-                    `;
+                        </div>`;
                 }).join('');
             },
 
-            // Notes Management — listener tự cập nhật, không reload thủ công
-            async saveNoteToDb(noteData) {
-                if (!this.currentUser) return;
+            // ============================================================
+            //  TRANSACTIONS + BEST-CARD SUGGESTION
+            // ============================================================
+            populateCategorySelects() {
+                const txCat = document.getElementById('txCategory');
+                if (txCat) txCat.innerHTML = CATEGORIES.map(c => `<option value="${c.key}">${c.icon} ${c.label}</option>`).join('');
+                const txDate = document.getElementById('txDate');
+                if (txDate && !txDate.value) txDate.value = new Date().toISOString().split('T')[0];
+            },
+            populateCardSelects() {
+                const filter = document.getElementById('txFilterCard');
+                if (!filter) return;
+                const prev = filter.value;
+                filter.innerHTML = `<option value="">Tất cả thẻ</option>` + this.cards.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+                filter.value = prev;
+            },
+
+            // Rank cards by cashback for the current amount + category.
+            getSuggestions(category, amount) {
+                return this.cards.map(card => {
+                    const cb = this.computeCashback(card, category, amount);
+                    const avail = this.availableCredit(card);
+                    const creditOk = avail === Infinity || avail >= amount;
+                    return { card, ...cb, creditOk, availableCredit: avail };
+                }).sort((a, b) => {
+                    if (a.creditOk !== b.creditOk) return a.creditOk ? -1 : 1;
+                    return b.cashback - a.cashback;
+                });
+            },
+
+            refreshSuggestions() {
+                const el = document.getElementById('suggestionList');
+                if (!el) return;
+                const amount = num(document.getElementById('txAmount')?.value);
+                const category = document.getElementById('txCategory')?.value;
+                if (!amount || !category) {
+                    el.innerHTML = `<p class="text-gray" style="font-size:14px;">Nhập số tiền và chọn danh mục để xem gợi ý.</p>`;
+                    return;
+                }
+                if (this.cards.length === 0) {
+                    el.innerHTML = `<p class="text-gray" style="font-size:14px;">Chưa có thẻ nào. Hãy thêm thẻ ở tab "Thẻ tín dụng".</p>`;
+                    return;
+                }
+                const suggestions = this.getSuggestions(category, amount);
+                el.innerHTML = suggestions.map((s, i) => {
+                    const best = i === 0 && s.cashback > 0 && s.creditOk;
+                    const capWarn = s.capped ? `<div class="text-warning" style="font-size:12px; margin-top:4px;">⚠️ Đã chạm cap hoàn tiền kỳ này (còn ${fmtVND(s.remainingCap)})</div>` : '';
+                    const creditWarn = !s.creditOk ? `<div class="text-danger" style="font-size:12px; margin-top:4px;">⛔ Không đủ hạn mức (còn ${s.availableCredit === Infinity ? '∞' : fmtVND(s.availableCredit)})</div>` : '';
+                    return `
+                        <div class="suggest-card ${best ? 'best' : ''} ${!s.creditOk ? 'disabled' : ''}">
+                            <div class="suggest-head">
+                                <div>
+                                    <strong>${escapeHtml(s.card.name)}</strong>
+                                    ${best ? '<span class="badge badge-success" style="margin-left:6px;">TỐT NHẤT</span>' : ''}
+                                    <div class="text-gray" style="font-size:12px;">Hoàn ${s.rate}%${s.availableCredit !== Infinity ? ` · hạn mức còn ${fmtVND(s.availableCredit)}` : ''}</div>
+                                </div>
+                                <div style="text-align:right;">
+                                    <div class="suggest-cashback">+${fmtVND(s.cashback)}</div>
+                                    <div class="text-gray" style="font-size:11px;">hoàn tiền</div>
+                                </div>
+                            </div>
+                            ${capWarn}${creditWarn}
+                            <button class="btn btn-sm btn-success mt-8" onclick="app.recordTransaction('${s.card.id}')">Chọn & ghi nợ thẻ này</button>
+                        </div>`;
+                }).join('');
+            },
+
+            async recordTransaction(cardId) {
+                const card = this.cards.find(c => c.id === cardId);
+                if (!card) return;
+                const amount = num(document.getElementById('txAmount').value);
+                const category = document.getElementById('txCategory').value;
+                const description = document.getElementById('txDescription').value.trim();
+                const date = document.getElementById('txDate').value || new Date().toISOString().split('T')[0];
+                if (!amount) return alert('Vui lòng nhập số tiền giao dịch');
+
+                const { cashback } = this.computeCashback(card, category, amount);
+                if (this.availableCredit(card) < amount) {
+                    if (!confirm('Thẻ này không đủ hạn mức. Vẫn ghi nợ giao dịch?')) return;
+                }
+
                 try {
-                    noteData.userId = this.currentUser.uid;
-                    await addDoc(collection(db, 'notes'), noteData);
-                } catch (error) {
-                    console.error('Error saving note:', error);
-                    alert('Lỗi khi lưu ghi chú');
+                    // Atomically write the transaction and update the card balance/cashback.
+                    const batch = writeBatch(db);
+                    const txRef = doc(collection(db, 'transactions'));
+                    batch.set(txRef, {
+                        userId: this.currentUser.uid,
+                        cardId, cardName: card.name,
+                        amount, category, description,
+                        date, cashbackEarned: cashback,
+                        createdAt: new Date().toISOString(),
+                    });
+                    batch.update(doc(db, 'cards', cardId), this.buildCardUpdateForTransaction(card, category, amount, cashback));
+                    await batch.commit();
+
+                    document.getElementById('txAmount').value = '';
+                    document.getElementById('txDescription').value = '';
+                    this.refreshSuggestions();
+                    this.showMessage(`Đã ghi nợ ${fmtVND(amount)} vào ${card.name} · hoàn ${fmtVND(cashback)} 🎉`);
+                } catch (e) {
+                    console.error('recordTransaction:', e);
+                    this.showMessage('Lỗi khi ghi giao dịch', true);
                 }
             },
 
-            async updateNoteInDb(noteId, updateData) {
+            async deleteTransaction(txId) {
+                const tx = this.transactions.find(t => t.id === txId);
+                if (!tx) return;
+                if (!confirm('Xóa giao dịch này? Dư nợ và hoàn tiền của thẻ sẽ được hoàn lại.')) return;
                 try {
-                    await updateDoc(doc(db, 'notes', noteId), updateData);
-                } catch (error) {
-                    console.error('Error updating note:', error);
-                    alert('Lỗi khi cập nhật ghi chú');
+                    const card = this.cards.find(c => c.id === tx.cardId);
+                    const batch = writeBatch(db);
+                    batch.delete(doc(db, 'transactions', txId));
+                    if (card) {
+                        // Reverse this transaction's impact on balance and cashback.
+                        const cats = (card.cashbackCategories || []).map(c => ({ ...c }));
+                        const match = cats.find(c => c.category === tx.category);
+                        if (match && card.cashbackCycle === this.currentCycle()) {
+                            match.earned = Math.max(0, num(match.earned) - num(tx.cashbackEarned));
+                        }
+                        batch.update(doc(db, 'cards', card.id), {
+                            currentBalance: Math.max(0, num(card.currentBalance) - num(tx.amount)),
+                            statementAmount: Math.max(0, num(card.statementAmount) - num(tx.amount)),
+                            cashbackCategories: cats,
+                            updatedAt: new Date().toISOString(),
+                        });
+                    }
+                    await batch.commit();
+                } catch (e) {
+                    console.error('deleteTransaction:', e);
+                    this.showMessage('Lỗi khi xóa giao dịch', true);
                 }
             },
 
-            async deleteNoteFromDb(noteId) {
-                if (!confirm('Bạn có chắc muốn xóa ghi chú này?')) return;
+            renderTransactions() {
+                const el = document.getElementById('transactionsList');
+                if (!el) return;
+                const filterCard = document.getElementById('txFilterCard')?.value || '';
+                let list = this.transactions;
+                if (filterCard) list = list.filter(t => t.cardId === filterCard);
+                if (list.length === 0) {
+                    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">💸</div><h3>Chưa có giao dịch</h3><p>Ghi giao dịch đầu tiên để theo dõi chi tiêu và hoàn tiền.</p></div>`;
+                    return;
+                }
+                el.innerHTML = list.map(t => `
+                    <div class="item-card" style="padding:14px 16px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                            <div>
+                                <div style="font-weight:700;">${fmtVND(t.amount)} <span class="badge badge-gray">${catLabel(t.category)}</span></div>
+                                <div class="text-gray" style="font-size:12px; margin-top:4px;">
+                                    ${escapeHtml(t.cardName || '')}${t.description ? ' · ' + escapeHtml(t.description) : ''} · ${new Date(t.date).toLocaleDateString('vi-VN')}
+                                </div>
+                            </div>
+                            <div style="text-align:right;">
+                                ${num(t.cashbackEarned) > 0 ? `<div class="text-success" style="font-weight:700;">+${fmtVND(t.cashbackEarned)}</div>` : ''}
+                                <button class="btn btn-sm btn-danger mt-8" onclick="app.deleteTransaction('${t.id}')">🗑️</button>
+                            </div>
+                        </div>
+                    </div>`).join('');
+            },
+
+            // ============================================================
+            //  LOANS
+            // ============================================================
+            showLoanForm() {
+                this.editingLoanId = null;
+                document.getElementById('loanFormTitle').textContent = 'Thêm khoản cho vay';
+                ['loanBorrower', 'loanPrincipal', 'loanRate', 'loanDueDate', 'loanTerm', 'loanNote'].forEach(id => document.getElementById(id).value = '');
+                document.getElementById('loanType').value = 'installment';
+                document.getElementById('loanStartDate').value = new Date().toISOString().split('T')[0];
+                const form = document.getElementById('loanForm');
+                form.classList.remove('hidden');
+                form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            },
+            hideLoanForm() { document.getElementById('loanForm').classList.add('hidden'); this.editingLoanId = null; },
+
+            startEditLoan(loanId) {
+                const loan = this.loans.find(l => l.id === loanId);
+                if (!loan) return;
+                this.editingLoanId = loanId;
+                document.getElementById('loanFormTitle').textContent = 'Chỉnh sửa khoản vay';
+                document.getElementById('loanBorrower').value = loan.borrowerName || '';
+                document.getElementById('loanPrincipal').value = loan.principal || '';
+                document.getElementById('loanType').value = loan.loanType || 'installment';
+                document.getElementById('loanRate').value = loan.interestRate || '';
+                document.getElementById('loanStartDate').value = loan.startDate || '';
+                document.getElementById('loanDueDate').value = loan.dueDate || '';
+                document.getElementById('loanTerm').value = loan.termMonths || '';
+                document.getElementById('loanNote').value = loan.note || '';
+                const form = document.getElementById('loanForm');
+                form.classList.remove('hidden');
+                form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            },
+
+            async saveLoan() {
+                const borrowerName = document.getElementById('loanBorrower').value.trim();
+                const principal = num(document.getElementById('loanPrincipal').value);
+                if (!borrowerName) return alert('Vui lòng nhập tên người vay');
+                if (!principal) return alert('Vui lòng nhập số tiền cho vay');
+                const data = {
+                    borrowerName, principal,
+                    loanType: document.getElementById('loanType').value,
+                    interestRate: num(document.getElementById('loanRate').value),
+                    startDate: document.getElementById('loanStartDate').value || null,
+                    dueDate: document.getElementById('loanDueDate').value || null,
+                    termMonths: num(document.getElementById('loanTerm').value),
+                    note: document.getElementById('loanNote').value.trim(),
+                    updatedAt: new Date().toISOString(),
+                };
                 try {
-                    await deleteDoc(doc(db, 'notes', noteId));
-                } catch (error) {
-                    console.error('Error deleting note:', error);
-                    alert('Lỗi khi xóa ghi chú');
+                    if (this.editingLoanId) {
+                        await updateDoc(doc(db, 'loans', this.editingLoanId), data);
+                    } else {
+                        data.userId = this.currentUser.uid;
+                        data.status = 'active';
+                        data.createdAt = new Date().toISOString();
+                        await addDoc(collection(db, 'loans'), data);
+                    }
+                    this.hideLoanForm();
+                } catch (e) {
+                    console.error('saveLoan:', e);
+                    this.showMessage('Lỗi khi lưu khoản vay', true);
                 }
             },
 
+            async deleteLoan(loanId) {
+                if (!confirm('Xóa khoản vay này và toàn bộ lịch sử trả?')) return;
+                try {
+                    const batch = writeBatch(db);
+                    batch.delete(doc(db, 'loans', loanId));
+                    (this.loanRepayments[loanId] || []).forEach(r => batch.delete(doc(db, 'loanRepayments', r.id)));
+                    await batch.commit();
+                } catch (e) { console.error('deleteLoan:', e); this.showMessage('Lỗi khi xóa khoản vay', true); }
+            },
+
+            async toggleLoanStatus(loanId) {
+                const loan = this.loans.find(l => l.id === loanId);
+                if (!loan) return;
+                try {
+                    await updateDoc(doc(db, 'loans', loanId), {
+                        status: loan.status === 'repaid' ? 'active' : 'repaid',
+                        updatedAt: new Date().toISOString(),
+                    });
+                } catch (e) { console.error('toggleLoanStatus:', e); }
+            },
+
+            // Repaid principal / remaining for a loan.
+            loanRemaining(loan) {
+                const reps = this.loanRepayments[loan.id] || [];
+                const principalPaid = reps.reduce((s, r) => s + num(r.principalPortion), 0);
+                const totalPaid = reps.reduce((s, r) => s + num(r.amount), 0);
+                const interestPaid = reps.reduce((s, r) => s + num(r.interestPortion), 0);
+                return { remaining: Math.max(0, num(loan.principal) - principalPaid), principalPaid, totalPaid, interestPaid };
+            },
+
+            // Expected interest for the next period, by loan type.
+            expectedInterest(loan, remaining) {
+                const r = num(loan.interestRate) / 100;
+                if (!r) return 0;
+                if (loan.loanType === 'interest_only') return num(loan.principal) * r;
+                // installment & reducing both accrue interest on the remaining balance
+                return remaining * r;
+            },
+
+            toggleRepayForm(loanId) {
+                const form = document.getElementById(`repay-form-${loanId}`);
+                if (!form) return;
+                form.classList.toggle('hidden');
+                if (!form.classList.contains('hidden')) {
+                    const loan = this.loans.find(l => l.id === loanId);
+                    const { remaining } = this.loanRemaining(loan);
+                    const interest = Math.round(this.expectedInterest(loan, remaining));
+                    const intInput = document.getElementById(`repay-interest-${loanId}`);
+                    if (intInput && !intInput.value) intInput.value = interest || '';
+                    const dateInput = document.getElementById(`repay-date-${loanId}`);
+                    if (dateInput && !dateInput.value) dateInput.value = new Date().toISOString().split('T')[0];
+                }
+            },
+
+            async addRepayment(loanId) {
+                const amount = num(document.getElementById(`repay-amount-${loanId}`).value);
+                const interestPortion = num(document.getElementById(`repay-interest-${loanId}`).value);
+                const date = document.getElementById(`repay-date-${loanId}`).value || new Date().toISOString().split('T')[0];
+                if (!amount) return alert('Vui lòng nhập số tiền đã trả');
+                const principalPortion = Math.max(0, amount - interestPortion);
+                try {
+                    await addDoc(collection(db, 'loanRepayments'), {
+                        userId: this.currentUser.uid,
+                        loanId, amount, interestPortion, principalPortion, date,
+                        createdAt: new Date().toISOString(),
+                    });
+                    // Auto-mark repaid when principal is fully covered.
+                    const loan = this.loans.find(l => l.id === loanId);
+                    const { remaining } = this.loanRemaining(loan);
+                    if (remaining - principalPortion <= 0 && loan.status !== 'repaid') {
+                        await updateDoc(doc(db, 'loans', loanId), { status: 'repaid', updatedAt: new Date().toISOString() });
+                    }
+                    this.toggleRepayForm(loanId);
+                } catch (e) { console.error('addRepayment:', e); this.showMessage('Lỗi khi ghi nhận thanh toán', true); }
+            },
+
+            async deleteRepayment(repId) {
+                if (!confirm('Xóa lần trả này?')) return;
+                try { await deleteDoc(doc(db, 'loanRepayments', repId)); }
+                catch (e) { console.error('deleteRepayment:', e); }
+            },
+
+            renderLoans() {
+                const el = document.getElementById('loansList');
+                if (!el) return;
+                if (this.loans.length === 0) {
+                    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🤝</div><h3>Chưa có khoản cho vay</h3><p>Thêm khoản cho vay để theo dõi gốc, lãi và lịch sử trả.</p></div>`;
+                    return;
+                }
+                el.innerHTML = this.loans.map(loan => {
+                    const { remaining, totalPaid, interestPaid } = this.loanRemaining(loan);
+                    const reps = this.loanRepayments[loan.id] || [];
+                    const isRepaid = loan.status === 'repaid' || remaining <= 0;
+                    const daysUntil = loan.dueDate ? this.getDaysUntil(loan.dueDate) : null;
+
+                    let statusBadge;
+                    if (isRepaid) statusBadge = '<span class="status-badge status-paid">Đã thu hồi</span>';
+                    else if (daysUntil !== null && daysUntil < 0) statusBadge = '<span class="status-badge status-overdue">Quá hạn thu</span>';
+                    else if (daysUntil !== null && daysUntil <= 7) statusBadge = '<span class="status-badge status-due-soon">Sắp đến hạn</span>';
+                    else statusBadge = '<span class="status-badge status-upcoming">Đang cho vay</span>';
+
+                    const expInterest = this.expectedInterest(loan, remaining);
+
+                    const repayForm = `
+                        <div id="repay-form-${loan.id}" class="hidden" style="margin-top:10px; background:var(--light); padding:12px; border-radius:8px;">
+                            <div class="form-row-3">
+                                <div class="form-group" style="margin-bottom:8px;"><label>Số tiền trả (₫)</label><input type="number" id="repay-amount-${loan.id}" min="0"></div>
+                                <div class="form-group" style="margin-bottom:8px;"><label>Trong đó lãi (₫)</label><input type="number" id="repay-interest-${loan.id}" min="0"></div>
+                                <div class="form-group" style="margin-bottom:8px;"><label>Ngày trả</label><input type="date" id="repay-date-${loan.id}"></div>
+                            </div>
+                            <div class="row-flex">
+                                <button class="btn btn-sm btn-success" onclick="app.addRepayment('${loan.id}')">💾 Ghi nhận</button>
+                                <button class="btn btn-sm btn-secondary" onclick="app.toggleRepayForm('${loan.id}')">Hủy</button>
+                            </div>
+                        </div>`;
+
+                    const repHistory = reps.length ? `
+                        <div style="margin-top:10px;">
+                            <div class="text-gray" style="font-size:11px; font-weight:600;">LỊCH SỬ TRẢ (${reps.length})</div>
+                            ${reps.map(r => `
+                                <div style="display:flex; justify-content:space-between; align-items:center; background:var(--light); padding:8px 10px; border-radius:6px; margin-top:6px;">
+                                    <div style="font-size:13px;">
+                                        <strong>${fmtVND(r.amount)}</strong>
+                                        <span class="text-gray">(gốc ${fmtVND(r.principalPortion)} · lãi ${fmtVND(r.interestPortion)})</span>
+                                        <div class="text-gray" style="font-size:11px;">${new Date(r.date).toLocaleDateString('vi-VN')}</div>
+                                    </div>
+                                    <button class="btn btn-sm btn-danger" style="padding:2px 8px;" onclick="app.deleteRepayment('${r.id}')">🗑️</button>
+                                </div>`).join('')}
+                        </div>` : '';
+
+                    return `
+                        <div class="item-card ${isRepaid ? 'paid' : (daysUntil !== null && daysUntil < 0 ? 'overdue' : '')}">
+                            <div class="item-head">
+                                <div>
+                                    <div class="item-title">${escapeHtml(loan.borrowerName)}</div>
+                                    <div class="item-meta">
+                                        <span class="badge badge-info">${LOAN_TYPES[loan.loanType] || loan.loanType}</span>
+                                        ${loan.interestRate ? `<span class="badge badge-gray">${loan.interestRate}%/tháng</span>` : ''}
+                                        ${loan.dueDate ? `<span>Hẹn trả: ${new Date(loan.dueDate).toLocaleDateString('vi-VN')}</span>` : ''}
+                                    </div>
+                                    ${daysUntil !== null && !isRepaid ? `<div class="text-gray" style="font-size:12px; margin-top:6px;">${this.daysText(daysUntil)}</div>` : ''}
+                                </div>
+                                <div style="text-align:right;">${statusBadge}</div>
+                            </div>
+                            <div class="info-grid">
+                                <div class="info-box"><div class="label">Gốc cho vay</div><div class="value">${fmtVND(loan.principal)}</div></div>
+                                <div class="info-box"><div class="label">Còn lại (gốc)</div><div class="value ${remaining > 0 ? 'text-danger' : 'text-success'}">${fmtVND(remaining)}</div></div>
+                                <div class="info-box"><div class="label">Đã thu (gốc+lãi)</div><div class="value text-success">${fmtVND(totalPaid)}</div></div>
+                                <div class="info-box"><div class="label">Lãi đã thu</div><div class="value">${fmtVND(interestPaid)}</div></div>
+                                ${!isRepaid && expInterest > 0 ? `<div class="info-box"><div class="label">Lãi dự kiến kỳ tới</div><div class="value">${fmtVND(Math.round(expInterest))}</div></div>` : ''}
+                            </div>
+                            ${loan.note ? `<div class="text-gray" style="font-size:13px; margin-top:10px; white-space:pre-wrap;">📌 ${escapeHtml(loan.note)}</div>` : ''}
+                            <div class="item-actions">
+                                ${!isRepaid ? `<button class="btn btn-sm btn-success" onclick="app.toggleRepayForm('${loan.id}')">💵 Ghi nhận trả</button>` : ''}
+                                <button class="btn btn-sm btn-info" onclick="app.toggleLoanStatus('${loan.id}')">${isRepaid ? '↩️ Mở lại' : '✅ Đã thu hồi'}</button>
+                                <button class="btn btn-sm btn-warning" onclick="app.startEditLoan('${loan.id}')">✏️ Sửa</button>
+                                <button class="btn btn-sm btn-danger" onclick="app.deleteLoan('${loan.id}')">🗑️ Xóa</button>
+                            </div>
+                            ${repayForm}
+                            ${repHistory}
+                        </div>`;
+                }).join('');
+            },
+
+            // ============================================================
+            //  DASHBOARD
+            // ============================================================
+            renderDashboard() {
+                const el = document.getElementById('dashboardContent');
+                if (!el) return;
+                const cycle = this.currentCycle();
+
+                const totalLimit = this.cards.reduce((s, c) => s + num(c.creditLimit), 0);
+                const totalBalance = this.cards.reduce((s, c) => s + num(c.currentBalance), 0);
+                const totalStatement = this.cards.reduce((s, c) => s + num(c.statementAmount), 0);
+                const usagePct = totalLimit > 0 ? Math.min(100, Math.round(totalBalance / totalLimit * 100)) : 0;
+
+                // Cashback earned this cycle (sum across cards' category counters).
+                const cashbackThisCycle = this.cards.reduce((s, c) => {
+                    if (c.cashbackCycle !== cycle) return s;
+                    return s + (c.cashbackCategories || []).reduce((x, cat) => x + num(cat.earned), 0);
+                }, 0);
+
+                const dueSoon = this.cards.filter(c => !c.isPaid && this.getDaysUntil(c.nextDueDate) >= 0 && this.getDaysUntil(c.nextDueDate) <= 3).length;
+                const overdue = this.cards.filter(c => !c.isPaid && this.getDaysUntil(c.nextDueDate) < 0).length;
+
+                const activeLoans = this.loans.filter(l => l.status !== 'repaid');
+                const totalLent = activeLoans.reduce((s, l) => s + this.loanRemaining(l).remaining, 0);
+                const totalCollected = this.loans.reduce((s, l) => s + this.loanRemaining(l).totalPaid, 0);
+                const loansDueSoon = activeLoans.filter(l => l.dueDate && this.getDaysUntil(l.dueDate) >= 0 && this.getDaysUntil(l.dueDate) <= 7).length;
+                const loansOverdue = activeLoans.filter(l => l.dueDate && this.getDaysUntil(l.dueDate) < 0).length;
+
+                el.innerHTML = `
+                    <div class="section-title" style="margin-top:0;">💳 Thẻ tín dụng</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number text-danger">${fmtVND(totalStatement)}</div>
+                            <div class="stat-label">Cần thanh toán kỳ này</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${fmtVND(totalBalance)}</div>
+                            <div class="stat-label">Tổng dư nợ</div>
+                            ${totalLimit > 0 ? `<div class="progress-bar"><div class="progress-fill" style="width:${usagePct}%; background:${usagePct >= 90 ? 'var(--danger)' : usagePct >= 70 ? 'var(--warning)' : 'var(--success)'};"></div></div><div class="stat-sub">${usagePct}% của ${fmtVND(totalLimit)}</div>` : ''}
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number text-success">+${fmtVND(cashbackThisCycle)}</div>
+                            <div class="stat-label">Hoàn tiền tháng này</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" style="color:${overdue ? 'var(--danger)' : dueSoon ? 'var(--warning)' : 'var(--success)'};">${overdue + dueSoon}</div>
+                            <div class="stat-label">Thẻ cần chú ý</div>
+                            <div class="stat-sub">${overdue} quá hạn · ${dueSoon} sắp đến hạn</div>
+                        </div>
+                    </div>
+
+                    <div class="section-title">🤝 Cho vay</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-number text-warning">${fmtVND(totalLent)}</div>
+                            <div class="stat-label">Đang cho vay (gốc còn lại)</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number text-success">${fmtVND(totalCollected)}</div>
+                            <div class="stat-label">Tổng đã thu</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">${activeLoans.length}</div>
+                            <div class="stat-label">Khoản đang hoạt động</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" style="color:${loansOverdue ? 'var(--danger)' : loansDueSoon ? 'var(--warning)' : 'var(--success)'};">${loansOverdue + loansDueSoon}</div>
+                            <div class="stat-label">Cần thu hồi</div>
+                            <div class="stat-sub">${loansOverdue} quá hạn · ${loansDueSoon} sắp đến hạn</div>
+                        </div>
+                    </div>`;
+            },
+
+            // ============================================================
+            //  NOTES (standalone) + CARD NOTES
+            // ============================================================
             showNoteForm() {
                 this.editingNoteId = null;
                 document.getElementById('noteFormTitle').textContent = 'Thêm ghi chú mới';
@@ -2052,45 +1631,31 @@
                 document.getElementById('noteForm').classList.remove('hidden');
                 document.getElementById('noteTitle').focus();
             },
-
             hideNoteForm() {
                 this.editingNoteId = null;
                 document.getElementById('noteForm').classList.add('hidden');
                 document.getElementById('noteTitle').value = '';
                 document.getElementById('noteContent').value = '';
             },
-
             async saveNote() {
                 const title = document.getElementById('noteTitle').value.trim();
                 const content = document.getElementById('noteContent').value.trim();
-
-                if (!title || !content) {
-                    alert('Vui lòng nhập đầy đủ tiêu đề và nội dung');
-                    return;
-                }
-
-                const noteData = {
-                    title: title,
-                    content: content,
-                    updatedAt: new Date().toISOString()
-                };
-
-                if (this.editingNoteId) {
-                    // Update existing note
-                    await this.updateNoteInDb(this.editingNoteId, noteData);
-                } else {
-                    // Create new note
-                    noteData.createdAt = new Date().toISOString();
-                    await this.saveNoteToDb(noteData);
-                }
-
-                this.hideNoteForm();
+                if (!title || !content) return alert('Vui lòng nhập đầy đủ tiêu đề và nội dung');
+                const data = { title, content, updatedAt: new Date().toISOString() };
+                try {
+                    if (this.editingNoteId) {
+                        await updateDoc(doc(db, 'notes', this.editingNoteId), data);
+                    } else {
+                        data.userId = this.currentUser.uid;
+                        data.createdAt = new Date().toISOString();
+                        await addDoc(collection(db, 'notes'), data);
+                    }
+                    this.hideNoteForm();
+                } catch (e) { console.error('saveNote:', e); alert('Lỗi khi lưu ghi chú'); }
             },
-
             startEditNote(noteId) {
                 const note = this.notes.find(n => n.id === noteId);
                 if (!note) return;
-
                 this.editingNoteId = noteId;
                 document.getElementById('noteFormTitle').textContent = 'Chỉnh sửa ghi chú';
                 document.getElementById('noteTitle').value = note.title;
@@ -2098,337 +1663,163 @@
                 document.getElementById('noteForm').classList.remove('hidden');
                 document.getElementById('noteTitle').focus();
             },
-
             async deleteNote(noteId) {
-                await this.deleteNoteFromDb(noteId);
-            },
-
-            // Card Notes Management — listener tự cập nhật
-            async saveCardNote(cardId, content) {
-                if (!this.currentUser || !cardId || !content.trim()) return;
-                try {
-                    await addDoc(collection(db, 'cardNotes'), {
-                        userId: this.currentUser.uid,
-                        cardId: cardId,
-                        content: content.trim(),
-                        createdAt: new Date().toISOString()
-                    });
-                } catch (error) {
-                    console.error('Error saving card note:', error);
-                    alert('Lỗi khi lưu ghi chú');
-                }
-            },
-
-            async deleteCardNote(noteId, cardId) {
                 if (!confirm('Bạn có chắc muốn xóa ghi chú này?')) return;
-                try {
-                    await deleteDoc(doc(db, 'cardNotes', noteId));
-                } catch (error) {
-                    console.error('Error deleting card note:', error);
-                    alert('Lỗi khi xóa ghi chú');
+                try { await deleteDoc(doc(db, 'notes', noteId)); }
+                catch (e) { console.error('deleteNote:', e); alert('Lỗi khi xóa ghi chú'); }
+            },
+            renderNotes() {
+                const el = document.getElementById('notesList');
+                if (!el) return;
+                if (this.notes.length === 0) {
+                    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📝</div><h3>Chưa có ghi chú nào</h3><p>Thêm ghi chú đầu tiên của bạn.</p></div>`;
+                    return;
                 }
+                el.innerHTML = this.notes.map(note => `
+                    <div class="item-card">
+                        <div style="font-weight:700; font-size:17px;">${escapeHtml(note.title)}</div>
+                        <div class="text-gray" style="font-size:12px; margin-top:2px;">${new Date(note.createdAt).toLocaleDateString('vi-VN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+                        <div style="margin-top:10px; white-space:pre-wrap; font-size:14px;">${escapeHtml(note.content)}</div>
+                        <div class="item-actions">
+                            <button class="btn btn-sm btn-warning" onclick="app.startEditNote('${note.id}')">✏️ Sửa</button>
+                            <button class="btn btn-sm btn-danger" onclick="app.deleteNote('${note.id}')">🗑️ Xóa</button>
+                        </div>
+                    </div>`).join('');
             },
 
             toggleCardNoteForm(cardId) {
                 const form = document.getElementById(`card-note-form-${cardId}`);
                 if (form) {
                     form.classList.toggle('hidden');
-                    if (!form.classList.contains('hidden')) {
-                        const textarea = form.querySelector('textarea');
-                        if (textarea) textarea.focus();
-                    }
+                    if (!form.classList.contains('hidden')) form.querySelector('textarea')?.focus();
                 }
             },
-
             async addCardNote(cardId) {
                 const textarea = document.getElementById(`card-note-input-${cardId}`);
                 if (!textarea) return;
-
                 const content = textarea.value.trim();
-                if (!content) {
-                    alert('Vui lòng nhập nội dung ghi chú');
-                    return;
-                }
-
-                await this.saveCardNote(cardId, content);
-                textarea.value = '';
-                this.toggleCardNoteForm(cardId);
+                if (!content) return alert('Vui lòng nhập nội dung ghi chú');
+                try {
+                    await addDoc(collection(db, 'cardNotes'), {
+                        userId: this.currentUser.uid, cardId, content,
+                        createdAt: new Date().toISOString(),
+                    });
+                    textarea.value = '';
+                    this.toggleCardNoteForm(cardId);
+                } catch (e) { console.error('addCardNote:', e); alert('Lỗi khi lưu ghi chú'); }
+            },
+            async deleteCardNote(noteId) {
+                if (!confirm('Bạn có chắc muốn xóa ghi chú này?')) return;
+                try { await deleteDoc(doc(db, 'cardNotes', noteId)); }
+                catch (e) { console.error('deleteCardNote:', e); alert('Lỗi khi xóa ghi chú'); }
             },
 
-            renderNotes() {
-                const notesList = document.getElementById('notesList');
-
-                if (this.notes.length === 0) {
-                    notesList.innerHTML = `
-                        <div class="notes-empty">
-                            <div class="notes-empty-icon">📝</div>
-                            <h3>Chưa có ghi chú nào</h3>
-                            <p>Thêm ghi chú đầu tiên của bạn</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                notesList.innerHTML = `
-                    <div class="notes-grid">
-                        ${this.notes.map(note => {
-                            const createdDate = new Date(note.createdAt);
-                            const dateStr = createdDate.toLocaleDateString('vi-VN', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            });
-
-                            return `
-                                <div class="note-item">
-                                    <div class="note-header">
-                                        <div class="note-title">${note.title}</div>
-                                        <div class="note-date">${dateStr}</div>
-                                    </div>
-                                    <div class="note-content">${note.content}</div>
-                                    <div class="note-actions">
-                                        <button class="btn btn-sm btn-warning" onclick="app.startEditNote('${note.id}')">
-                                            ✏️ Sửa
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" onclick="app.deleteNote('${note.id}')">
-                                            🗑️ Xóa
-                                        </button>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                `;
-            },
-
-            updateStats() {
-                if (this.cards.length === 0) {
-                    document.getElementById('stats').classList.add('hidden');
-                    return;
-                }
-
-                document.getElementById('stats').classList.remove('hidden');
-
-                const totalCards = this.cards.length;
-                const paidCards = this.cards.filter(card => card.isPaid).length;
-                const dueSoonCards = this.cards.filter(card =>
-                    !card.isPaid &&
-                    this.getDaysUntilDue(card.nextDueDate) <= 3 &&
-                    this.getDaysUntilDue(card.nextDueDate) >= 0
-                ).length;
-                const overdueCards = this.cards.filter(card =>
-                    !card.isPaid &&
-                    this.getDaysUntilDue(card.nextDueDate) < 0
-                ).length;
-
-                document.getElementById('totalCards').textContent = totalCards;
-                document.getElementById('paidCards').textContent = paidCards;
-                document.getElementById('dueSoonCards').textContent = dueSoonCards;
-                document.getElementById('overdueCards').textContent = overdueCards;
-            },
-
-            // Notification Management
+            // ============================================================
+            //  NOTIFICATIONS
+            // ============================================================
             isIOSSafari() {
                 const ua = window.navigator.userAgent;
                 const iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
-                const webkit = !!ua.match(/WebKit/i);
-                const iOSSafari = iOS && webkit && !ua.match(/CriOS/i);
-                return iOSSafari;
+                return iOS && !!ua.match(/WebKit/i) && !ua.match(/CriOS/i);
             },
-
             isStandalone() {
-                return window.navigator.standalone === true ||
-                       window.matchMedia('(display-mode: standalone)').matches;
+                return window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
             },
-
             async requestNotificationPermission() {
-                // Kiểm tra nếu là iOS Safari và chưa được cài đặt như PWA
-                if (this.isIOSSafari() && !this.isStandalone()) {
-                    this.showIOSInstallBanner();
-                    return false;
-                }
-
-                if (!('Notification' in window)) {
-                    alert('Trình duyệt của bạn không hỗ trợ thông báo');
-                    return false;
-                }
-
-                if (Notification.permission === 'granted') {
-                    return true;
-                }
-
-                if (Notification.permission !== 'denied') {
-                    const permission = await Notification.requestPermission();
-                    return permission === 'granted';
-                }
-
-                alert('Bạn đã từ chối quyền thông báo. Vui lòng vào Cài đặt trình duyệt để bật lại.');
+                if (this.isIOSSafari() && !this.isStandalone()) { this.showIOSInstallBanner(); return false; }
+                if (!('Notification' in window)) { alert('Trình duyệt không hỗ trợ thông báo'); return false; }
+                if (Notification.permission === 'granted') return true;
+                if (Notification.permission !== 'denied') return (await Notification.requestPermission()) === 'granted';
+                alert('Bạn đã từ chối quyền thông báo. Vui lòng bật lại trong Cài đặt trình duyệt.');
                 return false;
             },
+            showIOSInstallBanner() { document.getElementById('iosInstallBanner')?.classList.remove('hidden'); },
+            closeIOSBanner() { document.getElementById('iosInstallBanner')?.classList.add('hidden'); },
 
-            showIOSInstallBanner() {
-                const banner = document.getElementById('iosInstallBanner');
-                if (banner) {
-                    banner.classList.remove('hidden');
-                    // Lưu trạng thái đã hiển thị banner
-                    localStorage.setItem('iosInstallBannerShown', 'true');
-                }
-            },
-
-            closeIOSBanner() {
-                const banner = document.getElementById('iosInstallBanner');
-                if (banner) {
-                    banner.classList.add('hidden');
-                }
+            notify(title, body, tag, requireInteraction = false) {
+                try {
+                    new Notification(title, {
+                        body, tag, requireInteraction,
+                        icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23dc2626'/%3E%3Ctext x='50%25' y='50%25' font-family='Arial' font-size='20' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='middle'%3EP%3C/text%3E%3C/svg%3E",
+                    });
+                } catch (e) { console.error('notify:', e); }
             },
 
             async toggleNotifications() {
                 if (!this.notificationsEnabled) {
-                    // Bật thông báo
                     const granted = await this.requestNotificationPermission();
                     if (granted) {
                         this.notificationsEnabled = true;
                         localStorage.setItem('notificationsEnabled', 'true');
                         this.startNotificationCheck();
                         this.updateNotificationUI();
-
-                        // Gửi thông báo thử nghiệm
-                        new Notification('PingPay - Thông báo đã được bật', {
-                            body: 'Bạn sẽ nhận được thông báo về các giao dịch sắp đến hạn, đến hạn và trễ hạn.',
-                            icon: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'%3E%3Cdefs%3E%3ClinearGradient id=\'grad\' x1=\'0%25\' y1=\'0%25\' x2=\'100%25\' y2=\'100%25\'%3E%3Cstop offset=\'0%25\' style=\'stop-color:%23667eea;stop-opacity:1\' /%3E%3Cstop offset=\'100%25\' style=\'stop-color:%23764ba2;stop-opacity:1\' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=\'32\' height=\'32\' rx=\'6\' fill=\'url(%23grad)\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' font-family=\'Arial\' font-size=\'20\' font-weight=\'bold\' fill=\'white\' text-anchor=\'middle\' dominant-baseline=\'middle\'%3EP%3C/text%3E%3C/svg%3E',
-                            tag: 'pingpay-enabled'
-                        });
+                        this.notify('PingPay - Đã bật thông báo', 'Bạn sẽ nhận nhắc nhở về thẻ đến hạn và khoản cho vay cần thu hồi.', 'pingpay-enabled');
                     } else {
                         alert('Vui lòng cho phép thông báo trong cài đặt trình duyệt');
                     }
                 } else {
-                    // Tắt thông báo
                     this.notificationsEnabled = false;
                     localStorage.setItem('notificationsEnabled', 'false');
                     this.stopNotificationCheck();
                     this.updateNotificationUI();
                 }
             },
-
             updateNotificationUI() {
                 const toggle = document.getElementById('notificationToggle');
                 const status = document.getElementById('notificationStatus');
-
-                if (this.notificationsEnabled) {
-                    toggle.classList.add('enabled');
-                    toggle.classList.remove('disabled');
-                    status.textContent = 'Thông báo: Bật';
-                } else {
-                    toggle.classList.remove('enabled');
-                    toggle.classList.add('disabled');
-                    status.textContent = 'Thông báo: Tắt';
-                }
+                if (!toggle || !status) return;
+                toggle.classList.toggle('enabled', this.notificationsEnabled);
+                status.textContent = this.notificationsEnabled ? 'Thông báo: Bật' : 'Bật thông báo';
             },
 
             checkAndSendNotifications() {
                 if (!this.notificationsEnabled || !this.currentUser) return;
-
-                const now = new Date();
-                const today = now.toDateString();
-
-                // Chỉ kiểm tra một lần mỗi ngày
-                if (this.lastNotificationCheck === today) return;
-
+                const today = new Date().toDateString();
+                if (this.lastNotificationCheck === today) return;  // once per day
                 this.lastNotificationCheck = today;
 
-                const unpaidCards = this.cards.filter(card => !card.isPaid);
+                const unpaid = this.cards.filter(c => !c.isPaid);
+                const overdue = unpaid.filter(c => this.getDaysUntil(c.nextDueDate) < 0);
+                const dueToday = unpaid.filter(c => this.getDaysUntil(c.nextDueDate) === 0);
+                const dueSoon = unpaid.filter(c => { const d = this.getDaysUntil(c.nextDueDate); return d > 0 && d <= 3; });
 
-                // Kiểm tra thẻ quá hạn
-                const overdueCards = unpaidCards.filter(card =>
-                    this.getDaysUntilDue(card.nextDueDate) < 0
-                );
+                if (overdue.length) this.notify('⚠️ Thẻ quá hạn thanh toán!', `${overdue.length} thẻ quá hạn: ${overdue.map(c => c.name).join(', ')}`, 'pingpay-overdue', true);
+                if (dueToday.length) this.notify('🔔 Thẻ đến hạn hôm nay!', `${dueToday.length} thẻ: ${dueToday.map(c => c.name).join(', ')}`, 'pingpay-due-today', true);
+                if (dueSoon.length) this.notify('⏰ Thẻ sắp đến hạn!', `${dueSoon.length} thẻ trong 3 ngày tới: ${dueSoon.map(c => c.name).join(', ')}`, 'pingpay-due-soon');
 
-                if (overdueCards.length > 0) {
-                    new Notification('⚠️ Thẻ quá hạn thanh toán!', {
-                        body: `Bạn có ${overdueCards.length} thẻ đã quá hạn: ${overdueCards.map(c => c.name).join(', ')}`,
-                        icon: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'%3E%3Cdefs%3E%3ClinearGradient id=\'grad\' x1=\'0%25\' y1=\'0%25\' x2=\'100%25\' y2=\'100%25\'%3E%3Cstop offset=\'0%25\' style=\'stop-color:%23667eea;stop-opacity:1\' /%3E%3Cstop offset=\'100%25\' style=\'stop-color:%23764ba2;stop-opacity:1\' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=\'32\' height=\'32\' rx=\'6\' fill=\'url(%23grad)\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' font-family=\'Arial\' font-size=\'20\' font-weight=\'bold\' fill=\'white\' text-anchor=\'middle\' dominant-baseline=\'middle\'%3EP%3C/text%3E%3C/svg%3E',
-                        tag: 'pingpay-overdue',
-                        requireInteraction: true
-                    });
-                }
-
-                // Kiểm tra thẻ đến hạn hôm nay
-                const dueTodayCards = unpaidCards.filter(card =>
-                    this.getDaysUntilDue(card.nextDueDate) === 0
-                );
-
-                if (dueTodayCards.length > 0) {
-                    new Notification('🔔 Thẻ đến hạn hôm nay!', {
-                        body: `Bạn có ${dueTodayCards.length} thẻ đến hạn hôm nay: ${dueTodayCards.map(c => c.name).join(', ')}`,
-                        icon: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'%3E%3Cdefs%3E%3ClinearGradient id=\'grad\' x1=\'0%25\' y1=\'0%25\' x2=\'100%25\' y2=\'100%25\'%3E%3Cstop offset=\'0%25\' style=\'stop-color:%23667eea;stop-opacity:1\' /%3E%3Cstop offset=\'100%25\' style=\'stop-color:%23764ba2;stop-opacity:1\' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=\'32\' height=\'32\' rx=\'6\' fill=\'url(%23grad)\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' font-family=\'Arial\' font-size=\'20\' font-weight=\'bold\' fill=\'white\' text-anchor=\'middle\' dominant-baseline=\'middle\'%3EP%3C/text%3E%3C/svg%3E',
-                        tag: 'pingpay-due-today',
-                        requireInteraction: true
-                    });
-                }
-
-                // Kiểm tra thẻ sắp đến hạn (1-3 ngày)
-                const dueSoonCards = unpaidCards.filter(card => {
-                    const days = this.getDaysUntilDue(card.nextDueDate);
-                    return days > 0 && days <= 3;
-                });
-
-                if (dueSoonCards.length > 0) {
-                    new Notification('⏰ Thẻ sắp đến hạn!', {
-                        body: `Bạn có ${dueSoonCards.length} thẻ sắp đến hạn trong 3 ngày tới: ${dueSoonCards.map(c => c.name).join(', ')}`,
-                        icon: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 32 32\'%3E%3Cdefs%3E%3ClinearGradient id=\'grad\' x1=\'0%25\' y1=\'0%25\' x2=\'100%25\' y2=\'100%25\'%3E%3Cstop offset=\'0%25\' style=\'stop-color:%23667eea;stop-opacity:1\' /%3E%3Cstop offset=\'100%25\' style=\'stop-color:%23764ba2;stop-opacity:1\' /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=\'32\' height=\'32\' rx=\'6\' fill=\'url(%23grad)\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' font-family=\'Arial\' font-size=\'20\' font-weight=\'bold\' fill=\'white\' text-anchor=\'middle\' dominant-baseline=\'middle\'%3EP%3C/text%3E%3C/svg%3E',
-                        tag: 'pingpay-due-soon'
-                    });
-                }
+                const activeLoans = this.loans.filter(l => l.status !== 'repaid' && l.dueDate);
+                const loanOverdue = activeLoans.filter(l => this.getDaysUntil(l.dueDate) < 0);
+                const loanSoon = activeLoans.filter(l => { const d = this.getDaysUntil(l.dueDate); return d >= 0 && d <= 7; });
+                if (loanOverdue.length) this.notify('💰 Khoản cho vay quá hạn thu!', `${loanOverdue.length} khoản: ${loanOverdue.map(l => l.borrowerName).join(', ')}`, 'pingpay-loan-overdue', true);
+                if (loanSoon.length) this.notify('📅 Khoản cho vay sắp đến hạn thu', `${loanSoon.length} khoản trong 7 ngày tới: ${loanSoon.map(l => l.borrowerName).join(', ')}`, 'pingpay-loan-soon');
             },
-
             startNotificationCheck() {
-                // Kiểm tra ngay lập tức
                 this.checkAndSendNotifications();
-
-                // Thiết lập kiểm tra định kỳ mỗi 30 phút
-                this.notificationCheckInterval = setInterval(() => {
-                    this.checkAndSendNotifications();
-                }, 30 * 60 * 1000); // 30 phút
+                this.notificationCheckInterval = setInterval(() => this.checkAndSendNotifications(), 30 * 60 * 1000);
             },
-
             stopNotificationCheck() {
-                if (this.notificationCheckInterval) {
-                    clearInterval(this.notificationCheckInterval);
-                    this.notificationCheckInterval = null;
-                }
+                if (this.notificationCheckInterval) clearInterval(this.notificationCheckInterval);
+                this.notificationCheckInterval = null;
                 this.lastNotificationCheck = null;
             },
-
             loadNotificationSettings() {
                 const enabled = localStorage.getItem('notificationsEnabled') === 'true';
-                if (enabled && Notification.permission === 'granted') {
+                if (enabled && 'Notification' in window && Notification.permission === 'granted') {
                     this.notificationsEnabled = true;
                     this.startNotificationCheck();
                 }
                 this.updateNotificationUI();
-            }
+            },
         };
 
-        // Make app globally available
         window.app = app;
+        document.addEventListener('DOMContentLoaded', () => app.init());
 
-        // Initialize app when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            app.init();
-        });
-
-        // Register Service Worker for PWA
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
+            window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(function(registration) {
-                        console.log('ServiceWorker registration successful:', registration.scope);
-                    })
-                    .catch(function(err) {
-                        console.log('ServiceWorker registration failed:', err);
-                    });
+                    .then(reg => console.log('SW registered:', reg.scope))
+                    .catch(err => console.log('SW registration failed:', err));
             });
         }
     </script>
