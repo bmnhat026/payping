@@ -237,6 +237,17 @@
         .ios-install-banner li::before { content: '→ '; font-weight: bold; }
         .close-banner { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 14px; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: 600; }
 
+        /* Global toast — works on both auth and main app (the old in-auth message
+           boxes were invisible once logged in). */
+        .toast {
+            position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+            z-index: 9999; max-width: 92%; padding: 14px 20px; border-radius: 10px;
+            font-size: 14px; font-weight: 600; box-shadow: var(--shadow-lg);
+            animation: fadeIn 0.3s ease-out; text-align: center;
+        }
+        .toast.error { background: #fef2f2; color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
+        .toast.success { background: #ecfdf5; color: var(--success-dark); border: 1px solid rgba(16,185,129,0.3); }
+
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
@@ -255,11 +266,12 @@
         <h3>Đang tải PingPay...</h3>
     </div>
 
+    <!-- Global toast -->
+    <div id="toast" class="toast hidden"></div>
+
     <!-- Auth -->
     <div id="authContainer" class="auth-container hidden">
         <h2>✨ PingPay</h2>
-        <div id="errorMessage" class="message error-message hidden"></div>
-        <div id="successMessage" class="message success-message hidden"></div>
 
         <div id="loginForm">
             <div class="form-group">
@@ -742,11 +754,12 @@
                 document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === `tab-${tab}`));
             },
             showMessage(message, isError = false) {
-                const errorEl = document.getElementById('errorMessage');
-                const successEl = document.getElementById('successMessage');
-                if (isError) { errorEl.textContent = message; errorEl.classList.remove('hidden'); successEl.classList.add('hidden'); }
-                else { successEl.textContent = message; successEl.classList.remove('hidden'); errorEl.classList.add('hidden'); }
-                setTimeout(() => { errorEl.classList.add('hidden'); successEl.classList.add('hidden'); }, 5000);
+                const t = document.getElementById('toast');
+                if (!t) return;
+                t.textContent = message;
+                t.className = 'toast ' + (isError ? 'error' : 'success');
+                clearTimeout(this._toastTimer);
+                this._toastTimer = setTimeout(() => t.classList.add('hidden'), 4000);
             },
 
             // ---------- Auth ----------
@@ -846,7 +859,8 @@
                 const earned = (card.cashbackCycle === cycle && match) ? num(match.earned) : 0;
                 const remainingCap = cap > 0 ? Math.max(0, cap - earned) : Infinity;
                 const raw = amount * rate / 100;
-                const cashback = Math.min(raw, remainingCap);
+                // VND has no fractional unit — round so balances/counters stay integers.
+                const cashback = Math.round(Math.min(raw, remainingCap));
                 return { rate, cashback, capped: cap > 0 && raw > remainingCap, remainingCap: cap > 0 ? remainingCap : null };
             },
 
@@ -1212,7 +1226,7 @@
                                 <div>
                                     <strong>${escapeHtml(s.card.name)}</strong>
                                     ${best ? '<span class="badge badge-success" style="margin-left:6px;">TỐT NHẤT</span>' : ''}
-                                    <div class="text-gray" style="font-size:12px;">Hoàn ${s.rate}%${s.availableCredit !== Infinity ? ` · hạn mức còn ${fmtVND(s.availableCredit)}` : ''}</div>
+                                    <div class="text-gray" style="font-size:12px;">Hoàn ${s.rate}%${s.availableCredit !== Infinity ? ` · hạn mức còn ${fmtVND(Math.max(0, s.availableCredit))}` : ''}</div>
                                 </div>
                                 <div style="text-align:right;">
                                     <div class="suggest-cashback">+${fmtVND(s.cashback)}</div>
@@ -1560,11 +1574,10 @@
                 const totalStatement = this.cards.reduce((s, c) => s + num(c.statementAmount), 0);
                 const usagePct = totalLimit > 0 ? Math.min(100, Math.round(totalBalance / totalLimit * 100)) : 0;
 
-                // Cashback earned this cycle (sum across cards' category counters).
-                const cashbackThisCycle = this.cards.reduce((s, c) => {
-                    if (c.cashbackCycle !== cycle) return s;
-                    return s + (c.cashbackCategories || []).reduce((x, cat) => x + num(cat.earned), 0);
-                }, 0);
+                // Cashback earned this month, summed from transactions so default-rate
+                // cashback (not tied to any category counter) is included too.
+                const cashbackThisCycle = this.transactions.reduce((s, t) =>
+                    (String(t.date).slice(0, 7) === cycle ? s + num(t.cashbackEarned) : s), 0);
 
                 const dueSoon = this.cards.filter(c => !c.isPaid && this.getDaysUntil(c.nextDueDate) >= 0 && this.getDaysUntil(c.nextDueDate) <= 3).length;
                 const overdue = this.cards.filter(c => !c.isPaid && this.getDaysUntil(c.nextDueDate) < 0).length;
