@@ -668,34 +668,37 @@
                     (err) => console.error('cards listener:', err)
                 );
 
+                // No server-side orderBy on the newer collections so they don't depend on
+                // composite indexes being deployed/built — sort client-side instead.
                 this.unsub.transactions = onSnapshot(
-                    query(collection(db, 'transactions'), where('userId', '==', uid), orderBy('date', 'desc')),
+                    query(collection(db, 'transactions'), where('userId', '==', uid)),
                     (snap) => {
-                        this.transactions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        this.transactions = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                            .sort((a, b) => String(b.date).localeCompare(String(a.date)) || String(b.createdAt).localeCompare(String(a.createdAt)));
                         this.renderTransactions();
                         this.renderDashboard();
                     },
-                    (err) => console.error('transactions listener:', err)
+                    (err) => { console.error('transactions listener:', err); this.showMessage('Không tải được giao dịch (kiểm tra Firestore rules).', true); }
                 );
 
                 this.unsub.loans = onSnapshot(
-                    query(collection(db, 'loans'), where('userId', '==', uid), orderBy('createdAt', 'desc')),
+                    query(collection(db, 'loans'), where('userId', '==', uid)),
                     (snap) => {
-                        this.loans = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                        this.loans = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                            .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
                         this.renderLoans();
                         this.renderDashboard();
                     },
-                    (err) => console.error('loans listener:', err)
+                    (err) => { console.error('loans listener:', err); this.showMessage('Không tải được khoản vay (kiểm tra Firestore rules).', true); }
                 );
 
                 this.unsub.loanRepayments = onSnapshot(
-                    query(collection(db, 'loanRepayments'), where('userId', '==', uid), orderBy('createdAt', 'desc')),
+                    query(collection(db, 'loanRepayments'), where('userId', '==', uid)),
                     (snap) => {
                         const grouped = {};
-                        snap.docs.forEach(d => {
-                            const r = { id: d.id, ...d.data() };
-                            (grouped[r.loanId] = grouped[r.loanId] || []).push(r);
-                        });
+                        snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                            .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))
+                            .forEach(r => { (grouped[r.loanId] = grouped[r.loanId] || []).push(r); });
                         this.loanRepayments = grouped;
                         this.renderLoans();
                         this.renderDashboard();
