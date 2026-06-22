@@ -14,248 +14,257 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
+            /* Professional red / black / white palette — one accent (red), neutral grays, muted semantics */
             --primary: #dc2626;
             --primary-dark: #b91c1c;
-            --primary-light: #ef4444;
-            --success: #10b981;
-            --success-dark: #059669;
-            --warning: #f59e0b;
+            --primary-soft: #fef2f2;
+            --success: #15803d;
+            --success-dark: #166534;
+            --success-soft: #f0fdf4;
+            --warning: #b45309;
+            --warning-soft: #fffbeb;
             --danger: #dc2626;
-            --info: #6366f1;
-            --dark: #111827;
-            --gray: #6b7280;
-            --light: #f9fafb;
+            --danger-soft: #fef2f2;
+            --info: #3f3f46;
+            --dark: #18181b;       /* near-black text */
+            --ink-2: #3f3f46;      /* secondary text */
+            --gray: #71717a;       /* muted text */
+            --light: #f4f4f5;      /* subtle fills */
             --white: #ffffff;
-            --border: #e5e7eb;
-            --gradient-1: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            --gradient-info: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
-            --shadow-lg: 0 4px 12px rgba(0,0,0,0.1);
+            --border: #e4e4e7;
             --radius: 12px;
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --radius-sm: 8px;
+            --transition: all 0.15s ease;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        html { -webkit-text-size-adjust: 100%; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f3f4f6;
+            background: var(--white);
             min-height: 100vh;
             color: var(--dark);
             -webkit-font-smoothing: antialiased;
+            line-height: 1.5;
         }
 
-        .container { max-width: 1100px; margin: 0 auto; padding: 16px; }
+        .container { max-width: 940px; margin: 0 auto; padding: 16px; }
 
         /* ---------- Auth ---------- */
         .auth-container {
-            max-width: 420px; margin: 60px auto; background: var(--white);
-            padding: 40px; border-radius: 16px; box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border); animation: fadeIn 0.5s ease-out;
-            position: relative; overflow: hidden;
+            max-width: 400px; margin: 56px auto; background: var(--white);
+            padding: 32px; border-radius: var(--radius);
+            border: 1px solid var(--border); animation: fadeIn 0.4s ease-out;
         }
-        .auth-container::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--gradient-1); }
         .auth-container h2 {
-            background: var(--gradient-1); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; font-size: 32px; font-weight: 700; margin-bottom: 32px; text-align: center;
+            color: var(--dark); font-size: 26px; font-weight: 800; margin-bottom: 24px; text-align: center;
         }
 
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark); font-size: 13px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--ink-2); font-size: 13px; }
         .form-group input, .form-group select, .form-group textarea {
-            width: 100%; padding: 12px 14px; border: 2px solid var(--border); border-radius: 10px;
-            font-size: 15px; transition: var(--transition); background: var(--white); font-family: inherit;
+            width: 100%; padding: 11px 13px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+            font-size: 15px; transition: var(--transition); background: var(--white); color: var(--dark); font-family: inherit;
         }
         .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-            outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+            outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
         }
         .form-group small { color: var(--gray); display: block; margin-top: 6px; font-size: 12px; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 
         /* ---------- Buttons ---------- */
         .btn {
-            background: var(--gradient-1); color: white; border: none; padding: 12px 22px;
-            border-radius: 10px; cursor: pointer; font-size: 15px; font-weight: 600;
-            transition: var(--transition); box-shadow: var(--shadow-sm);
+            background: var(--primary); color: #fff; border: 1px solid var(--primary);
+            padding: 10px 18px; border-radius: var(--radius-sm); cursor: pointer;
+            font-size: 14px; font-weight: 600; transition: var(--transition);
+            min-height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
         }
-        .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
-        .btn:active { transform: translateY(0); }
-        .btn-secondary { background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); }
-        .btn-success { background: var(--gradient-success); }
-        .btn-warning { background: var(--gradient-warning); }
-        .btn-danger { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
-        .btn-info { background: var(--gradient-info); }
-        .btn-sm { padding: 7px 14px; font-size: 13px; }
+        .btn:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
+        .btn:active { transform: translateY(1px); }
+        /* Neutral outline — used for secondary, edit, info, cancel (removes loud colors) */
+        .btn-secondary, .btn-warning, .btn-info {
+            background: var(--white); color: var(--dark); border: 1px solid var(--border);
+        }
+        .btn-secondary:hover, .btn-warning:hover, .btn-info:hover { background: var(--light); border-color: #d4d4d8; }
+        .btn-success { background: var(--success); border-color: var(--success); color: #fff; }
+        .btn-success:hover { background: var(--success-dark); border-color: var(--success-dark); }
+        .btn-danger { background: var(--white); color: var(--danger); border: 1px solid #f3c7c7; }
+        .btn-danger:hover { background: var(--danger-soft); border-color: var(--danger); }
+        .btn-sm { padding: 6px 12px; font-size: 13px; min-height: 34px; }
         .btn-block { width: 100%; }
-
-        /* ---------- Messages ---------- */
-        .message { padding: 14px; border-radius: 10px; margin-bottom: 16px; animation: fadeIn 0.3s ease-out; font-size: 14px; }
-        .error-message { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
-        .success-message { background: rgba(16, 185, 129, 0.1); color: var(--success-dark); border: 1px solid rgba(16, 185, 129, 0.3); }
 
         /* ---------- Top bar ---------- */
         .topbar {
-            background: var(--white); padding: 14px 20px; border-radius: var(--radius);
-            margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;
-            box-shadow: var(--shadow-sm); border: 1px solid var(--border); flex-wrap: wrap; gap: 12px;
+            padding: 12px 0; margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 12px;
         }
-        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand { display: flex; align-items: center; gap: 10px; }
         .brand-logo {
-            width: 42px; height: 42px; border-radius: 10px; background: var(--gradient-1);
-            display: flex; align-items: center; justify-content: center; color: white; font-weight: 800; font-size: 22px;
+            width: 38px; height: 38px; border-radius: var(--radius-sm); background: var(--primary);
+            display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 20px;
         }
-        .brand h1 { font-size: 22px; font-weight: 800; }
+        .brand h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; }
         .brand p { font-size: 12px; color: var(--gray); }
-        .topbar-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .topbar-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .user-chip { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray); }
-        .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--gradient-1); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 14px; }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--dark); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px; }
 
         .notification-toggle {
             display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: var(--white);
-            border-radius: 10px; border: 2px solid var(--border); cursor: pointer; transition: var(--transition);
-            font-size: 13px; font-weight: 600;
+            border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: pointer; transition: var(--transition);
+            font-size: 13px; font-weight: 600; color: var(--ink-2); min-height: 38px;
         }
-        .notification-toggle.enabled { background: rgba(16, 185, 129, 0.1); border-color: var(--success); }
+        .notification-toggle:hover { background: var(--light); }
+        .notification-toggle.enabled { background: var(--success-soft); border-color: #bbf7d0; color: var(--success-dark); }
 
         /* ---------- Tabs ---------- */
         .tabs {
-            display: flex; gap: 6px; background: var(--white); padding: 6px; border-radius: var(--radius);
-            margin-bottom: 16px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); overflow-x: auto;
+            display: flex; gap: 4px; margin-bottom: 18px;
+            border-bottom: 1px solid var(--border); overflow-x: auto; -webkit-overflow-scrolling: touch;
         }
+        .tabs::-webkit-scrollbar { height: 0; }
         .tab-btn {
-            flex: 1; min-width: max-content; padding: 12px 16px; border: none; background: transparent;
-            border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 600; color: var(--gray);
-            transition: var(--transition); white-space: nowrap;
+            padding: 12px 14px; border: none; background: transparent; cursor: pointer;
+            font-size: 14px; font-weight: 600; color: var(--gray); white-space: nowrap;
+            border-bottom: 2px solid transparent; margin-bottom: -1px; transition: var(--transition);
         }
-        .tab-btn:hover { background: var(--light); color: var(--dark); }
-        .tab-btn.active { background: var(--gradient-1); color: white; box-shadow: var(--shadow-sm); }
+        .tab-btn:hover { color: var(--dark); }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-        .tab-content { display: none; animation: fadeIn 0.4s ease-out; }
+        .tab-content { display: none; animation: fadeIn 0.25s ease-out; }
         .tab-content.active { display: block; }
 
         /* ---------- Panels ---------- */
-        .panel {
-            background: var(--white); padding: 22px; border-radius: var(--radius); margin-bottom: 16px;
-            box-shadow: var(--shadow-sm); border: 1px solid var(--border);
-        }
-        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px; }
-        .panel-header h2 { font-size: 20px; font-weight: 700; }
-        .section-title { font-size: 16px; font-weight: 700; margin: 18px 0 10px; color: var(--dark); }
+        .panel { margin-bottom: 22px; }
+        .panel + .panel { padding-top: 22px; border-top: 1px solid var(--border); }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
+        .panel-header h2 { font-size: 18px; font-weight: 700; }
+        .section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--gray); margin: 20px 0 12px; }
 
-        /* ---------- Stat grid ---------- */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
-        .stat-item {
-            padding: 18px; border-radius: var(--radius); background: var(--light);
-            border: 1px solid var(--border); transition: var(--transition);
+        /* ---------- Stat grid (flat, hairline-separated) ---------- */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden;
         }
-        .stat-item:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
-        .stat-number { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
-        .stat-label { color: var(--gray); font-size: 13px; font-weight: 600; }
-        .stat-sub { color: var(--gray); font-size: 12px; margin-top: 4px; }
+        .stat-item { background: var(--white); padding: 16px; }
+        .stat-number { font-size: 22px; font-weight: 800; margin-bottom: 2px; letter-spacing: -0.01em; }
+        .stat-label { color: var(--gray); font-size: 12px; font-weight: 600; }
+        .stat-sub { color: var(--gray); font-size: 11px; margin-top: 4px; }
 
         /* ---------- Progress bar ---------- */
-        .progress-bar { height: 8px; background: #e5e7eb; border-radius: 6px; overflow: hidden; margin-top: 6px; }
-        .progress-fill { height: 100%; border-radius: 6px; transition: width 0.4s ease; }
+        .progress-bar { height: 6px; background: var(--light); border-radius: 4px; overflow: hidden; margin-top: 8px; }
+        .progress-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
 
-        /* ---------- Item cards ---------- */
+        /* ---------- Item cards (flat) ---------- */
         .item-card {
-            background: var(--white); padding: 20px; border-radius: var(--radius); margin-bottom: 14px;
-            border: 1px solid var(--border); box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
-            transition: var(--transition); animation: fadeIn 0.4s ease-out;
+            background: var(--white); padding: 18px; border-radius: var(--radius); margin-bottom: 12px;
+            border: 1px solid var(--border);
         }
-        .item-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--gradient-1); }
-        .item-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
-        .item-card.paid::before { background: var(--gradient-success); }
-        .item-card.due-soon::before { background: var(--gradient-warning); }
-        .item-card.overdue { animation: pulse 2.5s infinite; }
-        .item-card.overdue::before { background: var(--gradient-1); }
-
-        .item-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; gap: 12px; }
-        .item-title { font-size: 19px; font-weight: 700; margin-bottom: 6px; }
+        .item-card.overdue { border-color: #f3c7c7; }
+        .item-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 12px; }
+        .item-title { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
         .item-meta { display: flex; align-items: center; gap: 8px; color: var(--gray); font-size: 13px; flex-wrap: wrap; }
         .item-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; }
-        .badge-info { background: rgba(99, 102, 241, 0.1); color: var(--info); }
-        .badge-success { background: rgba(16, 185, 129, 0.12); color: var(--success-dark); }
-        .badge-gray { background: #f3f4f6; color: var(--gray); }
+        .badge { padding: 3px 9px; border-radius: 6px; font-size: 11px; font-weight: 600; display: inline-block; }
+        .badge-info { background: var(--light); color: var(--ink-2); }
+        .badge-success { background: var(--success-soft); color: var(--success-dark); }
+        .badge-gray { background: var(--light); color: var(--gray); }
 
-        .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; color: white; display: inline-block; }
-        .status-paid { background: var(--gradient-success); }
-        .status-due-soon { background: var(--gradient-warning); }
-        .status-overdue { background: var(--gradient-1); animation: pulse 1.5s infinite; }
-        .status-upcoming { background: var(--gradient-info); }
+        /* Status: subtle pills, no gradients/animation */
+        .status-badge { padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-block; }
+        .status-paid { background: var(--success-soft); color: var(--success-dark); }
+        .status-due-soon { background: var(--warning-soft); color: var(--warning); }
+        .status-overdue { background: var(--danger-soft); color: var(--danger); }
+        .status-upcoming { background: var(--light); color: var(--ink-2); }
 
-        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 10px; }
-        .info-box { background: var(--light); padding: 10px 12px; border-radius: 8px; }
-        .info-box .label { font-size: 11px; color: var(--gray); font-weight: 600; }
-        .info-box .value { font-size: 15px; font-weight: 700; margin-top: 2px; }
+        /* Key/value info (flat, no boxes) */
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px 18px; margin-top: 14px; }
+        .info-box .label { font-size: 11px; color: var(--gray); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+        .info-box .value { font-size: 15px; font-weight: 700; margin-top: 3px; }
 
-        .cashback-tag { font-size: 12px; padding: 6px 10px; border-radius: 8px; background: rgba(16,185,129,0.1); color: var(--success-dark); margin: 3px 3px 0 0; display: inline-block; font-weight: 600; }
+        .cashback-tag { font-size: 12px; padding: 5px 9px; border-radius: 6px; background: var(--light); color: var(--ink-2); margin: 4px 4px 0 0; display: inline-block; font-weight: 600; }
         .cashback-row {
             display: grid; grid-template-columns: 1.4fr 0.7fr 1fr auto; gap: 8px; align-items: center;
-            background: var(--light); padding: 8px; border-radius: 8px; margin-bottom: 8px;
+            margin-bottom: 8px;
         }
-        .cashback-row.header { background: transparent; font-size: 11px; color: var(--gray); font-weight: 700; padding: 2px 8px; }
+        .cashback-row.header { font-size: 11px; color: var(--gray); font-weight: 700; margin-bottom: 4px; }
 
         .suggest-card {
-            border: 2px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 10px;
-            transition: var(--transition); cursor: pointer; background: var(--white);
+            border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; background: var(--white);
         }
-        .suggest-card:hover { border-color: var(--primary); box-shadow: var(--shadow-md); }
-        .suggest-card.best { border-color: var(--success); background: rgba(16,185,129,0.04); }
+        .suggest-card.best { border-color: var(--success); background: var(--success-soft); }
         .suggest-card.disabled { opacity: 0.55; }
         .suggest-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-        .suggest-cashback { font-size: 22px; font-weight: 800; color: var(--success-dark); }
+        .suggest-cashback { font-size: 20px; font-weight: 800; color: var(--success-dark); }
 
-        .empty-state { text-align: center; padding: 50px 20px; color: var(--gray); }
-        .empty-state-icon { font-size: 64px; margin-bottom: 16px; }
-        .empty-state h3 { color: var(--dark); font-size: 20px; margin-bottom: 8px; }
+        /* Transaction list — flat rows */
+        .tx-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--border); }
+        .tx-row:last-child { border-bottom: none; }
+        .tx-main { min-width: 0; }
+        .tx-amount { font-weight: 700; font-size: 15px; }
+        .tx-sub { color: var(--gray); font-size: 12px; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; }
+        .tx-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .tx-edit { margin-top: 12px; padding: 14px; background: var(--light); border-radius: var(--radius-sm); }
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 16px; padding: 6px; border-radius: 6px; line-height: 1; }
+        .icon-btn:hover { background: var(--light); }
+
+        .empty-state { text-align: center; padding: 44px 20px; color: var(--gray); }
+        .empty-state-icon { font-size: 48px; margin-bottom: 14px; opacity: 0.7; }
+        .empty-state h3 { color: var(--dark); font-size: 17px; margin-bottom: 6px; }
+        .empty-state p { font-size: 14px; }
 
         .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
-        .loading-spinner { width: 56px; height: 56px; border: 4px solid rgba(220,38,38,0.15); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        .loading h3 { font-size: 20px; font-weight: 600; color: var(--gray); }
+        .loading-spinner { width: 44px; height: 44px; border: 3px solid var(--light); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.9s linear infinite; margin-bottom: 16px; }
+        .loading h3 { font-size: 16px; font-weight: 600; color: var(--gray); }
 
         .hidden { display: none !important; }
         .text-success { color: var(--success-dark); }
         .text-danger { color: var(--danger); }
-        .text-warning { color: #b45309; }
+        .text-warning { color: var(--warning); }
         .text-gray { color: var(--gray); }
         .mt-8 { margin-top: 8px; }
-        .row-flex { display: flex; gap: 12px; flex-wrap: wrap; }
+        .row-flex { display: flex; gap: 10px; flex-wrap: wrap; }
+        .inline-form { border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 18px; }
 
-        .ios-install-banner { background: var(--gradient-info); color: white; padding: 18px; border-radius: var(--radius); margin-bottom: 16px; }
-        .ios-install-banner h3 { font-size: 16px; margin-bottom: 10px; }
-        .ios-install-banner ul { list-style: none; margin: 10px 0; }
-        .ios-install-banner li { padding: 4px 0; font-size: 13px; }
-        .ios-install-banner li::before { content: '→ '; font-weight: bold; }
-        .close-banner { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 14px; border-radius: 8px; cursor: pointer; margin-top: 10px; font-weight: 600; }
+        .ios-install-banner { background: var(--primary-soft); border: 1px solid #f3c7c7; color: var(--dark); padding: 16px; border-radius: var(--radius); margin-bottom: 16px; }
+        .ios-install-banner h3 { font-size: 15px; margin-bottom: 8px; }
+        .ios-install-banner ul { list-style: none; margin: 8px 0; }
+        .ios-install-banner li { padding: 3px 0; font-size: 13px; color: var(--ink-2); }
+        .ios-install-banner li::before { content: '→ '; font-weight: bold; color: var(--primary); }
+        .close-banner { background: var(--white); border: 1px solid var(--border); color: var(--dark); padding: 8px 14px; border-radius: var(--radius-sm); cursor: pointer; margin-top: 10px; font-weight: 600; }
 
-        /* Global toast — works on both auth and main app (the old in-auth message
-           boxes were invisible once logged in). */
+        /* Global toast */
         .toast {
             position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
-            z-index: 9999; max-width: 92%; padding: 14px 20px; border-radius: 10px;
-            font-size: 14px; font-weight: 600; box-shadow: var(--shadow-lg);
-            animation: fadeIn 0.3s ease-out; text-align: center;
+            z-index: 9999; max-width: 92%; padding: 13px 18px; border-radius: var(--radius-sm);
+            font-size: 14px; font-weight: 600; box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+            animation: fadeIn 0.25s ease-out; text-align: center;
         }
-        .toast.error { background: #fef2f2; color: var(--danger); border: 1px solid rgba(239,68,68,0.3); }
-        .toast.success { background: #ecfdf5; color: var(--success-dark); border: 1px solid rgba(16,185,129,0.3); }
+        .toast.error { background: var(--danger-soft); color: var(--danger); border: 1px solid #f3c7c7; }
+        .toast.success { background: var(--success-soft); color: var(--success-dark); border: 1px solid #bbf7d0; }
 
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 4px; }
 
-        @media (max-width: 768px) {
+        /* ---------- Mobile ---------- */
+        @media (max-width: 640px) {
+            .container { padding: 12px; }
             .form-row, .form-row-3 { grid-template-columns: 1fr; }
             .brand h1 { font-size: 18px; }
+            .brand p { display: none; }
+            .panel-header h2 { font-size: 17px; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .info-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
             .cashback-row { grid-template-columns: 1fr 1fr; }
             .cashback-row.header { display: none; }
+            .item-actions .btn { flex: 1; }
+            .user-chip span { display: none; }
+            .tab-btn { padding: 11px 12px; font-size: 13px; }
         }
     </style>
 </head>
@@ -365,7 +374,7 @@
                 </div>
 
                 <!-- Card form (add + edit) -->
-                <div id="cardForm" class="hidden" style="border:2px dashed var(--border); border-radius:var(--radius); padding:20px; margin-bottom:18px;">
+                <div id="cardForm" class="hidden inline-form">
                     <h3 id="cardFormTitle" class="section-title" style="margin-top:0;">Thêm thẻ tín dụng</h3>
                     <div class="form-group">
                         <label>Tên thẻ</label>
@@ -421,6 +430,19 @@
                         </div>
                     </div>
 
+                    <div class="section-title">Tối ưu miễn lãi (tùy chọn)</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Ngày sao kê hàng tháng</label>
+                            <input type="number" id="statementDay" placeholder="VD: 5" min="1" max="31">
+                        </div>
+                        <div class="form-group">
+                            <label>Số ngày miễn lãi sau sao kê</label>
+                            <input type="number" id="gracePeriodDays" placeholder="VD: 15" min="1" max="60">
+                        </div>
+                    </div>
+                    <small style="display:block; color:var(--gray); margin:-8px 0 4px;">Quẹt thẻ ngay sau ngày sao kê sẽ được miễn lãi dài nhất. App sẽ gợi ý thẻ tối ưu thời gian.</small>
+
                     <div class="section-title">Quyền lợi hoàn tiền theo danh mục</div>
                     <div class="cashback-row header">
                         <div>Danh mục</div><div>Tỷ lệ %</div><div>Cap/tháng (₫)</div><div></div>
@@ -470,7 +492,7 @@
             <div class="panel">
                 <div class="panel-header">
                     <h2>📜 Lịch sử giao dịch</h2>
-                    <select id="txFilterCard" onchange="app.renderTransactions()" style="width:auto; padding:8px 12px; border-radius:8px; border:2px solid var(--border);"></select>
+                    <select id="txFilterCard" onchange="app.renderTransactions()" style="width:auto; padding:8px 12px; border-radius:8px; border:1px solid var(--border);"></select>
                 </div>
                 <div id="transactionsList"></div>
             </div>
@@ -484,7 +506,7 @@
                     <button class="btn btn-success" onclick="app.showLoanForm()">➕ Thêm khoản vay</button>
                 </div>
 
-                <div id="loanForm" class="hidden" style="border:2px dashed var(--border); border-radius:var(--radius); padding:20px; margin-bottom:18px;">
+                <div id="loanForm" class="hidden inline-form">
                     <h3 id="loanFormTitle" class="section-title" style="margin-top:0;">Thêm khoản cho vay</h3>
                     <div class="form-row">
                         <div class="form-group">
@@ -545,7 +567,7 @@
                     <h2>📝 Ghi chú</h2>
                     <button class="btn btn-success" onclick="app.showNoteForm()">➕ Thêm ghi chú</button>
                 </div>
-                <div id="noteForm" class="hidden" style="border:2px dashed var(--border); border-radius:var(--radius); padding:20px; margin-bottom:18px;">
+                <div id="noteForm" class="hidden inline-form">
                     <h3 id="noteFormTitle" class="section-title" style="margin-top:0;">Thêm ghi chú mới</h3>
                     <div class="form-group">
                         <label>Tiêu đề</label>
@@ -627,6 +649,7 @@
             editingCardId: null,
             editingLoanId: null,
             editingNoteId: null,
+            editingTxId: null,
             cashbackDraft: [],     // working list of cashback categories in the card form
             notificationsEnabled: false,
             notificationCheckInterval: null,
@@ -847,6 +870,30 @@
             },
 
             // ============================================================
+            //  INTEREST-FREE OPTIMIZATION
+            //  Each card: statementDay (closing day of month) + gracePeriodDays.
+            //  A purchase is billed on the first statement strictly after the
+            //  purchase date; payment is due statement + grace. Swiping right
+            //  after the statement close yields the longest interest-free window.
+            // ============================================================
+            interestFreeInfo(card, from) {
+                const sd = num(card.statementDay), grace = num(card.gracePeriodDays);
+                if (sd < 1 || grace < 1) return null;
+                const now = from || new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                // Statement date for a given year/month, clamped to the last day of short months.
+                const mkStmt = (y, m) => { const dim = new Date(y, m + 1, 0).getDate(); return new Date(y, m, Math.min(sd, dim)); };
+                let stmt = mkStmt(today.getFullYear(), today.getMonth());
+                if (stmt <= today) stmt = mkStmt(today.getFullYear(), today.getMonth() + 1); // bill on next statement after today
+                const due = new Date(stmt); due.setDate(due.getDate() + grace);
+                const days = Math.round((due - today) / 86400000);
+                // Theoretical maximum: buying the day after the previous statement close.
+                const prevStmt = mkStmt(stmt.getFullYear(), stmt.getMonth() - 1);
+                const maxDays = Math.round((due - prevStmt) / 86400000) - 1;
+                return { statementDate: stmt, dueDate: due, days, maxDays };
+            },
+
+            // ============================================================
             //  CASHBACK LOGIC
             // ============================================================
             currentCycle() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; },
@@ -901,7 +948,7 @@
                 document.getElementById('dueDate').value = '';
                 document.getElementById('transactionDate').value = '';
                 document.getElementById('daysToAdd').value = '20';
-                ['creditLimit', 'currentBalance', 'statementAmount', 'minimumPayment', 'cashbackDefaultRate'].forEach(id => document.getElementById(id).value = '');
+                ['creditLimit', 'currentBalance', 'statementAmount', 'minimumPayment', 'cashbackDefaultRate', 'statementDay', 'gracePeriodDays'].forEach(id => document.getElementById(id).value = '');
                 this.onCardTypeChange();
                 this.renderCashbackEditor();
                 const form = document.getElementById('cardForm');
@@ -972,6 +1019,8 @@
                 document.getElementById('statementAmount').value = card.statementAmount || '';
                 document.getElementById('minimumPayment').value = card.minimumPayment || '';
                 document.getElementById('cashbackDefaultRate').value = card.cashbackDefaultRate || '';
+                document.getElementById('statementDay').value = card.statementDay || '';
+                document.getElementById('gracePeriodDays').value = card.gracePeriodDays || '';
                 this.cashbackDraft = (card.cashbackCategories || []).map(c => ({ category: c.category, rate: c.rate, cap: c.cap }));
                 this.onCardTypeChange();
                 this.renderCashbackEditor();
@@ -1001,6 +1050,8 @@
                     statementAmount: num(document.getElementById('statementAmount').value),
                     minimumPayment: num(document.getElementById('minimumPayment').value),
                     cashbackDefaultRate: num(document.getElementById('cashbackDefaultRate').value),
+                    statementDay: num(document.getElementById('statementDay').value),
+                    gracePeriodDays: num(document.getElementById('gracePeriodDays').value),
                     cashbackCategories,
                     cashbackCycle: existing?.cashbackCycle || this.currentCycle(),
                     updatedAt: new Date().toISOString(),
@@ -1082,8 +1133,25 @@
                     el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">💳</div><h3>Chưa có thẻ nào</h3><p>Thêm thẻ tín dụng đầu tiên để bắt đầu theo dõi.</p></div>`;
                     return;
                 }
+                // Interest-free ranking: which card to swipe today for the longest grace period.
+                const ranked = this.cards
+                    .map(c => ({ c, info: this.interestFreeInfo(c) }))
+                    .filter(x => x.info)
+                    .sort((a, b) => b.info.days - a.info.days);
+                let banner = '';
+                if (ranked.length) {
+                    const best = ranked[0];
+                    const rest = ranked.slice(1, 4).map(x => `${escapeHtml(x.c.name)} ${x.info.days}n`).join(' · ');
+                    banner = `
+                        <div class="inline-form" style="border-color:#bbf7d0; background:var(--success-soft);">
+                            <div style="font-weight:700; margin-bottom:2px;">💡 Quẹt hôm nay tối ưu thời gian</div>
+                            <div style="font-size:18px; font-weight:800;">${escapeHtml(best.c.name)} — <span class="text-success">miễn lãi ${best.info.days} ngày</span></div>
+                            <div class="text-gray" style="font-size:12px; margin-top:4px;">Trả trước ${best.info.dueDate.toLocaleDateString('vi-VN')}${best.info.maxDays ? ` · tối đa thẻ này ~${best.info.maxDays} ngày` : ''}${rest ? ` · Khác: ${rest}` : ''}</div>
+                        </div>`;
+                }
+
                 const sorted = [...this.cards].sort((a, b) => this.getDaysUntil(a.nextDueDate) - this.getDaysUntil(b.nextDueDate));
-                el.innerHTML = sorted.map(card => {
+                el.innerHTML = banner + sorted.map(card => {
                     const daysUntil = this.getDaysUntil(card.nextDueDate);
                     const { status, class: cls, badge } = this.getCardStatus(daysUntil, card.isPaid);
                     const dueDate = new Date(card.nextDueDate);
@@ -1103,6 +1171,11 @@
                             <div class="value">${fmtVND(balance)} / ${fmtVND(limit)} (${usagePct}%)</div>
                             <div class="progress-bar"><div class="progress-fill" style="width:${usagePct}%; background:${usageColor};"></div></div>
                         </div>` : '';
+
+                    const ifInfo = this.interestFreeInfo(card);
+                    const ifBox = ifInfo ? `
+                        <div class="info-box"><div class="label">Quẹt hôm nay miễn lãi</div><div class="value text-success">${ifInfo.days} ngày</div></div>
+                        <div class="info-box"><div class="label">Sao kê → Hạn TT</div><div class="value" style="font-size:13px;">Ngày ${num(card.statementDay)} → ${ifInfo.dueDate.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' })}</div></div>` : '';
 
                     const cycle = this.currentCycle();
                     const cashbackTags = (card.cashbackCategories || []).map(c => {
@@ -1162,6 +1235,7 @@
                                 <div class="info-box"><div class="label">Dư nợ hiện tại</div><div class="value">${fmtVND(balance)}</div></div>
                                 ${num(card.minimumPayment) ? `<div class="info-box"><div class="label">Tối thiểu</div><div class="value">${fmtVND(card.minimumPayment)}</div></div>` : ''}
                                 ${limit > 0 ? `<div class="info-box"><div class="label">Hạn mức còn lại</div><div class="value text-success">${fmtVND(limit - balance)}</div></div>` : ''}
+                                ${ifBox}
                                 ${limitBox}
                             </div>
                             ${cashbackSection}
@@ -1229,7 +1303,7 @@
                                 <div>
                                     <strong>${escapeHtml(s.card.name)}</strong>
                                     ${best ? '<span class="badge badge-success" style="margin-left:6px;">TỐT NHẤT</span>' : ''}
-                                    <div class="text-gray" style="font-size:12px;">Hoàn ${s.rate}%${s.availableCredit !== Infinity ? ` · hạn mức còn ${fmtVND(Math.max(0, s.availableCredit))}` : ''}</div>
+                                    <div class="text-gray" style="font-size:12px;">Hoàn ${s.rate}%${s.availableCredit !== Infinity ? ` · hạn mức còn ${fmtVND(Math.max(0, s.availableCredit))}` : ''}${(() => { const inf = this.interestFreeInfo(s.card); return inf ? ` · miễn lãi ${inf.days} ngày` : ''; })()}</div>
                                 </div>
                                 <div style="text-align:right;">
                                     <div class="suggest-cashback">+${fmtVND(s.cashback)}</div>
@@ -1319,21 +1393,99 @@
                     el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">💸</div><h3>Chưa có giao dịch</h3><p>Ghi giao dịch đầu tiên để theo dõi chi tiêu và hoàn tiền.</p></div>`;
                     return;
                 }
-                el.innerHTML = list.map(t => `
-                    <div class="item-card" style="padding:14px 16px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
-                            <div>
-                                <div style="font-weight:700;">${fmtVND(t.amount)} <span class="badge badge-gray">${catLabel(t.category)}</span></div>
-                                <div class="text-gray" style="font-size:12px; margin-top:4px;">
-                                    ${escapeHtml(t.cardName || '')}${t.description ? ' · ' + escapeHtml(t.description) : ''} · ${new Date(t.date).toLocaleDateString('vi-VN')}
+                el.innerHTML = list.map(t => {
+                    if (this.editingTxId === t.id) {
+                        const opts = CATEGORIES.map(c => `<option value="${c.key}" ${c.key === t.category ? 'selected' : ''}>${c.icon} ${c.label}</option>`).join('');
+                        return `
+                            <div class="tx-edit">
+                                <div class="form-row">
+                                    <div class="form-group" style="margin-bottom:10px;"><label>Số tiền (₫)</label><input type="number" id="edit-tx-amount-${t.id}" value="${num(t.amount)}" min="0"></div>
+                                    <div class="form-group" style="margin-bottom:10px;"><label>Danh mục</label><select id="edit-tx-category-${t.id}">${opts}</select></div>
                                 </div>
+                                <div class="form-row">
+                                    <div class="form-group" style="margin-bottom:10px;"><label>Mô tả</label><input type="text" id="edit-tx-desc-${t.id}" value="${escapeHtml(t.description || '')}"></div>
+                                    <div class="form-group" style="margin-bottom:10px;"><label>Ngày</label><input type="date" id="edit-tx-date-${t.id}" value="${escapeHtml(t.date || '')}"></div>
+                                </div>
+                                <div class="text-gray" style="font-size:12px; margin-bottom:12px;">Thẻ: ${escapeHtml(t.cardName || '')} · dư nợ & hoàn tiền sẽ được tính lại theo số tiền/danh mục mới.</div>
+                                <div class="row-flex">
+                                    <button class="btn btn-sm btn-success" onclick="app.saveTransactionEdit('${t.id}')">💾 Lưu</button>
+                                    <button class="btn btn-sm btn-secondary" onclick="app.cancelEditTransaction()">Hủy</button>
+                                </div>
+                            </div>`;
+                    }
+                    return `
+                        <div class="tx-row">
+                            <div class="tx-main">
+                                <div class="tx-amount">${fmtVND(t.amount)} <span class="badge badge-gray">${catLabel(t.category)}</span></div>
+                                <div class="tx-sub">${escapeHtml(t.cardName || '')}${t.description ? ' · ' + escapeHtml(t.description) : ''} · ${new Date(t.date).toLocaleDateString('vi-VN')}</div>
                             </div>
-                            <div style="text-align:right;">
-                                ${num(t.cashbackEarned) > 0 ? `<div class="text-success" style="font-weight:700;">+${fmtVND(t.cashbackEarned)}</div>` : ''}
-                                <button class="btn btn-sm btn-danger mt-8" onclick="app.deleteTransaction('${t.id}')">🗑️</button>
+                            <div class="tx-right">
+                                ${num(t.cashbackEarned) > 0 ? `<span class="text-success" style="font-weight:700; font-size:14px;">+${fmtVND(t.cashbackEarned)}</span>` : ''}
+                                <button class="icon-btn" title="Sửa" onclick="app.startEditTransaction('${t.id}')">✏️</button>
+                                <button class="icon-btn" title="Xóa" onclick="app.deleteTransaction('${t.id}')">🗑️</button>
                             </div>
-                        </div>
-                    </div>`).join('');
+                        </div>`;
+                }).join('');
+            },
+
+            startEditTransaction(txId) {
+                this.editingTxId = txId;
+                this.renderTransactions();
+            },
+            cancelEditTransaction() {
+                this.editingTxId = null;
+                this.renderTransactions();
+            },
+            // Edit a logged transaction: reverse its old effect on the card then apply the new
+            // amount/category so balance and cashback (incl. caps) stay consistent.
+            async saveTransactionEdit(txId) {
+                const tx = this.transactions.find(t => t.id === txId);
+                if (!tx) return;
+                const newAmount = num(document.getElementById(`edit-tx-amount-${txId}`).value);
+                if (!newAmount || newAmount <= 0) return alert('Vui lòng nhập số tiền hợp lệ');
+                const newCategory = document.getElementById(`edit-tx-category-${txId}`).value;
+                const newDescription = document.getElementById(`edit-tx-desc-${txId}`).value.trim();
+                const newDate = document.getElementById(`edit-tx-date-${txId}`).value || tx.date;
+
+                try {
+                    const batch = writeBatch(db);
+                    const card = this.cards.find(c => c.id === tx.cardId);
+                    let newCashback = 0;
+                    if (card) {
+                        const cycle = this.currentCycle();
+                        let cats = (card.cashbackCategories || []).map(c => ({ ...c }));
+                        // Reverse the old transaction's cashback (only meaningful within the same cycle).
+                        if (card.cashbackCycle !== cycle) {
+                            cats = cats.map(c => ({ ...c, earned: 0 }));
+                        } else {
+                            const om = cats.find(c => c.category === tx.category);
+                            if (om) om.earned = Math.max(0, num(om.earned) - num(tx.cashbackEarned));
+                        }
+                        // Compute the new cashback against the reversed/ reset counters.
+                        const r = this.computeCashback({ ...card, cashbackCategories: cats, cashbackCycle: cycle }, newCategory, newAmount);
+                        newCashback = r.cashback;
+                        const nm = cats.find(c => c.category === newCategory);
+                        if (nm) nm.earned = num(nm.earned) + newCashback;
+                        const delta = newAmount - num(tx.amount);
+                        batch.update(doc(db, 'cards', card.id), {
+                            currentBalance: Math.max(0, num(card.currentBalance) + delta),
+                            statementAmount: Math.max(0, num(card.statementAmount) + delta),
+                            cashbackCategories: cats,
+                            cashbackCycle: cycle,
+                            updatedAt: new Date().toISOString(),
+                        });
+                    }
+                    batch.update(doc(db, 'transactions', txId), {
+                        amount: newAmount, category: newCategory, description: newDescription,
+                        date: newDate, cashbackEarned: newCashback, updatedAt: new Date().toISOString(),
+                    });
+                    await batch.commit();
+                    this.editingTxId = null;
+                    this.showMessage('Đã cập nhật giao dịch');
+                } catch (e) {
+                    console.error('saveTransactionEdit:', e);
+                    this.showMessage('Lỗi khi cập nhật giao dịch', true);
+                }
             },
 
             // ============================================================
