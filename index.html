@@ -396,12 +396,13 @@
                     </div>
                     <div id="variableDateInput" class="form-row hidden">
                         <div class="form-group">
-                            <label>Ngày thông báo giao dịch</label>
+                            <label>Ngày thông báo giao dịch (sao kê)</label>
                             <input type="date" id="transactionDate">
                         </div>
                         <div class="form-group">
-                            <label>Số ngày cộng thêm</label>
+                            <label>Số ngày cộng thêm (miễn lãi)</label>
                             <input type="number" id="daysToAdd" value="20" min="1" max="365">
+                            <small>App dùng ngày sao kê + số ngày này để tính ngày thanh toán và gợi ý quẹt thẻ tối ưu miễn lãi.</small>
                         </div>
                     </div>
 
@@ -429,19 +430,6 @@
                             <input type="number" id="cashbackDefaultRate" placeholder="0" min="0" step="0.1">
                         </div>
                     </div>
-
-                    <div class="section-title">Tối ưu miễn lãi (tùy chọn)</div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Ngày sao kê hàng tháng</label>
-                            <input type="number" id="statementDay" placeholder="VD: 5" min="1" max="31">
-                        </div>
-                        <div class="form-group">
-                            <label>Số ngày miễn lãi sau sao kê</label>
-                            <input type="number" id="gracePeriodDays" placeholder="VD: 15" min="1" max="60">
-                        </div>
-                    </div>
-                    <small style="display:block; color:var(--gray); margin:-8px 0 4px;">Quẹt thẻ ngay sau ngày sao kê sẽ được miễn lãi dài nhất. App sẽ gợi ý thẻ tối ưu thời gian.</small>
 
                     <div class="section-title">Quyền lợi hoàn tiền theo danh mục</div>
                     <div class="cashback-row header">
@@ -871,13 +859,16 @@
 
             // ============================================================
             //  INTEREST-FREE OPTIMIZATION
-            //  Each card: statementDay (closing day of month) + gracePeriodDays.
+            //  Reuses variable-card fields: statement day = day-of-month of transactionDate, grace = daysToAdd.
             //  A purchase is billed on the first statement strictly after the
             //  purchase date; payment is due statement + grace. Swiping right
             //  after the statement close yields the longest interest-free window.
             // ============================================================
             interestFreeInfo(card, from) {
-                const sd = num(card.statementDay), grace = num(card.gracePeriodDays);
+                // Reuse the variable-card fields: statement day = day-of-month of the
+                // transaction (statement) date; grace = daysToAdd.
+                const grace = num(card.daysToAdd);
+                const sd = card.transactionDate ? new Date(card.transactionDate).getDate() : 0;
                 if (sd < 1 || grace < 1) return null;
                 const now = from || new Date();
                 const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -890,7 +881,7 @@
                 // Theoretical maximum: buying the day after the previous statement close.
                 const prevStmt = mkStmt(stmt.getFullYear(), stmt.getMonth() - 1);
                 const maxDays = Math.round((due - prevStmt) / 86400000) - 1;
-                return { statementDate: stmt, dueDate: due, days, maxDays };
+                return { statementDay: sd, statementDate: stmt, dueDate: due, days, maxDays };
             },
 
             // ============================================================
@@ -948,7 +939,7 @@
                 document.getElementById('dueDate').value = '';
                 document.getElementById('transactionDate').value = '';
                 document.getElementById('daysToAdd').value = '20';
-                ['creditLimit', 'currentBalance', 'statementAmount', 'minimumPayment', 'cashbackDefaultRate', 'statementDay', 'gracePeriodDays'].forEach(id => document.getElementById(id).value = '');
+                ['creditLimit', 'currentBalance', 'statementAmount', 'minimumPayment', 'cashbackDefaultRate'].forEach(id => document.getElementById(id).value = '');
                 this.onCardTypeChange();
                 this.renderCashbackEditor();
                 const form = document.getElementById('cardForm');
@@ -1019,8 +1010,6 @@
                 document.getElementById('statementAmount').value = card.statementAmount || '';
                 document.getElementById('minimumPayment').value = card.minimumPayment || '';
                 document.getElementById('cashbackDefaultRate').value = card.cashbackDefaultRate || '';
-                document.getElementById('statementDay').value = card.statementDay || '';
-                document.getElementById('gracePeriodDays').value = card.gracePeriodDays || '';
                 this.cashbackDraft = (card.cashbackCategories || []).map(c => ({ category: c.category, rate: c.rate, cap: c.cap }));
                 this.onCardTypeChange();
                 this.renderCashbackEditor();
@@ -1050,8 +1039,6 @@
                     statementAmount: num(document.getElementById('statementAmount').value),
                     minimumPayment: num(document.getElementById('minimumPayment').value),
                     cashbackDefaultRate: num(document.getElementById('cashbackDefaultRate').value),
-                    statementDay: num(document.getElementById('statementDay').value),
-                    gracePeriodDays: num(document.getElementById('gracePeriodDays').value),
                     cashbackCategories,
                     cashbackCycle: existing?.cashbackCycle || this.currentCycle(),
                     updatedAt: new Date().toISOString(),
@@ -1175,7 +1162,7 @@
                     const ifInfo = this.interestFreeInfo(card);
                     const ifBox = ifInfo ? `
                         <div class="info-box"><div class="label">Quẹt hôm nay miễn lãi</div><div class="value text-success">${ifInfo.days} ngày</div></div>
-                        <div class="info-box"><div class="label">Sao kê → Hạn TT</div><div class="value" style="font-size:13px;">Ngày ${num(card.statementDay)} → ${ifInfo.dueDate.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' })}</div></div>` : '';
+                        <div class="info-box"><div class="label">Sao kê → Hạn TT</div><div class="value" style="font-size:13px;">Ngày ${ifInfo.statementDay} → ${ifInfo.dueDate.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' })}</div></div>` : '';
 
                     const cycle = this.currentCycle();
                     const cashbackTags = (card.cashbackCategories || []).map(c => {
