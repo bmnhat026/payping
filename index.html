@@ -389,10 +389,17 @@
                         </select>
                     </div>
 
-                    <div id="fixedDateInput" class="form-group">
-                        <label>Ngày đến hạn hàng tháng</label>
-                        <input type="date" id="dueDate">
-                        <small>Chọn một ngày bất kỳ, app lấy ngày trong tháng làm ngày cố định.</small>
+                    <div id="fixedDateInput" class="form-row">
+                        <div class="form-group">
+                            <label>Ngày đến hạn hàng tháng</label>
+                            <input type="date" id="dueDate">
+                            <small>Chọn một ngày bất kỳ, app lấy ngày trong tháng làm ngày cố định.</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Ngày sao kê hàng tháng (miễn lãi)</label>
+                            <input type="number" id="statementDayFixed" min="1" max="31" placeholder="VD: 25">
+                            <small>Ngày chốt sao kê hàng tháng — để tính số ngày miễn lãi khi quẹt thẻ.</small>
+                        </div>
                     </div>
                     <div id="variableDateInput" class="form-row hidden">
                         <div class="form-group">
@@ -865,21 +872,41 @@
             //  after the statement close yields the longest interest-free window.
             // ============================================================
             interestFreeInfo(card, from) {
-                // Reuse the variable-card fields: statement day = day-of-month of the
-                // transaction (statement) date; grace = daysToAdd.
-                const grace = num(card.daysToAdd);
-                const sd = card.transactionDate ? new Date(card.transactionDate).getDate() : 0;
-                if (sd < 1 || grace < 1) return null;
                 const now = from || new Date();
                 const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                // Statement date for a given year/month, clamped to the last day of short months.
-                const mkStmt = (y, m) => { const dim = new Date(y, m + 1, 0).getDate(); return new Date(y, m, Math.min(sd, dim)); };
-                let stmt = mkStmt(today.getFullYear(), today.getMonth());
-                if (stmt <= today) stmt = mkStmt(today.getFullYear(), today.getMonth() + 1); // bill on next statement after today
-                const due = new Date(stmt); due.setDate(due.getDate() + grace);
+                // day-of-month helper, clamped to the last day of short months
+                const mkDay = (y, m, day) => { const dim = new Date(y, m + 1, 0).getDate(); return new Date(y, m, Math.min(day, dim)); };
+
+                // Statement day-of-month: variable cards = day of transactionDate; fixed cards = statementDay.
+                let sd;
+                if (card.type === 'variable') {
+                    sd = card.transactionDate ? new Date(card.transactionDate).getDate() : 0;
+                } else {
+                    sd = num(card.statementDay);
+                }
+                if (sd < 1) return null;
+
+                // Next statement strictly after today (a purchase today is billed on it).
+                let stmt = mkDay(today.getFullYear(), today.getMonth(), sd);
+                if (stmt <= today) stmt = mkDay(today.getFullYear(), today.getMonth() + 1, sd);
+
+                // Payment due for that statement.
+                let due;
+                if (card.type === 'variable') {
+                    const grace = num(card.daysToAdd);
+                    if (grace < 1) return null;
+                    due = new Date(stmt); due.setDate(due.getDate() + grace);
+                } else {
+                    // Fixed: due = first "due day-of-month" strictly after the statement.
+                    const dueDom = card.originalDueDate ? new Date(card.originalDueDate).getDate() : 0;
+                    if (dueDom < 1) return null;
+                    due = mkDay(stmt.getFullYear(), stmt.getMonth(), dueDom);
+                    if (due <= stmt) due = mkDay(stmt.getFullYear(), stmt.getMonth() + 1, dueDom);
+                }
+
                 const days = Math.round((due - today) / 86400000);
                 // Theoretical maximum: buying the day after the previous statement close.
-                const prevStmt = mkStmt(stmt.getFullYear(), stmt.getMonth() - 1);
+                const prevStmt = mkDay(stmt.getFullYear(), stmt.getMonth() - 1, sd);
                 const maxDays = Math.round((due - prevStmt) / 86400000) - 1;
                 return { statementDay: sd, statementDate: stmt, dueDate: due, days, maxDays };
             },
@@ -939,7 +966,7 @@
                 document.getElementById('dueDate').value = '';
                 document.getElementById('transactionDate').value = '';
                 document.getElementById('daysToAdd').value = '20';
-                ['creditLimit', 'currentBalance', 'statementAmount', 'minimumPayment', 'cashbackDefaultRate'].forEach(id => document.getElementById(id).value = '');
+                ['creditLimit', 'currentBalance', 'statementAmount', 'minimumPayment', 'cashbackDefaultRate', 'statementDayFixed'].forEach(id => document.getElementById(id).value = '');
                 this.onCardTypeChange();
                 this.renderCashbackEditor();
                 const form = document.getElementById('cardForm');
@@ -1010,6 +1037,7 @@
                 document.getElementById('statementAmount').value = card.statementAmount || '';
                 document.getElementById('minimumPayment').value = card.minimumPayment || '';
                 document.getElementById('cashbackDefaultRate').value = card.cashbackDefaultRate || '';
+                document.getElementById('statementDayFixed').value = card.statementDay || '';
                 this.cashbackDraft = (card.cashbackCategories || []).map(c => ({ category: c.category, rate: c.rate, cap: c.cap }));
                 this.onCardTypeChange();
                 this.renderCashbackEditor();
@@ -1050,6 +1078,8 @@
                     if (!dueDate) return alert('Vui lòng chọn ngày đến hạn');
                     data.originalDueDate = dueDate;
                     data.transactionDate = null; data.daysToAdd = null; data.estimatedCycleDays = null;
+                    // Optional statement day (day of month) for interest-free calculation.
+                    data.statementDay = num(document.getElementById('statementDayFixed').value);
                     nextDue = this.getNextDueDateFixed(dueDate);
                 } else {
                     const transactionDate = document.getElementById('transactionDate').value;
@@ -1059,6 +1089,7 @@
                     data.transactionDate = transactionDate;
                     data.daysToAdd = parseInt(daysToAdd);
                     data.estimatedCycleDays = parseInt(daysToAdd);
+                    data.statementDay = null; // variable cards derive the statement day from transactionDate
                     nextDue = this.getDueDateVariable(transactionDate, daysToAdd);
                 }
                 data.nextDueDate = nextDue.toISOString();
