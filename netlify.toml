@@ -1,0 +1,25 @@
+# Cấu hình deploy PingPay trên Netlify (hosting tĩnh).
+# Database vẫn dùng Firebase Firestore (gọi trực tiếp từ trình duyệt).
+
+[build]
+  # Không có bước build — publish thẳng thư mục gốc.
+  publish = "."
+  command = ""
+
+# PWA: cho phép service worker kiểm soát toàn site + không cache file sw.js
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Service-Worker-Allowed = "/"
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+
+# SPA fallback: mọi đường dẫn chưa khớp file tĩnh -> index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
