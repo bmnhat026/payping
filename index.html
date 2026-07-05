@@ -40,15 +40,18 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        html { -webkit-text-size-adjust: 100%; }
+        html { -webkit-text-size-adjust: 100%; overflow-x: hidden; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--white);
             min-height: 100vh;
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;                   /* chặn cuộn ngang toàn trang */
             color: var(--dark);
             -webkit-font-smoothing: antialiased;
             line-height: 1.5;
-            touch-action: pan-x pan-y;            /* cho cuộn, chặn pinch-zoom */
+            touch-action: pan-y;                  /* chỉ cho kéo dọc; khóa kéo ngang + pinch-zoom */
             -webkit-text-size-adjust: 100%;
         }
         /* Cho phép double-tap không zoom trên các phần tử tương tác */
