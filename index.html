@@ -1168,10 +1168,18 @@
                         </div>`;
                 }
 
-                const sorted = [...this.cards].sort((a, b) => this.getDaysUntil(a.nextDueDate) - this.getDaysUntil(b.nextDueDate));
+                // Cards with an amount due first (soonest on top); settled cards (0 to pay) sink to the bottom.
+                const sorted = [...this.cards].sort((a, b) => {
+                    const pa = num(a.statementAmount) > 0, pb = num(b.statementAmount) > 0;
+                    if (pa !== pb) return pa ? -1 : 1;
+                    return this.getDaysUntil(a.nextDueDate) - this.getDaysUntil(b.nextDueDate);
+                });
                 el.innerHTML = banner + sorted.map(card => {
                     const daysUntil = this.getDaysUntil(card.nextDueDate);
-                    const { status, class: cls, badge } = this.getCardStatus(daysUntil, card.isPaid);
+                    const settled = num(card.statementAmount) <= 0;
+                    const { status, class: cls, badge } = settled
+                        ? { status: 'Đã thanh toán', class: 'paid', badge: 'status-paid' }
+                        : this.getCardStatus(daysUntil, card.isPaid);
                     const dueDate = new Date(card.nextDueDate);
                     const limit = num(card.creditLimit);
                     const balance = num(card.currentBalance);
@@ -1245,7 +1253,7 @@
                                 </div>
                                 <div style="text-align:right;">
                                     <div class="status-badge ${badge}">${status}</div>
-                                    <div class="text-gray" style="font-size:13px; margin-top:6px;">${this.daysText(daysUntil)}</div>
+                                    <div class="text-gray" style="font-size:13px; margin-top:6px;">${settled ? 'Kỳ tới ' + dueDate.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' }) : this.daysText(daysUntil)}</div>
                                 </div>
                             </div>
                             <div class="info-grid">
@@ -1625,25 +1633,38 @@
             },
 
             async addRepayment(loanId) {
+                const loan = this.loans.find(l => l.id === loanId);
+                if (!loan) return;
                 const amount = num(document.getElementById(`repay-amount-${loanId}`).value);
-                // Clamp interest into [0, amount] so principal portion can't go negative
-                // and "lãi đã thu" never exceeds the total paid.
+                // Clamp interest into [0, amount] so principal portion can't go negative.
                 const interestPortion = Math.min(amount, Math.max(0, num(document.getElementById(`repay-interest-${loanId}`).value)));
                 const date = document.getElementById(`repay-date-${loanId}`).value || new Date().toISOString().split('T')[0];
                 if (!amount || amount <= 0) return alert('Vui lòng nhập số tiền đã trả hợp lệ');
                 const principalPortion = Math.max(0, amount - interestPortion);
                 try {
-                    await addDoc(collection(db, 'loanRepayments'), {
+                    const { remaining, principalPaid } = this.loanRemaining(loan);
+                    // Interest due this period; any unpaid interest is capitalized into principal.
+                    const expInterest = Math.round(this.expectedInterest(loan, remaining));
+                    const shortfall = Math.max(0, expInterest - interestPortion);
+                    const newPrincipal = num(loan.principal) + shortfall;
+
+                    const batch = writeBatch(db);
+                    const repRef = doc(collection(db, 'loanRepayments'));
+                    batch.set(repRef, {
                         userId: this.currentUser.uid,
                         loanId, amount, interestPortion, principalPortion, date,
+                        interestShortfall: shortfall,
                         createdAt: new Date().toISOString(),
                     });
-                    // Auto-mark repaid when principal is fully covered.
-                    const loan = this.loans.find(l => l.id === loanId);
-                    const { remaining } = this.loanRemaining(loan);
-                    if (remaining - principalPortion <= 0 && loan.status !== 'repaid') {
-                        await updateDoc(doc(db, 'loans', loanId), { status: 'repaid', updatedAt: new Date().toISOString() });
-                    }
+                    const loanUpdate = { updatedAt: new Date().toISOString() };
+                    if (shortfall > 0) loanUpdate.principal = newPrincipal;      // capitalize unpaid interest
+                    const remainingAfter = newPrincipal - (principalPaid + principalPortion);
+                    if (remainingAfter <= 0 && loan.status !== 'repaid') loanUpdate.status = 'repaid';
+                    batch.update(doc(db, 'loans', loanId), loanUpdate);
+                    await batch.commit();
+
+                    if (shortfall > 0) this.showMessage(`Thiếu lãi ${fmtVND(shortfall)} → đã cộng vào gốc`);
+                    else this.showMessage('Đã ghi nhận thanh toán');
                     this.toggleRepayForm(loanId);
                 } catch (e) { console.error('addRepayment:', e); this.showMessage('Lỗi khi ghi nhận thanh toán', true); }
             },
@@ -1661,7 +1682,17 @@
                     el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🤝</div><h3>Chưa có khoản cho vay</h3><p>Thêm khoản cho vay để theo dõi gốc, lãi và lịch sử trả.</p></div>`;
                     return;
                 }
-                el.innerHTML = this.loans.map(loan => {
+                // Priority sort: active loans first (soonest/overdue deadline on top,
+                // undated last), fully-repaid loans at the bottom.
+                const sortedLoans = [...this.loans].sort((a, b) => {
+                    const ra = a.status === 'repaid' || this.loanRemaining(a).remaining <= 0;
+                    const rb = b.status === 'repaid' || this.loanRemaining(b).remaining <= 0;
+                    if (ra !== rb) return ra ? 1 : -1;
+                    const da = a.dueDate ? this.getDaysUntil(a.dueDate) : Infinity;
+                    const db = b.dueDate ? this.getDaysUntil(b.dueDate) : Infinity;
+                    return da - db;
+                });
+                el.innerHTML = sortedLoans.map(loan => {
                     const { remaining, totalPaid, interestPaid } = this.loanRemaining(loan);
                     const reps = this.loanRepayments[loan.id] || [];
                     const isRepaid = loan.status === 'repaid' || remaining <= 0;
@@ -1682,6 +1713,7 @@
                                 <div class="form-group" style="margin-bottom:8px;"><label>Trong đó lãi (₫)</label><input type="number" id="repay-interest-${loan.id}" min="0"></div>
                                 <div class="form-group" style="margin-bottom:8px;"><label>Ngày trả</label><input type="date" id="repay-date-${loan.id}"></div>
                             </div>
+                            <div class="text-gray" style="font-size:12px; margin-bottom:8px;">Lãi cần trả kỳ này ≈ ${fmtVND(Math.round(expInterest))}. Nếu trả thiếu lãi, phần thiếu sẽ được cộng vào gốc.</div>
                             <div class="row-flex">
                                 <button class="btn btn-sm btn-success" onclick="app.addRepayment('${loan.id}')">💾 Ghi nhận</button>
                                 <button class="btn btn-sm btn-secondary" onclick="app.toggleRepayForm('${loan.id}')">Hủy</button>
@@ -1754,8 +1786,8 @@
                 const cashbackThisCycle = this.transactions.reduce((s, t) =>
                     (String(t.date).slice(0, 7) === cycle ? s + num(t.cashbackEarned) : s), 0);
 
-                const dueSoon = this.cards.filter(c => !c.isPaid && this.getDaysUntil(c.nextDueDate) >= 0 && this.getDaysUntil(c.nextDueDate) <= 3).length;
-                const overdue = this.cards.filter(c => !c.isPaid && this.getDaysUntil(c.nextDueDate) < 0).length;
+                const dueSoon = this.cards.filter(c => num(c.statementAmount) > 0 && this.getDaysUntil(c.nextDueDate) >= 0 && this.getDaysUntil(c.nextDueDate) <= 3).length;
+                const overdue = this.cards.filter(c => num(c.statementAmount) > 0 && this.getDaysUntil(c.nextDueDate) < 0).length;
 
                 const activeLoans = this.loans.filter(l => l.status !== 'repaid');
                 const totalLent = activeLoans.reduce((s, l) => s + this.loanRemaining(l).remaining, 0);
@@ -1966,7 +1998,7 @@
                 if (this.lastNotificationCheck === today) return;  // once per day
                 this.lastNotificationCheck = today;
 
-                const unpaid = this.cards.filter(c => !c.isPaid);
+                const unpaid = this.cards.filter(c => num(c.statementAmount) > 0); // only cards with an amount still due
                 const overdue = unpaid.filter(c => this.getDaysUntil(c.nextDueDate) < 0);
                 const dueToday = unpaid.filter(c => this.getDaysUntil(c.nextDueDate) === 0);
                 const dueSoon = unpaid.filter(c => { const d = this.getDaysUntil(c.nextDueDate); return d > 0 && d <= 3; });

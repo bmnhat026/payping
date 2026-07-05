@@ -1,6 +1,6 @@
 // Service Worker cho PingPay PWA
 // Bump CACHE_NAME mỗi lần deploy để force refresh client.
-const CACHE_NAME = 'pingpay-v6';
+const CACHE_NAME = 'pingpay-v7';
 const APP_SHELL = [
   './',
   './index.html',
