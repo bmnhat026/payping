@@ -1635,7 +1635,9 @@
                 const principalPaid = reps.reduce((s, r) => s + num(r.principalPortion), 0);
                 const totalPaid = reps.reduce((s, r) => s + num(r.amount), 0);
                 const interestPaid = reps.reduce((s, r) => s + num(r.interestPortion), 0);
-                return { remaining: Math.max(0, num(loan.principal) - principalPaid), principalPaid, totalPaid, interestPaid };
+                // Interest that was capitalized into principal (already reflected in loan.principal).
+                const capitalized = reps.reduce((s, r) => s + num(r.interestShortfall), 0);
+                return { remaining: Math.max(0, num(loan.principal) - principalPaid), principalPaid, totalPaid, interestPaid, capitalized };
             },
 
             // Expected interest for the next period, by loan type.
@@ -1697,6 +1699,38 @@
                     else this.showMessage('Đã ghi nhận thanh toán');
                     this.toggleRepayForm(loanId);
                 } catch (e) { console.error('addRepayment:', e); this.showMessage('Lỗi khi ghi nhận thanh toán', true); }
+            },
+
+            // Đến hạn nhưng không trả: dồn lãi kỳ này vào gốc, ghi nhận cho kỳ sau.
+            async capitalizeInterest(loanId) {
+                const loan = this.loans.find(l => l.id === loanId);
+                if (!loan) return;
+                const { remaining } = this.loanRemaining(loan);
+                const expInterest = Math.round(this.expectedInterest(loan, remaining));
+                if (expInterest <= 0) return alert('Khoản vay này không có lãi để dồn (lãi suất = 0).');
+                if (!confirm(`Dồn lãi kỳ này ${fmtVND(expInterest)} vào gốc? Gốc mới sẽ là ${fmtVND(num(loan.principal) + expInterest)}.`)) return;
+                try {
+                    const today = new Date().toISOString().split('T')[0];
+                    const batch = writeBatch(db);
+                    // Record as a reversible entry (interestShortfall lets delete/edit undo it).
+                    const repRef = doc(collection(db, 'loanRepayments'));
+                    batch.set(repRef, {
+                        userId: this.currentUser.uid,
+                        loanId, amount: 0, interestPortion: 0, principalPortion: 0,
+                        interestShortfall: expInterest, capitalized: true,
+                        date: today, createdAt: new Date().toISOString(),
+                    });
+                    const loanUpdate = { principal: num(loan.principal) + expInterest, updatedAt: new Date().toISOString() };
+                    // Đẩy hạn phải trả sang kỳ sau (nếu có đặt ngày đến hạn phải trả).
+                    if (loan.nextPaymentDate) {
+                        const d = new Date(loan.nextPaymentDate);
+                        d.setMonth(d.getMonth() + 1);
+                        loanUpdate.nextPaymentDate = d.toISOString().split('T')[0];
+                    }
+                    batch.update(doc(db, 'loans', loanId), loanUpdate);
+                    await batch.commit();
+                    this.showMessage(`Đã dồn lãi ${fmtVND(expInterest)} vào gốc${loan.nextPaymentDate ? ' · dời hạn sang kỳ sau' : ''}`);
+                } catch (e) { console.error('capitalizeInterest:', e); this.showMessage('Lỗi khi dồn lãi vào gốc', true); }
             },
 
             // Find a repayment (and its loanId) from the grouped state.
@@ -1796,7 +1830,7 @@
                     return da - db;
                 });
                 el.innerHTML = sortedLoans.map(loan => {
-                    const { remaining, totalPaid, interestPaid } = this.loanRemaining(loan);
+                    const { remaining, totalPaid, interestPaid, capitalized } = this.loanRemaining(loan);
                     const reps = this.loanRepayments[loan.id] || [];
                     const isRepaid = loan.status === 'repaid' || remaining <= 0;
                     const deadline = deadlineOf(loan);
@@ -1828,6 +1862,17 @@
                         <div style="margin-top:10px;">
                             <div class="text-gray" style="font-size:11px; font-weight:600;">LỊCH SỬ TRẢ (${reps.length})</div>
                             ${reps.map(r => {
+                                // Capitalization entry (interest rolled into principal) — special row, delete only.
+                                if (r.capitalized) {
+                                    return `
+                                        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--warning-soft); padding:8px 10px; border-radius:6px; margin-top:6px;">
+                                            <div style="font-size:13px;">
+                                                <strong class="text-warning">➕ Dồn lãi vào gốc: ${fmtVND(r.interestShortfall)}</strong>
+                                                <div class="text-gray" style="font-size:11px;">${new Date(r.date).toLocaleDateString('vi-VN')}</div>
+                                            </div>
+                                            <button class="icon-btn" title="Hoàn tác" onclick="app.deleteRepayment('${r.id}')">🗑️</button>
+                                        </div>`;
+                                }
                                 if (this.editingRepId === r.id) {
                                     return `
                                         <div class="tx-edit" style="margin-top:6px;">
@@ -1873,7 +1918,7 @@
                                 <div style="text-align:right;">${statusBadge}</div>
                             </div>
                             <div class="info-grid">
-                                <div class="info-box"><div class="label">Gốc cho vay</div><div class="value">${fmtVND(loan.principal)}</div></div>
+                                <div class="info-box"><div class="label">Gốc cho vay</div><div class="value">${fmtVND(loan.principal)}</div>${capitalized > 0 ? `<div class="text-warning" style="font-size:11px; margin-top:2px;">gồm ${fmtVND(capitalized)} lãi dồn</div>` : ''}</div>
                                 <div class="info-box"><div class="label">Còn lại (gốc)</div><div class="value ${remaining > 0 ? 'text-danger' : 'text-success'}">${fmtVND(remaining)}</div></div>
                                 <div class="info-box"><div class="label">Đã thu (gốc+lãi)</div><div class="value text-success">${fmtVND(totalPaid)}</div></div>
                                 <div class="info-box"><div class="label">Lãi đã thu</div><div class="value">${fmtVND(interestPaid)}</div></div>
@@ -1882,6 +1927,7 @@
                             ${loan.note ? `<div class="text-gray" style="font-size:13px; margin-top:10px; white-space:pre-wrap;">📌 ${escapeHtml(loan.note)}</div>` : ''}
                             <div class="item-actions">
                                 ${!isRepaid ? `<button class="btn btn-sm btn-success" onclick="app.toggleRepayForm('${loan.id}')">💵 Ghi nhận trả</button>` : ''}
+                                ${!isRepaid && num(loan.interestRate) > 0 ? `<button class="btn btn-sm btn-warning" onclick="app.capitalizeInterest('${loan.id}')">➕ Dồn lãi vào gốc</button>` : ''}
                                 <button class="btn btn-sm btn-info" onclick="app.toggleLoanStatus('${loan.id}')">${isRepaid ? '↩️ Mở lại' : '✅ Đã thu hồi'}</button>
                                 <button class="btn btn-sm btn-warning" onclick="app.startEditLoan('${loan.id}')">✏️ Sửa</button>
                                 <button class="btn btn-sm btn-danger" onclick="app.deleteLoan('${loan.id}')">🗑️ Xóa</button>
