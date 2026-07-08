@@ -1,6 +1,6 @@
 // Service Worker cho PingPay PWA
 // Bump CACHE_NAME mỗi lần deploy để force refresh client.
-const CACHE_NAME = 'pingpay-v10';
+const CACHE_NAME = 'pingpay-v11';
 const APP_SHELL = [
   './',
   './index.html',
@@ -28,8 +28,25 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(req.url);
 
-  // Bypass tất cả request Firebase / Google API — Firestore SDK có cache riêng (IndexedDB),
-  // nếu SW cache thêm sẽ trả stale data và phá realtime listener.
+  // Firebase SDK JS (bản versioned, bất biến) — cache-first để app vẫn mở được
+  // kể cả khi mạng chập chờn / CDN lỗi (tránh kẹt màn hình loading vô tận).
+  if (url.hostname === 'www.gstatic.com' && url.pathname.includes('/firebasejs/')) {
+    event.respondWith(
+      caches.match(req).then((cached) =>
+        cached || fetch(req).then((res) => {
+          if (res && res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE_NAME).then((c) => c.put(req, copy));
+          }
+          return res;
+        })
+      )
+    );
+    return;
+  }
+
+  // Bypass các request dữ liệu/auth Firebase / Google API — Firestore SDK có cache riêng
+  // (IndexedDB), nếu SW cache thêm sẽ trả stale data và phá realtime listener.
   if (
     url.hostname.endsWith('googleapis.com') ||
     url.hostname.endsWith('firebaseio.com') ||
