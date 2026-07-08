@@ -285,6 +285,25 @@
         <h3>Đang tải PingPay...</h3>
     </div>
 
+    <!-- Watchdog (classic script — vẫn chạy kể cả khi module Firebase tải lỗi).
+         Nếu sau 10s vẫn kẹt loading (mạng/CDN), hiện thông báo + nút Tải lại thay vì xoay mãi. -->
+    <script>
+        (function () {
+            setTimeout(function () {
+                var el = document.getElementById('loadingState');
+                if (el && !el.classList.contains('hidden')) {
+                    el.innerHTML =
+                        '<div style="text-align:center;padding:24px;max-width:340px;">' +
+                        '<div style="font-size:44px;margin-bottom:12px;">📶</div>' +
+                        '<h3 style="margin-bottom:8px;color:#18181b;">Không tải được ứng dụng</h3>' +
+                        '<p style="color:#71717a;font-size:14px;margin-bottom:18px;line-height:1.5;">Có thể do mạng chập chờn. Kiểm tra kết nối rồi thử lại.</p>' +
+                        '<button onclick="location.reload()" style="background:#dc2626;color:#fff;border:none;padding:12px 24px;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer;">🔄 Tải lại</button>' +
+                        '</div>';
+                }
+            }, 10000);
+        })();
+    </script>
+
     <!-- Global toast -->
     <div id="toast" class="toast hidden"></div>
 
