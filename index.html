@@ -467,6 +467,12 @@
                             <input type="number" id="cashbackDefaultRate" placeholder="0" min="0" step="0.1">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label>Nhóm dùng chung hạn mức (tùy chọn)</label>
+                        <input type="text" id="creditGroup" list="creditGroupList" placeholder="VD: VIB — đặt cùng tên cho các thẻ chung hạn mức">
+                        <datalist id="creditGroupList"></datalist>
+                        <small>Các thẻ có cùng tên nhóm sẽ dùng chung một hạn mức (hạn mức khả dụng tính trên tổng dư nợ cả nhóm).</small>
+                    </div>
 
                     <div class="section-title">Quyền lợi hoàn tiền theo danh mục</div>
                     <div class="cashback-row header">
@@ -979,10 +985,21 @@
                 return { rate, cashback, capped: cap > 0 && raw > remainingCap, remainingCap: cap > 0 ? remainingCap : null };
             },
 
+            // ---- Shared credit limit groups (2+ cards sharing one limit) ----
+            creditGroupOf(card) { return (card.creditGroup || '').trim(); },
+            groupMembers(card) {
+                const g = this.creditGroupOf(card);
+                if (!g) return [card];
+                return this.cards.filter(c => (c.creditGroup || '').trim() === g);
+            },
+            // Shared limit = the largest limit set among members; shared balance = sum of members' balances.
+            groupLimit(card) { return this.groupMembers(card).reduce((mx, c) => Math.max(mx, num(c.creditLimit)), 0); },
+            groupBalance(card) { return this.groupMembers(card).reduce((s, c) => s + num(c.currentBalance), 0); },
+
             availableCredit(card) {
-                const limit = num(card.creditLimit);
+                const limit = this.groupLimit(card);
                 if (limit === 0) return Infinity;
-                return limit - num(card.currentBalance);
+                return limit - this.groupBalance(card);
             },
 
             // Build the card update needed when a transaction is recorded on it.
@@ -1013,12 +1030,20 @@
                 document.getElementById('dueDate').value = '';
                 document.getElementById('transactionDate').value = '';
                 document.getElementById('daysToAdd').value = '20';
-                ['creditLimit', 'currentBalance', 'statementAmount', 'minimumPayment', 'cashbackDefaultRate', 'statementDayFixed'].forEach(id => document.getElementById(id).value = '');
+                ['creditLimit', 'currentBalance', 'statementAmount', 'minimumPayment', 'cashbackDefaultRate', 'statementDayFixed', 'creditGroup'].forEach(id => document.getElementById(id).value = '');
+                this.populateCreditGroupList();
                 this.onCardTypeChange();
                 this.renderCashbackEditor();
                 const form = document.getElementById('cardForm');
                 form.classList.remove('hidden');
                 form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            },
+            // Suggest existing group names in the card form datalist.
+            populateCreditGroupList() {
+                const dl = document.getElementById('creditGroupList');
+                if (!dl) return;
+                const groups = [...new Set(this.cards.map(c => (c.creditGroup || '').trim()).filter(Boolean))];
+                dl.innerHTML = groups.map(g => `<option value="${escapeHtml(g)}"></option>`).join('');
             },
             hideCardForm() {
                 document.getElementById('cardForm').classList.add('hidden');
@@ -1085,6 +1110,8 @@
                 document.getElementById('minimumPayment').value = card.minimumPayment || '';
                 document.getElementById('cashbackDefaultRate').value = card.cashbackDefaultRate || '';
                 document.getElementById('statementDayFixed').value = card.statementDay || '';
+                document.getElementById('creditGroup').value = card.creditGroup || '';
+                this.populateCreditGroupList();
                 this.cashbackDraft = (card.cashbackCategories || []).map(c => ({ category: c.category, rate: c.rate, cap: c.cap }));
                 this.onCardTypeChange();
                 this.renderCashbackEditor();
@@ -1114,6 +1141,7 @@
                     statementAmount: num(document.getElementById('statementAmount').value),
                     minimumPayment: num(document.getElementById('minimumPayment').value),
                     cashbackDefaultRate: num(document.getElementById('cashbackDefaultRate').value),
+                    creditGroup: document.getElementById('creditGroup').value.trim() || null,
                     cashbackCategories,
                     cashbackCycle: existing?.cashbackCycle || this.currentCycle(),
                     updatedAt: new Date().toISOString(),
@@ -1228,9 +1256,13 @@
                         ? { status: 'Đã thanh toán', class: 'paid', badge: 'status-paid' }
                         : this.getCardStatus(daysUntil, card.isPaid);
                     const dueDate = new Date(card.nextDueDate);
-                    const limit = num(card.creditLimit);
                     const balance = num(card.currentBalance);
-                    const usagePct = limit > 0 ? Math.min(100, Math.round(balance / limit * 100)) : 0;
+                    // Shared-limit aware: effective limit/balance across the card's group.
+                    const grp = this.creditGroupOf(card);
+                    const effLimit = grp ? this.groupLimit(card) : num(card.creditLimit);
+                    const effBalance = grp ? this.groupBalance(card) : balance;
+                    const limit = effLimit; // used by "Hạn mức còn lại" box below
+                    const usagePct = effLimit > 0 ? Math.min(100, Math.round(effBalance / effLimit * 100)) : 0;
                     const usageColor = usagePct >= 90 ? 'var(--danger)' : usagePct >= 70 ? 'var(--warning)' : 'var(--success)';
 
                     let typeInfo = '';
@@ -1238,11 +1270,12 @@
                         typeInfo = `<div class="text-gray" style="font-size:12px; margin-top:6px;">Ngày GD: ${new Date(card.transactionDate).toLocaleDateString('vi-VN')} + ${card.daysToAdd} ngày</div>`;
                     }
 
-                    const limitBox = limit > 0 ? `
+                    const limitBox = effLimit > 0 ? `
                         <div class="info-box" style="grid-column: 1 / -1;">
-                            <div class="label">Hạn mức sử dụng</div>
-                            <div class="value">${fmtVND(balance)} / ${fmtVND(limit)} (${usagePct}%)</div>
+                            <div class="label">${grp ? `Hạn mức dùng chung — nhóm ${escapeHtml(grp)}` : 'Hạn mức sử dụng'}</div>
+                            <div class="value">${fmtVND(effBalance)} / ${fmtVND(effLimit)} (${usagePct}%)</div>
                             <div class="progress-bar"><div class="progress-fill" style="width:${usagePct}%; background:${usageColor};"></div></div>
+                            ${grp ? `<div class="text-gray" style="font-size:11px; margin-top:4px;">Dư nợ thẻ này: ${fmtVND(balance)} · còn lại chung: ${fmtVND(Math.max(0, effLimit - effBalance))}</div>` : ''}
                         </div>` : '';
 
                     const ifInfo = this.interestFreeInfo(card);
@@ -1294,6 +1327,7 @@
                                     <div class="item-title">${escapeHtml(card.name)}</div>
                                     <div class="item-meta">
                                         <span class="badge badge-info">${card.type === 'fixed' ? '📅 Ngày cố định' : '🔄 Ngày biến động'}</span>
+                                        ${grp ? `<span class="badge badge-gray">🔗 Chung HM: ${escapeHtml(grp)}</span>` : ''}
                                         <span>Đến hạn: ${dueDate.toLocaleDateString('vi-VN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</span>
                                     </div>
                                     ${typeInfo}
@@ -1307,7 +1341,7 @@
                                 <div class="info-box"><div class="label">Cần thanh toán kỳ này</div><div class="value text-danger">${fmtVND(card.statementAmount)}</div></div>
                                 <div class="info-box"><div class="label">Dư nợ hiện tại</div><div class="value">${fmtVND(balance)}</div></div>
                                 ${num(card.minimumPayment) ? `<div class="info-box"><div class="label">Tối thiểu</div><div class="value">${fmtVND(card.minimumPayment)}</div></div>` : ''}
-                                ${limit > 0 ? `<div class="info-box"><div class="label">Hạn mức còn lại</div><div class="value text-success">${fmtVND(limit - balance)}</div></div>` : ''}
+                                ${effLimit > 0 ? `<div class="info-box"><div class="label">Hạn mức còn lại${grp ? ' (chung)' : ''}</div><div class="value text-success">${fmtVND(Math.max(0, effLimit - effBalance))}</div></div>` : ''}
                                 ${ifBox}
                                 ${limitBox}
                             </div>
@@ -1965,7 +1999,13 @@
                 if (!el) return;
                 const cycle = this.currentCycle();
 
-                const totalLimit = this.cards.reduce((s, c) => s + num(c.creditLimit), 0);
+                // Total limit: count each shared-limit group once (avoid double-counting).
+                let totalLimit = 0; const seenGroups = new Set();
+                this.cards.forEach(c => {
+                    const g = (c.creditGroup || '').trim();
+                    if (g) { if (!seenGroups.has(g)) { seenGroups.add(g); totalLimit += this.groupLimit(c); } }
+                    else totalLimit += num(c.creditLimit);
+                });
                 const totalBalance = this.cards.reduce((s, c) => s + num(c.currentBalance), 0);
                 const totalStatement = this.cards.reduce((s, c) => s + num(c.statementAmount), 0);
                 const usagePct = totalLimit > 0 ? Math.min(100, Math.round(totalBalance / totalLimit * 100)) : 0;
