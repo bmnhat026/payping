@@ -1020,8 +1020,9 @@
                 return {
                     cashbackCategories: cats,
                     cashbackCycle: cycle,
+                    // Chỉ tăng dư nợ tổng. KHÔNG cộng vào statementAmount: giao dịch quẹt
+                    // sau ngày chốt sao kê thuộc kỳ sau, không nằm trong sao kê đã chốt.
                     currentBalance: num(card.currentBalance) + amount,
-                    statementAmount: num(card.statementAmount) + amount,
                     updatedAt: new Date().toISOString(),
                 };
             },
@@ -1486,7 +1487,6 @@
                         }
                         batch.update(doc(db, 'cards', card.id), {
                             currentBalance: Math.max(0, num(card.currentBalance) - num(tx.amount)),
-                            statementAmount: Math.max(0, num(card.statementAmount) - num(tx.amount)),
                             cashbackCategories: cats,
                             updatedAt: new Date().toISOString(),
                         });
@@ -1584,7 +1584,6 @@
                         const delta = newAmount - num(tx.amount);
                         batch.update(doc(db, 'cards', card.id), {
                             currentBalance: Math.max(0, num(card.currentBalance) + delta),
-                            statementAmount: Math.max(0, num(card.statementAmount) + delta),
                             cashbackCategories: cats,
                             cashbackCycle: cycle,
                             updatedAt: new Date().toISOString(),
@@ -1708,6 +1707,11 @@
                 if (loan.loanType === 'interest_only') return num(loan.principal) * r;
                 // installment & reducing both accrue interest on the remaining balance
                 return remaining * r;
+            },
+
+            // Đã thu hồi = đánh dấu repaid HOẶC gốc còn lại <= 0. Dùng nhất quán ở mọi nơi.
+            isLoanSettled(loan) {
+                return loan.status === 'repaid' || this.loanRemaining(loan).remaining <= 0;
             },
 
             toggleRepayForm(loanId) {
@@ -2059,7 +2063,7 @@
 
                 // 6) Loans to collect
                 const loanDl = l => l.nextPaymentDate || l.dueDate;
-                const activeLoans = this.loans.filter(l => l.status !== 'repaid' && this.loanRemaining(l).remaining > 0);
+                const activeLoans = this.loans.filter(l => !this.isLoanSettled(l));
                 activeLoans.filter(l => loanDl(l) && this.getDaysUntil(loanDl(l)) < 0)
                     .sort((a, b) => this.getDaysUntil(loanDl(a)) - this.getDaysUntil(loanDl(b)))
                     .forEach(l => push('urgent', `Nên thu hồi: ${l.borrowerName} đã quá hạn`,
@@ -2067,6 +2071,42 @@
                 activeLoans.filter(l => { const d = loanDl(l) ? this.getDaysUntil(loanDl(l)) : null; return d !== null && d >= 0 && d <= 7; })
                     .forEach(l => push('warning', `Sắp đến hạn thu: ${l.borrowerName}`,
                         `Hạn ${new Date(loanDl(l)).toLocaleDateString('vi-VN')} · còn ${fmtVND(this.loanRemaining(l).remaining)} gốc.`));
+
+                // 7) Tổng cần thanh toán trong 7 ngày tới
+                const cycle = this.currentCycle();
+                const dueSoonTotal = this.cards
+                    .filter(c => { const d = this.getDaysUntil(c.nextDueDate); return num(c.statementAmount) > 0 && d >= 0 && d <= 7; })
+                    .reduce((s, c) => s + num(c.statementAmount), 0);
+                if (dueSoonTotal > 0) push('tip', 'Tổng cần thanh toán trong 7 ngày tới', `${fmtVND(dueSoonTotal)} — chuẩn bị dòng tiền để không lỡ hạn.`);
+
+                // 8) Cashback: sắp/đã chạm cap kỳ này
+                this.cards.forEach(c => {
+                    if (c.cashbackCycle !== cycle) return;
+                    (c.cashbackCategories || []).forEach(m => {
+                        const cap = num(m.cap); if (cap <= 0) return;
+                        const earned = num(m.earned); const pct = Math.round(earned / cap * 100);
+                        if (pct >= 100) push('tip', `Hết cap hoàn tiền: ${c.name} · ${catLabel(m.category)}`,
+                            `Đã đạt tối đa ${fmtVND(cap)} kỳ này — quẹt nhóm này bằng thẻ khác để được hoàn tiếp.`);
+                        else if (pct >= 80) push('warning', `Sắp chạm cap hoàn tiền: ${c.name} · ${catLabel(m.category)}`,
+                            `Đã hoàn ${fmtVND(earned)}/${fmtVND(cap)} (${pct}%). Cân nhắc dùng thẻ khác cho nhóm này.`);
+                    });
+                });
+
+                // 9) Thẻ tối ưu hoàn tiền theo danh mục (còn dư địa cap)
+                const catBest = [];
+                CATEGORIES.forEach(cat => {
+                    let best = null;
+                    this.cards.forEach(c => {
+                        const m = (c.cashbackCategories || []).find(x => x.category === cat.key);
+                        if (!m || num(m.rate) <= 0) return;
+                        const earned = c.cashbackCycle === cycle ? num(m.earned) : 0;
+                        const capLeft = num(m.cap) > 0 ? Math.max(0, num(m.cap) - earned) : Infinity;
+                        if (capLeft <= 0) return;
+                        if (!best || num(m.rate) > best.rate) best = { name: c.name, rate: num(m.rate) };
+                    });
+                    if (best) catBest.push(`${cat.icon} ${cat.label} → ${best.name} (${best.rate}%)`);
+                });
+                if (catBest.length) push('tip', 'Tối đa hoàn tiền tháng này — quẹt thẻ theo danh mục', catBest.join('  ·  '));
 
                 if (!tips.length) push('tip', 'Mọi thứ đang ổn 👍',
                     'Không có khoản nào cần chú ý gấp. Nhớ quẹt thẻ ngay sau ngày sao kê để tối đa thời gian miễn lãi.');
@@ -2112,7 +2152,7 @@
                 const dueSoon = this.cards.filter(c => num(c.statementAmount) > 0 && this.getDaysUntil(c.nextDueDate) >= 0 && this.getDaysUntil(c.nextDueDate) <= 3).length;
                 const overdue = this.cards.filter(c => num(c.statementAmount) > 0 && this.getDaysUntil(c.nextDueDate) < 0).length;
 
-                const activeLoans = this.loans.filter(l => l.status !== 'repaid');
+                const activeLoans = this.loans.filter(l => !this.isLoanSettled(l));
                 const totalLent = activeLoans.reduce((s, l) => s + this.loanRemaining(l).remaining, 0);
                 const totalCollected = this.loans.reduce((s, l) => s + this.loanRemaining(l).totalPaid, 0);
                 const loanDl = l => l.nextPaymentDate || l.dueDate;
@@ -2333,7 +2373,7 @@
                 if (dueSoon.length) this.notify('⏰ Thẻ sắp đến hạn!', `${dueSoon.length} thẻ trong 3 ngày tới: ${dueSoon.map(c => c.name).join(', ')}`, 'pingpay-due-soon');
 
                 const loanDeadline = l => l.nextPaymentDate || l.dueDate;
-                const activeLoans = this.loans.filter(l => l.status !== 'repaid' && loanDeadline(l));
+                const activeLoans = this.loans.filter(l => !this.isLoanSettled(l) && loanDeadline(l));
                 const loanOverdue = activeLoans.filter(l => this.getDaysUntil(loanDeadline(l)) < 0);
                 const loanSoon = activeLoans.filter(l => { const d = this.getDaysUntil(loanDeadline(l)); return d >= 0 && d <= 7; });
                 if (loanOverdue.length) this.notify('💰 Khoản cho vay quá hạn thu!', `${loanOverdue.length} khoản: ${loanOverdue.map(l => l.borrowerName).join(', ')}`, 'pingpay-loan-overdue', true);
