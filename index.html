@@ -635,7 +635,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, addDoc, updateDoc, deleteDoc, doc, query, where, orderBy, onSnapshot, writeBatch } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, addDoc, updateDoc, deleteDoc, doc, getDoc, query, where, orderBy, onSnapshot, writeBatch, runTransaction } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyBEtdEz6RJF1_eLoCNE9_Pp0oZLqDzaLuk",
@@ -1447,26 +1447,34 @@
                 }
 
                 try {
-                    // Atomically write the transaction and update the card balance/cashback.
-                    const batch = writeBatch(db);
-                    const txRef = doc(collection(db, 'transactions'));
-                    batch.set(txRef, {
-                        userId: this.currentUser.uid,
-                        cardId, cardName: card.name,
-                        amount, category, description,
-                        date, cashbackEarned: cashback,
-                        createdAt: new Date().toISOString(),
+                    // runTransaction: đọc dư nợ TƯƠI từ server ngay trong transaction rồi mới cộng.
+                    // Nếu dùng batch với bản sao trong bộ nhớ, 2 giao dịch ghi liên tiếp sẽ cùng đọc
+                    // dư nợ cũ và cái sau ghi đè cái trước (mất giao dịch).
+                    let applied = cashback;
+                    await runTransaction(db, async (t) => {
+                        const cardRef = doc(db, 'cards', cardId);
+                        const snap = await t.get(cardRef);
+                        if (!snap.exists()) throw new Error('Thẻ không tồn tại');
+                        const fresh = { id: cardId, ...snap.data() };
+                        applied = this.computeCashback(fresh, category, amount).cashback;
+                        const txRef = doc(collection(db, 'transactions'));
+                        t.set(txRef, {
+                            userId: this.currentUser.uid,
+                            cardId, cardName: fresh.name || card.name,
+                            amount, category, description,
+                            date, cashbackEarned: applied,
+                            createdAt: new Date().toISOString(),
+                        });
+                        t.update(cardRef, this.buildCardUpdateForTransaction(fresh, category, amount, applied));
                     });
-                    batch.update(doc(db, 'cards', cardId), this.buildCardUpdateForTransaction(card, category, amount, cashback));
-                    await batch.commit();
 
                     document.getElementById('txAmount').value = '';
                     document.getElementById('txDescription').value = '';
                     this.refreshSuggestions();
-                    this.showMessage(`Đã ghi nợ ${fmtVND(amount)} vào ${card.name} · hoàn ${fmtVND(cashback)} 🎉`);
+                    this.showMessage(`Đã ghi nợ ${fmtVND(amount)} vào ${card.name} · hoàn ${fmtVND(applied)} 🎉`);
                 } catch (e) {
                     console.error('recordTransaction:', e);
-                    this.showMessage('Lỗi khi ghi giao dịch', true);
+                    this.showMessage('Lỗi khi ghi giao dịch — kiểm tra kết nối rồi thử lại', true);
                 }
             },
 
@@ -1475,23 +1483,25 @@
                 if (!tx) return;
                 if (!confirm('Xóa giao dịch này? Dư nợ và hoàn tiền của thẻ sẽ được hoàn lại.')) return;
                 try {
-                    const card = this.cards.find(c => c.id === tx.cardId);
-                    const batch = writeBatch(db);
-                    batch.delete(doc(db, 'transactions', txId));
-                    if (card) {
-                        // Reverse this transaction's impact on balance and cashback.
-                        const cats = (card.cashbackCategories || []).map(c => ({ ...c }));
-                        const match = cats.find(c => c.category === tx.category);
-                        if (match && card.cashbackCycle === this.currentCycle()) {
-                            match.earned = Math.max(0, num(match.earned) - num(tx.cashbackEarned));
+                    await runTransaction(db, async (t) => {
+                        const cardRef = tx.cardId ? doc(db, 'cards', tx.cardId) : null;
+                        const snap = cardRef ? await t.get(cardRef) : null;
+                        t.delete(doc(db, 'transactions', txId));
+                        if (snap && snap.exists()) {
+                            // Reverse this transaction's impact on the FRESH balance/cashback.
+                            const fresh = snap.data();
+                            const cats = (fresh.cashbackCategories || []).map(c => ({ ...c }));
+                            const match = cats.find(c => c.category === tx.category);
+                            if (match && fresh.cashbackCycle === this.currentCycle()) {
+                                match.earned = Math.max(0, num(match.earned) - num(tx.cashbackEarned));
+                            }
+                            t.update(cardRef, {
+                                currentBalance: Math.max(0, num(fresh.currentBalance) - num(tx.amount)),
+                                cashbackCategories: cats,
+                                updatedAt: new Date().toISOString(),
+                            });
                         }
-                        batch.update(doc(db, 'cards', card.id), {
-                            currentBalance: Math.max(0, num(card.currentBalance) - num(tx.amount)),
-                            cashbackCategories: cats,
-                            updatedAt: new Date().toISOString(),
-                        });
-                    }
-                    await batch.commit();
+                    });
                 } catch (e) {
                     console.error('deleteTransaction:', e);
                     this.showMessage('Lỗi khi xóa giao dịch', true);
@@ -1563,37 +1573,38 @@
                 const newDate = document.getElementById(`edit-tx-date-${txId}`).value || tx.date;
 
                 try {
-                    const batch = writeBatch(db);
-                    const card = this.cards.find(c => c.id === tx.cardId);
-                    let newCashback = 0;
-                    if (card) {
-                        const cycle = this.currentCycle();
-                        let cats = (card.cashbackCategories || []).map(c => ({ ...c }));
-                        // Reverse the old transaction's cashback (only meaningful within the same cycle).
-                        if (card.cashbackCycle !== cycle) {
-                            cats = cats.map(c => ({ ...c, earned: 0 }));
-                        } else {
-                            const om = cats.find(c => c.category === tx.category);
-                            if (om) om.earned = Math.max(0, num(om.earned) - num(tx.cashbackEarned));
+                    await runTransaction(db, async (t) => {
+                        const cardRef = tx.cardId ? doc(db, 'cards', tx.cardId) : null;
+                        const snap = cardRef ? await t.get(cardRef) : null;
+                        let newCashback = 0;
+                        if (snap && snap.exists()) {
+                            const fresh = snap.data();
+                            const cycle = this.currentCycle();
+                            let cats = (fresh.cashbackCategories || []).map(c => ({ ...c }));
+                            // Reverse the old transaction's cashback (only meaningful within the same cycle).
+                            if (fresh.cashbackCycle !== cycle) {
+                                cats = cats.map(c => ({ ...c, earned: 0 }));
+                            } else {
+                                const om = cats.find(c => c.category === tx.category);
+                                if (om) om.earned = Math.max(0, num(om.earned) - num(tx.cashbackEarned));
+                            }
+                            // Compute the new cashback against the reversed/reset counters.
+                            newCashback = this.computeCashback({ ...fresh, cashbackCategories: cats, cashbackCycle: cycle }, newCategory, newAmount).cashback;
+                            const nm = cats.find(c => c.category === newCategory);
+                            if (nm) nm.earned = num(nm.earned) + newCashback;
+                            const delta = newAmount - num(tx.amount);
+                            t.update(cardRef, {
+                                currentBalance: Math.max(0, num(fresh.currentBalance) + delta),
+                                cashbackCategories: cats,
+                                cashbackCycle: cycle,
+                                updatedAt: new Date().toISOString(),
+                            });
                         }
-                        // Compute the new cashback against the reversed/ reset counters.
-                        const r = this.computeCashback({ ...card, cashbackCategories: cats, cashbackCycle: cycle }, newCategory, newAmount);
-                        newCashback = r.cashback;
-                        const nm = cats.find(c => c.category === newCategory);
-                        if (nm) nm.earned = num(nm.earned) + newCashback;
-                        const delta = newAmount - num(tx.amount);
-                        batch.update(doc(db, 'cards', card.id), {
-                            currentBalance: Math.max(0, num(card.currentBalance) + delta),
-                            cashbackCategories: cats,
-                            cashbackCycle: cycle,
-                            updatedAt: new Date().toISOString(),
+                        t.update(doc(db, 'transactions', txId), {
+                            amount: newAmount, category: newCategory, description: newDescription,
+                            date: newDate, cashbackEarned: newCashback, updatedAt: new Date().toISOString(),
                         });
-                    }
-                    batch.update(doc(db, 'transactions', txId), {
-                        amount: newAmount, category: newCategory, description: newDescription,
-                        date: newDate, cashbackEarned: newCashback, updatedAt: new Date().toISOString(),
                     });
-                    await batch.commit();
                     this.editingTxId = null;
                     this.showMessage('Đã cập nhật giao dịch');
                 } catch (e) {
@@ -1714,6 +1725,22 @@
                 return loan.status === 'repaid' || this.loanRemaining(loan).remaining <= 0;
             },
 
+            // Đẩy hạn phải trả sang kỳ kế tiếp (mỗi kỳ 1 tháng), luôn ra ngày SAU ngày trả.
+            // Giữ ngày trong tháng, tự kẹp về ngày cuối tháng với tháng ngắn.
+            nextPeriodDate(fromDateStr, paidDateStr) {
+                const base = new Date(fromDateStr);
+                const dom = base.getDate();
+                const paid = paidDateStr ? new Date(paidDateStr) : new Date();
+                let d = new Date(base.getFullYear(), base.getMonth(), 1), i = 0;
+                do {
+                    i++;
+                    const y = base.getFullYear(), m = base.getMonth() + i;
+                    const dim = new Date(y, m + 1, 0).getDate();
+                    d = new Date(y, m, Math.min(dom, dim));
+                } while (d <= paid && i < 240);   // nhảy tiếp cho tới khi vượt ngày đã trả
+                return d.toISOString().split('T')[0];
+            },
+
             toggleRepayForm(loanId) {
                 const form = document.getElementById(`repay-form-${loanId}`);
                 if (!form) return;
@@ -1745,23 +1772,34 @@
                     const shortfall = Math.max(0, expInterest - interestPortion);
                     const newPrincipal = num(loan.principal) + shortfall;
 
+                    const loanUpdate = { updatedAt: new Date().toISOString() };
+                    if (shortfall > 0) loanUpdate.principal = newPrincipal;      // capitalize unpaid interest
+                    const remainingAfter = newPrincipal - (principalPaid + principalPortion);
+                    const settled = remainingAfter <= 0;
+                    if (settled && loan.status !== 'repaid') loanUpdate.status = 'repaid';
+
+                    // Trả rồi thì hạn phải trả phải chuyển sang kỳ kế tiếp, nếu không sẽ mãi báo quá hạn.
+                    let rolled = null;
+                    if (!settled && loan.nextPaymentDate) {
+                        rolled = this.nextPeriodDate(loan.nextPaymentDate, date);
+                        loanUpdate.nextPaymentDate = rolled;
+                    }
+
                     const batch = writeBatch(db);
                     const repRef = doc(collection(db, 'loanRepayments'));
                     batch.set(repRef, {
                         userId: this.currentUser.uid,
                         loanId, amount, interestPortion, principalPortion, date,
                         interestShortfall: shortfall,
+                        prevNextPaymentDate: loan.nextPaymentDate || null,  // để xóa/sửa khôi phục được
                         createdAt: new Date().toISOString(),
                     });
-                    const loanUpdate = { updatedAt: new Date().toISOString() };
-                    if (shortfall > 0) loanUpdate.principal = newPrincipal;      // capitalize unpaid interest
-                    const remainingAfter = newPrincipal - (principalPaid + principalPortion);
-                    if (remainingAfter <= 0 && loan.status !== 'repaid') loanUpdate.status = 'repaid';
                     batch.update(doc(db, 'loans', loanId), loanUpdate);
                     await batch.commit();
 
-                    if (shortfall > 0) this.showMessage(`Thiếu lãi ${fmtVND(shortfall)} → đã cộng vào gốc`);
-                    else this.showMessage('Đã ghi nhận thanh toán');
+                    const rollTxt = rolled ? ` · hạn kế tiếp ${new Date(rolled).toLocaleDateString('vi-VN')}` : '';
+                    if (shortfall > 0) this.showMessage(`Thiếu lãi ${fmtVND(shortfall)} → đã cộng vào gốc${rollTxt}`);
+                    else this.showMessage(`Đã ghi nhận thanh toán${rollTxt}`);
                     this.toggleRepayForm(loanId);
                 } catch (e) { console.error('addRepayment:', e); this.showMessage('Lỗi khi ghi nhận thanh toán', true); }
             },
@@ -1783,15 +1821,12 @@
                         userId: this.currentUser.uid,
                         loanId, amount: 0, interestPortion: 0, principalPortion: 0,
                         interestShortfall: expInterest, capitalized: true,
+                        prevNextPaymentDate: loan.nextPaymentDate || null,
                         date: today, createdAt: new Date().toISOString(),
                     });
                     const loanUpdate = { principal: num(loan.principal) + expInterest, updatedAt: new Date().toISOString() };
                     // Đẩy hạn phải trả sang kỳ sau (nếu có đặt ngày đến hạn phải trả).
-                    if (loan.nextPaymentDate) {
-                        const d = new Date(loan.nextPaymentDate);
-                        d.setMonth(d.getMonth() + 1);
-                        loanUpdate.nextPaymentDate = d.toISOString().split('T')[0];
-                    }
+                    if (loan.nextPaymentDate) loanUpdate.nextPaymentDate = this.nextPeriodDate(loan.nextPaymentDate, today);
                     batch.update(doc(db, 'loans', loanId), loanUpdate);
                     await batch.commit();
                     this.showMessage(`Đã dồn lãi ${fmtVND(expInterest)} vào gốc${loan.nextPaymentDate ? ' · dời hạn sang kỳ sau' : ''}`);
@@ -1826,6 +1861,8 @@
                         const remainingAfter = newPrincipal - principalPaidOthers;
                         const update = { updatedAt: new Date().toISOString(), status: remainingAfter <= 0 && others.length ? 'repaid' : 'active' };
                         if (shortfall > 0) update.principal = newPrincipal;
+                        // Khôi phục hạn phải trả về đúng trước khi ghi nhận lần trả này.
+                        if (rep.prevNextPaymentDate) update.nextPaymentDate = rep.prevNextPaymentDate;
                         batch.update(doc(db, 'loans', loanId), update);
                     }
                     await batch.commit();
