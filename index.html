@@ -681,6 +681,14 @@
         // Ngày dạng YYYY-MM-DD theo giờ ĐỊA PHƯƠNG. Dùng toISOString() sẽ lệch 1 ngày ở VN (UTC+7).
         const toISODate = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         const todayISO = () => toISODate(new Date());
+        // Cộng n tháng, giữ ngày trong tháng, tự kẹp về ngày cuối tháng với tháng ngắn.
+        const addMonths = (dateStr, n) => {
+            const d = new Date(dateStr), dom = d.getDate();
+            const y = d.getFullYear(), m = d.getMonth() + n;
+            const dim = new Date(y, m + 1, 0).getDate();
+            return new Date(y, m, Math.min(dom, dim));
+        };
+        const fmtDate = (v) => v ? new Date(v).toLocaleDateString('vi-VN') : '—';
         const escapeHtml = (s) => String(s == null ? '' : s)
             .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
@@ -1970,6 +1978,13 @@
                     else if (daysUntil !== null && daysUntil <= 7) statusBadge = '<span class="status-badge status-due-soon">Sắp đến hạn</span>';
                     else statusBadge = '<span class="status-badge status-upcoming">Đang cho vay</span>';
 
+                    // Ngày tất toán: lấy dueDate, nếu trống thì suy ra từ ngày vay + kỳ hạn.
+                    let maturity = loan.dueDate || null, maturityEst = false;
+                    if (!maturity && loan.startDate && num(loan.termMonths) > 0) {
+                        maturity = toISODate(addMonths(loan.startDate, num(loan.termMonths)));
+                        maturityEst = true;
+                    }
+
                     const expInterest = this.expectedInterest(loan, remaining);
 
                     const repayForm = `
@@ -2038,8 +2053,11 @@
                                     <div class="item-meta">
                                         <span class="badge badge-info">${LOAN_TYPES[loan.loanType] || loan.loanType}</span>
                                         ${loan.interestRate ? `<span class="badge badge-gray">${loan.interestRate}%/tháng</span>` : ''}
-                                        ${loan.nextPaymentDate ? `<span>Đến hạn phải trả: <strong>${new Date(loan.nextPaymentDate).toLocaleDateString('vi-VN')}</strong></span>` : (loan.dueDate ? `<span>Hẹn trả: ${new Date(loan.dueDate).toLocaleDateString('vi-VN')}</span>` : '')}
-                                        ${loan.nextPaymentDate && loan.dueDate ? `<span>· Tất toán: ${new Date(loan.dueDate).toLocaleDateString('vi-VN')}</span>` : ''}
+                                        ${num(loan.termMonths) > 0 ? `<span class="badge badge-gray">Kỳ hạn ${num(loan.termMonths)} tháng</span>` : ''}
+                                        ${deadline ? `<span>Đến hạn phải trả: <strong>${fmtDate(deadline)}</strong></span>` : `<span class="text-warning">Chưa đặt ngày đến hạn phải trả</span>`}
+                                    </div>
+                                    <div class="text-gray" style="font-size:12px; margin-top:6px;">
+                                        Ngày vay: ${fmtDate(loan.startDate)}${maturity ? ` · Tất toán${maturityEst ? ' (dự kiến)' : ''}: ${fmtDate(maturity)}` : ''}
                                     </div>
                                     ${daysUntil !== null && !isRepaid ? `<div class="text-gray" style="font-size:12px; margin-top:6px;">${collected ? 'Đã thu kỳ này · hạn kế tiếp ' + new Date(deadline).toLocaleDateString('vi-VN') : this.daysText(daysUntil)}</div>` : ''}
                                 </div>
