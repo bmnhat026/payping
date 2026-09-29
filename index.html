@@ -276,7 +276,10 @@
         /* Mức độ gấp: viền trái theo trạng thái */
         .item-card.urgent { border-color: #f3c7c7; border-left: 4px solid var(--danger); }
         .item-card.soon { border-left: 4px solid #f59e0b; }
-        .item-card.paid { opacity: 0.85; }
+        /* Không dùng opacity cho thẻ đã trả: opacity tạo lớp vẽ riêng, khiến menu ⋯ bị thẻ bên dưới che. */
+        .item-card.paid { background: #fcfcfc; }
+        /* Khối nào đang mở menu ⋯ thì đưa lên trên các khối kế tiếp. */
+        .item-card:has(details.menu[open]), .borrower-group:has(details.menu[open]), .tx-row:has(details.menu[open]) { position: relative; z-index: 40; }
         .status-urgent { background: var(--danger); color: #fff; }
 
         /* Khối thu gọn (hoàn tiền, ghi chú, lịch sử trả) */
@@ -321,7 +324,6 @@
         .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; }
         .filter-bar select, .filter-bar input { padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 13px; font-family: inherit; background: var(--white); max-width: 100%; }
         .step-hint { font-size: 13px; color: var(--ink-2); background: var(--light); border-radius: var(--radius-sm); padding: 10px 12px; }
-        .warn-note { font-size: 12px; color: var(--warning); background: var(--warning-soft); border-radius: 6px; padding: 6px 10px; margin-top: 8px; }
 
         .empty-state { text-align: center; padding: 44px 20px; color: var(--gray); }
         .empty-state-icon { font-size: 48px; margin-bottom: 14px; opacity: 0.7; }
@@ -655,7 +657,6 @@
                             <label>Người vay</label>
                             <input type="text" id="loanBorrower" list="borrowerList" placeholder="VD: Anh Tuấn">
                             <datalist id="borrowerList"></datalist>
-                            <small>Nhập đúng cùng một tên cho các khoản của cùng một người để app cộng dồn.</small>
                         </div>
                         <div class="form-group">
                             <label>Số tiền cho vay (gốc, ₫)</label>
@@ -1032,9 +1033,13 @@
             // Hạn hiển thị: thẻ đã trả xong mà hạn lưu đã trôi qua (chưa ai bấm thanh toán kỳ đó)
             // thì cuộn tới kỳ kế tiếp, tránh hiện "kỳ tới hạn" là một ngày trong quá khứ.
             displayDueDate(card) {
-                if (card.type !== 'fixed' || num(card.statementAmount) > 0 || !card.originalDueDate) return card.nextDueDate;
-                if (this.getDaysUntil(card.nextDueDate) >= 0) return card.nextDueDate;
-                return this.dueDayAfter(new Date(Date.now() - 86400000), new Date(card.originalDueDate).getDate()).toISOString();
+                if (num(card.statementAmount) > 0 || this.getDaysUntil(card.nextDueDate) >= 0) return card.nextDueDate;
+                if (card.type === 'fixed' && card.originalDueDate) {
+                    return this.dueDayAfter(new Date(Date.now() - 86400000), new Date(card.originalDueDate).getDate()).toISOString();
+                }
+                // Thẻ ngày biến động: hạn kỳ tới = hạn của kỳ sao kê sắp tới (sao kê + số ngày).
+                const info = this.interestFreeInfo(card);
+                return info ? info.dueDate.toISOString() : card.nextDueDate;
             },
             getDueDateVariable(transactionDate, daysToAdd) {
                 const txDate = new Date(transactionDate);
@@ -1407,12 +1412,10 @@
                     const from = card.nextDueDate || new Date().toISOString();
                     updateData.nextDueDate = this.dueDayAfter(from, dom).toISOString();
                 } else {
-                    const cycleDays = card.daysToAdd || card.estimatedCycleDays || 30;
-                    const nextTxDate = new Date(card.transactionDate);
-                    nextTxDate.setDate(nextTxDate.getDate() + cycleDays);
-                    const nextTxStr = toISODate(nextTxDate);
+                    // Ngày sao kê lặp lại hằng tháng → kỳ sau = sao kê + 1 tháng, hạn = sao kê mới + số ngày.
+                    // (Trước đây cộng "số ngày miễn lãi" vào ngày sao kê, làm ngày sao kê trôi dần.)
+                    const nextTxStr = toISODate(addMonths(card.transactionDate, 1));
                     updateData.transactionDate = nextTxStr;
-                    updateData.estimatedCycleDays = cycleDays;
                     updateData.nextDueDate = this.getDueDateVariable(nextTxStr, card.daysToAdd).toISOString();
                 }
                 try {
@@ -2313,17 +2316,11 @@
                     // Lịch sử theo ngày trả mới nhất; nghi nhập trùng = 2 lần trả cùng số tiền cách nhau ≤ 10 ngày.
                     const repsByDate = [...reps].sort((a, b) => String(b.date).localeCompare(String(a.date)));
                     const realReps = repsByDate.filter(r => !r.capitalized);
-                    const dupPairs = [];
-                    for (let i = 0; i + 1 < realReps.length; i++) {
-                        const a = realReps[i], b = realReps[i + 1];
-                        if (num(a.amount) === num(b.amount) && Math.abs(new Date(a.date) - new Date(b.date)) <= 10 * 86400000) dupPairs.push([b, a]);
-                    }
                     const lastRep = realReps[0];
                     const editingHere = reps.some(r => r.id === this.editingRepId);
                     const repHistory = reps.length ? `
                         <details class="fold" ${this.foldAttrs('rep-' + loan.id, editingHere)}>
                             <summary><span class="fold-title">Lịch sử trả (${reps.length})</span><span class="fold-meta">${lastRep ? `gần nhất ${fmtVND(lastRep.amount)} · ${fmtDM(lastRep.date)}` : ''}</span></summary>
-                            ${dupPairs.map(([a, b]) => `<div class="warn-note">⚠️ Có 2 lần trả ${fmtVND(a.amount)} vào ${fmtDM(a.date)} và ${fmtDM(b.date)} — kiểm tra xem có nhập trùng không.</div>`).join('')}
                             ${repsByDate.map(r => {
                                 // Capitalization entry (interest rolled into principal) — special row, delete only.
                                 if (r.capitalized) {
@@ -2368,14 +2365,14 @@
                     // Việc chính: kỳ tới thu bao nhiêu, vào ngày nào.
                     let hero;
                     if (isRepaid) hero = `<div class="hero-line">✅ Đã thu hồi đủ gốc</div>`;
-                    else if (!deadline) hero = `<div class="hero-line text-warning">Chưa đặt hạn thu kỳ tới — bấm ⋯ → Sửa để thêm.</div>`;
+                    else if (!deadline) hero = `<div class="hero-line text-gray">Chưa đặt hạn thu kỳ tới</div>`;
                     else hero = `
                         <div class="hero-line">${collected ? 'Đã thu kỳ này · kỳ tới' : 'Kỳ này cần thu'}${expInterest > 0 ? ` lãi ≈ <strong class="hero-amount" style="font-size:20px; ${urg.cls === 'urgent' ? 'color:var(--danger);' : ''}">${fmtVND(Math.round(expInterest))}</strong>` : ''}</div>
                         <div class="hero-line">hạn <strong>${fmtWD(deadline)}</strong>${collected ? '' : ` · ${this.daysText(daysUntil).toLowerCase()}`}</div>`;
 
                     const rate = num(loan.interestRate);
                     const yearly = Math.round(rate * 12 * 10) / 10;
-                    const rateBadge = rate ? `<span class="badge ${yearly > 20 ? '' : 'badge-gray'}" ${yearly > 20 ? `style="background:var(--warning-soft); color:var(--warning);" title="Vượt trần 20%/năm (Điều 468 Bộ luật Dân sự 2015): phần lãi vượt không được pháp luật bảo vệ khi tranh chấp."` : ''}>${rate}%/tháng ≈ ${yearly}%/năm${yearly > 20 ? ' ⚠️' : ''}</span>` : '';
+                    const rateBadge = rate ? `<span class="badge badge-gray">${rate}%/tháng ≈ ${yearly}%/năm</span>` : '';
                     const principalPaid = totalPaid - interestPaid;
 
                     return `
@@ -2427,15 +2424,7 @@
                     if (!groups.has(k)) groups.set(k, []);
                     groups.get(k).push(l);
                 });
-                // Gợi ý (không tự sửa): các tên khác nhau nhưng cùng chữ đầu, VD "Ly đứng lần 5" và "Ly gốc".
-                const byFirst = {};
-                [...groups.keys()].filter(k => !k.startsWith('#')).forEach(k => {
-                    const f = k.split(' ')[0];
-                    (byFirst[f] = byFirst[f] || []).push(groups.get(k)[0].borrowerName);
-                });
-                const hints = Object.values(byFirst).filter(names => names.length >= 2);
-                const hintHtml = hints.length ? `<div class="step-hint" style="margin-bottom:14px;">💡 Có phải ${hints.map(n => n.map(x => `"${escapeHtml(x)}"`).join(', ')).join('; ')} là của cùng một người? Bấm ⋯ → <strong>Sửa khoản vay</strong>, đặt <strong>Người vay</strong> trùng một tên (VD "${escapeHtml(hints[0][0].split(' ')[0])}") và ghi phần còn lại vào <strong>Tên khoản vay</strong> — app sẽ cộng dồn số đang nợ của người đó.</div>` : '';
-                el.innerHTML = hintHtml + [...groups.values()].map(list => {
+                el.innerHTML = [...groups.values()].map(list => {
                     if (list.length < 2) return cardOf(list[0], false);
                     const active = list.filter(l => !this.isLoanSettled(l));
                     const owed = active.reduce((s, l) => s + this.loanRemaining(l).remaining, 0);
