@@ -1287,9 +1287,11 @@
                     nextDue = this.getNextDueDateFixed(dueDate);
                     // Sửa thẻ mà không đổi ngày đến hạn: giữ nguyên hạn đang lưu. Tính lại từ hôm nay
                     // sẽ kéo hạn đã chuyển sang kỳ sau về lại kỳ này, hoặc che mất một kỳ đang quá hạn.
+                    // Ngoại lệ: hạn lưu đã qua mà kỳ đó đã trả xong (không còn nợ) thì dùng hạn tính mới.
                     if (existing && existing.type === 'fixed' && existing.nextDueDate && existing.originalDueDate
                         && new Date(existing.originalDueDate).getDate() === new Date(dueDate).getDate()) {
-                        nextDue = new Date(existing.nextDueDate);
+                        const storedPast = this.getDaysUntil(existing.nextDueDate) < 0;
+                        if (!(storedPast && num(existing.statementAmount) <= 0)) nextDue = new Date(existing.nextDueDate);
                     }
                 } else {
                     const transactionDate = document.getElementById('transactionDate').value;
