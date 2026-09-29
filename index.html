@@ -984,13 +984,26 @@
             // ============================================================
             //  DATE / DUE-DATE LOGIC (credit cards)
             // ============================================================
+            // Ngày đến hạn đầu tiên SAU ngày `from` (so theo ngày, bỏ giờ).
+            // Tháng ngắn thì kẹp về ngày cuối tháng: hạn ngày 31 → 30/09, 28/02...
+            dueDayAfter(from, dueDom) {
+                const f = new Date(from);
+                const base = new Date(f.getFullYear(), f.getMonth(), f.getDate());
+                const mk = (y, m) => new Date(y, m, Math.min(dueDom, new Date(y, m + 1, 0).getDate()));
+                let d = mk(base.getFullYear(), base.getMonth());
+                if (d <= base) d = mk(base.getFullYear(), base.getMonth() + 1);
+                return d;
+            },
+            // Hạn kế tiếp tính từ hôm nay (hạn đúng hôm nay coi như đã qua — giữ hành vi cũ).
             getNextDueDateFixed(dueDate) {
-                const today = new Date();
-                const cardDueDay = new Date(dueDate).getDate();
-                let nextDue = new Date(today.getFullYear(), today.getMonth(), cardDueDay);
-                if (nextDue <= today) nextDue = new Date(today.getFullYear(), today.getMonth() + 1, cardDueDay);
-                if (nextDue.getDate() !== cardDueDay) nextDue = new Date(nextDue.getFullYear(), nextDue.getMonth() + 1, 0);
-                return nextDue;
+                return this.dueDayAfter(new Date(), new Date(dueDate).getDate());
+            },
+            // Hạn hiển thị: thẻ đã trả xong mà hạn lưu đã trôi qua (chưa ai bấm thanh toán kỳ đó)
+            // thì cuộn tới kỳ kế tiếp, tránh hiện "kỳ tới hạn" là một ngày trong quá khứ.
+            displayDueDate(card) {
+                if (card.type !== 'fixed' || num(card.statementAmount) > 0 || !card.originalDueDate) return card.nextDueDate;
+                if (this.getDaysUntil(card.nextDueDate) >= 0) return card.nextDueDate;
+                return this.dueDayAfter(new Date(Date.now() - 86400000), new Date(card.originalDueDate).getDate()).toISOString();
             },
             getDueDateVariable(transactionDate, daysToAdd) {
                 const txDate = new Date(transactionDate);
@@ -1272,6 +1285,12 @@
                     // Optional statement day (day of month) for interest-free calculation.
                     data.statementDay = num(document.getElementById('statementDayFixed').value);
                     nextDue = this.getNextDueDateFixed(dueDate);
+                    // Sửa thẻ mà không đổi ngày đến hạn: giữ nguyên hạn đang lưu. Tính lại từ hôm nay
+                    // sẽ kéo hạn đã chuyển sang kỳ sau về lại kỳ này, hoặc che mất một kỳ đang quá hạn.
+                    if (existing && existing.type === 'fixed' && existing.nextDueDate && existing.originalDueDate
+                        && new Date(existing.originalDueDate).getDate() === new Date(dueDate).getDate()) {
+                        nextDue = new Date(existing.nextDueDate);
+                    }
                 } else {
                     const transactionDate = document.getElementById('transactionDate').value;
                     const daysToAdd = document.getElementById('daysToAdd').value;
@@ -1349,7 +1368,11 @@
                     statementAmount: 0,
                 };
                 if (card.type === 'fixed') {
-                    updateData.nextDueDate = this.getNextDueDateFixed(card.originalDueDate).toISOString();
+                    // Kỳ kế tiếp tính từ HẠN CỦA KỲ VỪA TRẢ, không phải từ hôm nay: trả sớm ngày 29/09
+                    // cho hạn 30/09 thì kỳ tới phải là 30/10 (tính từ hôm nay sẽ ra lại 30/09).
+                    const dom = new Date(card.originalDueDate).getDate();
+                    const from = card.nextDueDate || new Date().toISOString();
+                    updateData.nextDueDate = this.dueDayAfter(from, dom).toISOString();
                 } else {
                     const cycleDays = card.daysToAdd || card.estimatedCycleDays || 30;
                     const nextTxDate = new Date(card.transactionDate);
@@ -1421,7 +1444,7 @@
                     // (1) Việc chính: trả bao nhiêu, trước ngày nào.
                     const hero = settled
                         ? `<div class="hero">
-                               <div class="hero-line">✅ Kỳ này đã thanh toán xong · kỳ tới hạn <strong>${fmtWD(card.nextDueDate)}</strong></div>
+                               <div class="hero-line">✅ Kỳ này đã thanh toán xong · kỳ tới hạn <strong>${fmtWD(this.displayDueDate(card))}</strong></div>
                            </div>`
                         : `<div class="hero">
                                <div class="hero-amount ${urg.cls === 'urgent' ? 'text-danger' : ''}">${fmtVND(card.statementAmount)}</div>
