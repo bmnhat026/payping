@@ -231,6 +231,79 @@
         .icon-btn { background: none; border: none; cursor: pointer; font-size: 16px; padding: 6px; border-radius: 6px; line-height: 1; }
         .icon-btn:hover { background: var(--light); }
 
+        /* ---------- Menu ⋯ (Sửa / Xóa / thao tác phụ) ---------- */
+        .menu { position: relative; display: inline-block; }
+        .menu > summary {
+            list-style: none; cursor: pointer; user-select: none;
+            width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+            border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 18px; font-weight: 700; color: var(--ink-2); background: var(--white);
+        }
+        .menu > summary::-webkit-details-marker { display: none; }
+        .menu > summary:hover, .menu[open] > summary { background: var(--light); }
+        .menu.menu-flat > summary { border-color: transparent; width: 32px; height: 32px; }
+        .menu-list {
+            position: absolute; right: 0; top: calc(100% + 4px); z-index: 30; min-width: 190px;
+            background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.10); padding: 4px;
+        }
+        .menu-list button {
+            display: block; width: 100%; text-align: left; background: none; border: none; cursor: pointer;
+            padding: 9px 12px; border-radius: 6px; font-size: 14px; color: var(--dark); font-family: inherit;
+        }
+        .menu-list button:hover { background: var(--light); }
+        .menu-list button.danger { color: var(--danger); }
+        .menu-list hr { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+
+        /* ---------- Hàng hành động: nút chính + menu ⋯ ---------- */
+        .action-bar { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+        .action-bar .btn { flex: 0 0 auto; }
+        .action-bar .spacer { flex: 1; }
+
+        /* ---------- Khối "việc chính" của thẻ/khoản vay ---------- */
+        .hero { margin-top: 4px; }
+        .hero-amount { font-size: 24px; font-weight: 800; letter-spacing: -0.01em; }
+        .hero-line { font-size: 14px; color: var(--ink-2); margin-top: 2px; }
+        .hero-line strong { color: var(--dark); }
+        .sub-block { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 13px; color: var(--ink-2); }
+        .sub-block .row { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+        .usage-line { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; flex-wrap: wrap; }
+        .usage-line strong { color: var(--dark); }
+
+        /* Mức độ gấp: viền trái theo trạng thái */
+        .item-card.urgent { border-color: #f3c7c7; border-left: 4px solid var(--danger); }
+        .item-card.soon { border-left: 4px solid #f59e0b; }
+        .item-card.paid { opacity: 0.85; }
+        .status-urgent { background: var(--danger); color: #fff; }
+
+        /* Khối thu gọn (hoàn tiền, ghi chú, lịch sử trả) */
+        .fold { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+        .fold > summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--ink-2); list-style: none; display: flex; justify-content: space-between; gap: 8px; }
+        .fold > summary::-webkit-details-marker { display: none; }
+        .fold > summary::before { content: '▸'; margin-right: 6px; color: var(--gray); }
+        .fold[open] > summary::before { content: '▾'; }
+        .fold > summary .fold-title { flex: 1; }
+        .fold > summary .fold-meta { color: var(--gray); font-weight: 500; }
+        .mini-bar { height: 4px; background: var(--border); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+        .mini-bar > div { height: 100%; background: var(--success); }
+        .cb-item { padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 13px; }
+        .cb-item:last-child { border-bottom: none; }
+
+        /* Tóm tắt đầu tab */
+        .summary-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 14px; }
+        .summary-tile { border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
+        .summary-tile .k { font-size: 12px; color: var(--gray); font-weight: 600; }
+        .summary-tile .v { font-size: 18px; font-weight: 800; margin-top: 2px; }
+        .summary-tile .s { font-size: 12px; color: var(--gray); margin-top: 2px; }
+        .summary-tile.good { background: var(--success-soft); border-color: #bbf7d0; }
+
+        /* Lịch sử giao dịch chia theo ngày */
+        .tx-day { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.03em; padding: 14px 0 4px; border-bottom: 1px solid var(--border); }
+        .tx-cb-zero { color: var(--gray); font-size: 13px; }
+        .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+        .filter-bar select, .filter-bar input { padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 13px; font-family: inherit; background: var(--white); max-width: 100%; }
+        .step-hint { font-size: 13px; color: var(--ink-2); background: var(--light); border-radius: var(--radius-sm); padding: 10px 12px; }
+        .warn-note { font-size: 12px; color: var(--warning); background: var(--warning-soft); border-radius: 6px; padding: 6px 10px; margin-top: 8px; }
+
         .empty-state { text-align: center; padding: 44px 20px; color: var(--gray); }
         .empty-state-icon { font-size: 48px; margin-bottom: 14px; opacity: 0.7; }
         .empty-state h3 { color: var(--dark); font-size: 17px; margin-bottom: 6px; }
@@ -524,15 +597,20 @@
                     </div>
                 </div>
 
-                <div class="section-title">💡 Gợi ý thẻ cho hoàn tiền tốt nhất</div>
-                <div id="suggestionList"><p class="text-gray" style="font-size:14px;">Nhập số tiền và chọn danh mục để xem gợi ý.</p></div>
+                <div class="section-title">Chọn thẻ để lưu giao dịch</div>
+                <div id="suggestionList"></div>
             </div>
 
             <div class="panel">
                 <div class="panel-header">
                     <h2>📜 Lịch sử giao dịch</h2>
-                    <select id="txFilterCard" onchange="app.renderTransactions()" style="width:auto; padding:8px 12px; border-radius:8px; border:1px solid var(--border);"></select>
+                    <div class="filter-bar">
+                        <select id="txFilterMonth" onchange="app.renderTransactions()"></select>
+                        <select id="txFilterCard" onchange="app.renderTransactions()"></select>
+                        <select id="txFilterCategory" onchange="app.renderTransactions()"></select>
+                    </div>
                 </div>
+                <div id="txSummary"></div>
                 <div id="transactionsList"></div>
             </div>
         </div>
@@ -688,7 +766,12 @@
             const dim = new Date(y, m + 1, 0).getDate();
             return new Date(y, m, Math.min(dom, dim));
         };
-        const fmtDate = (v) => v ? new Date(v).toLocaleDateString('vi-VN') : '—';
+        // Một định dạng ngày thống nhất: 30/09/2026, 30/09, T4 · 30/09.
+        const pad2 = (n) => String(n).padStart(2, '0');
+        const fmtDate = (v) => { if (!v) return '—'; const d = new Date(v); return `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}/${d.getFullYear()}`; };
+        const fmtDM = (v) => { if (!v) return '—'; const d = new Date(v); return `${pad2(d.getDate())}/${pad2(d.getMonth() + 1)}`; };
+        const weekdayVN = (d) => d.getDay() === 0 ? 'CN' : `T${d.getDay() + 1}`;
+        const fmtWD = (v) => { if (!v) return '—'; const d = new Date(v); return `${weekdayVN(d)} · ${fmtDM(d)}`; };
         const escapeHtml = (s) => String(s == null ? '' : s)
             .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
@@ -901,13 +984,26 @@
             // ============================================================
             //  DATE / DUE-DATE LOGIC (credit cards)
             // ============================================================
+            // Ngày đến hạn đầu tiên SAU ngày `from` (so theo ngày, bỏ giờ).
+            // Tháng ngắn thì kẹp về ngày cuối tháng: hạn ngày 31 → 30/09, 28/02...
+            dueDayAfter(from, dueDom) {
+                const f = new Date(from);
+                const base = new Date(f.getFullYear(), f.getMonth(), f.getDate());
+                const mk = (y, m) => new Date(y, m, Math.min(dueDom, new Date(y, m + 1, 0).getDate()));
+                let d = mk(base.getFullYear(), base.getMonth());
+                if (d <= base) d = mk(base.getFullYear(), base.getMonth() + 1);
+                return d;
+            },
+            // Hạn kế tiếp tính từ hôm nay (hạn đúng hôm nay coi như đã qua — giữ hành vi cũ).
             getNextDueDateFixed(dueDate) {
-                const today = new Date();
-                const cardDueDay = new Date(dueDate).getDate();
-                let nextDue = new Date(today.getFullYear(), today.getMonth(), cardDueDay);
-                if (nextDue <= today) nextDue = new Date(today.getFullYear(), today.getMonth() + 1, cardDueDay);
-                if (nextDue.getDate() !== cardDueDay) nextDue = new Date(nextDue.getFullYear(), nextDue.getMonth() + 1, 0);
-                return nextDue;
+                return this.dueDayAfter(new Date(), new Date(dueDate).getDate());
+            },
+            // Hạn hiển thị: thẻ đã trả xong mà hạn lưu đã trôi qua (chưa ai bấm thanh toán kỳ đó)
+            // thì cuộn tới kỳ kế tiếp, tránh hiện "kỳ tới hạn" là một ngày trong quá khứ.
+            displayDueDate(card) {
+                if (card.type !== 'fixed' || num(card.statementAmount) > 0 || !card.originalDueDate) return card.nextDueDate;
+                if (this.getDaysUntil(card.nextDueDate) >= 0) return card.nextDueDate;
+                return this.dueDayAfter(new Date(Date.now() - 86400000), new Date(card.originalDueDate).getDate()).toISOString();
             },
             getDueDateVariable(transactionDate, daysToAdd) {
                 const txDate = new Date(transactionDate);
@@ -923,15 +1019,28 @@
                 const target = new Date(d.getFullYear(), d.getMonth(), d.getDate());
                 return Math.round((target - today) / 86400000);
             },
-            getCardStatus(daysUntil, isPaid) {
-                if (isPaid) return { status: 'Đã thanh toán', class: 'paid', badge: 'status-paid' };
-                if (daysUntil < 0) return { status: 'Quá hạn', class: 'overdue', badge: 'status-overdue' };
-                if (daysUntil <= 3) return { status: 'Sắp đến hạn', class: 'due-soon', badge: 'status-due-soon' };
-                return { status: 'Sắp tới', class: 'upcoming', badge: 'status-upcoming' };
+            // Mức độ gấp dùng chung cho thẻ và khoản vay:
+            // đỏ = quá hạn hoặc còn ≤ 2 ngày, cam = còn ≤ 7 ngày, xám = còn xa.
+            urgencyOf(daysUntil) {
+                const label = this.daysText(daysUntil);
+                if (daysUntil < 0) return { label, cls: 'urgent', badge: 'status-urgent' };
+                if (daysUntil <= 2) return { label, cls: 'urgent', badge: 'status-urgent' };
+                if (daysUntil <= 7) return { label, cls: 'soon', badge: 'status-due-soon' };
+                return { label, cls: '', badge: 'status-upcoming' };
             },
+            // Màu thanh hạn mức theo tỷ lệ đã dùng: < 30% xanh, 30–70% cam, > 70% đỏ.
+            usageColor(pct) { return pct > 70 ? 'var(--danger)' : pct >= 30 ? '#f59e0b' : 'var(--success)'; },
+
+            // Giữ trạng thái mở/đóng của các khối thu gọn qua mỗi lần vẽ lại (dữ liệu realtime vẽ lại liên tục).
+            openFolds: new Set(),
+            foldAttrs(key, forceOpen = false) {
+                return `${forceOpen || this.openFolds.has(key) ? 'open' : ''} ontoggle="app.onFoldToggle('${key}', this.open)"`;
+            },
+            onFoldToggle(key, open) { if (open) this.openFolds.add(key); else this.openFolds.delete(key); },
+            closeMenus(except) { document.querySelectorAll('details.menu[open]').forEach(m => { if (m !== except) m.removeAttribute('open'); }); },
             daysText(daysUntil) {
-                if (daysUntil === 0) return 'Đến hạn hôm nay';
-                if (daysUntil === 1) return 'Đến hạn ngày mai';
+                if (daysUntil === 0) return 'Hạn hôm nay';
+                if (daysUntil === 1) return 'Hạn ngày mai';
                 if (daysUntil < 0) return `Quá hạn ${Math.abs(daysUntil)} ngày`;
                 return `Còn ${daysUntil} ngày`;
             },
@@ -1176,6 +1285,14 @@
                     // Optional statement day (day of month) for interest-free calculation.
                     data.statementDay = num(document.getElementById('statementDayFixed').value);
                     nextDue = this.getNextDueDateFixed(dueDate);
+                    // Sửa thẻ mà không đổi ngày đến hạn: giữ nguyên hạn đang lưu. Tính lại từ hôm nay
+                    // sẽ kéo hạn đã chuyển sang kỳ sau về lại kỳ này, hoặc che mất một kỳ đang quá hạn.
+                    // Ngoại lệ: hạn lưu đã qua mà kỳ đó đã trả xong (không còn nợ) thì dùng hạn tính mới.
+                    if (existing && existing.type === 'fixed' && existing.nextDueDate && existing.originalDueDate
+                        && new Date(existing.originalDueDate).getDate() === new Date(dueDate).getDate()) {
+                        const storedPast = this.getDaysUntil(existing.nextDueDate) < 0;
+                        if (!(storedPast && num(existing.statementAmount) <= 0)) nextDue = new Date(existing.nextDueDate);
+                    }
                 } else {
                     const transactionDate = document.getElementById('transactionDate').value;
                     const daysToAdd = document.getElementById('daysToAdd').value;
@@ -1212,20 +1329,52 @@
                 catch (e) { console.error('delete card:', e); this.showMessage('Lỗi khi xóa thẻ', true); }
             },
 
+            togglePayForm(cardId) {
+                const form = document.getElementById(`pay-form-${cardId}`);
+                if (!form) return;
+                form.classList.toggle('hidden');
+                if (!form.classList.contains('hidden')) {
+                    const card = this.cards.find(c => c.id === cardId);
+                    const input = document.getElementById(`pay-amount-${cardId}`);
+                    if (input) { input.value = num(card?.statementAmount) || ''; input.focus(); input.select(); }
+                }
+            },
+
+            // Ghi nhận thanh toán thẻ. Trả đủ → chuyển sang kỳ sau; trả một phần → chỉ giảm số cần trả, giữ nguyên hạn.
             async markAsPaid(cardId) {
                 const card = this.cards.find(c => c.id === cardId);
                 if (!card) return;
                 const today = new Date();
-                const paidAmount = num(card.statementAmount);
+                const due = num(card.statementAmount);
+                const input = document.getElementById(`pay-amount-${cardId}`);
+                const paidAmount = input ? num(input.value) : due;
+                if (!paidAmount || paidAmount <= 0) return alert('Vui lòng nhập số tiền đã thanh toán');
+                const balanceAfter = Math.max(0, num(card.currentBalance) - paidAmount);
+                if (paidAmount < due) {
+                    try {
+                        await updateDoc(doc(db, 'cards', cardId), {
+                            lastPaidDate: today.toISOString(),
+                            updatedAt: today.toISOString(),
+                            currentBalance: balanceAfter,
+                            statementAmount: due - paidAmount,
+                        });
+                        this.showMessage(`Đã ghi nhận ${fmtVND(paidAmount)} · còn phải trả ${fmtVND(due - paidAmount)}`);
+                    } catch (e) { console.error('markAsPaid (partial):', e); this.showMessage('Lỗi khi cập nhật thẻ', true); }
+                    return;
+                }
                 const updateData = {
                     isPaid: false, // keep rolling to the next cycle instead of a terminal paid state
                     lastPaidDate: today.toISOString(),
                     updatedAt: today.toISOString(),
-                    currentBalance: Math.max(0, num(card.currentBalance) - paidAmount),
+                    currentBalance: balanceAfter,
                     statementAmount: 0,
                 };
                 if (card.type === 'fixed') {
-                    updateData.nextDueDate = this.getNextDueDateFixed(card.originalDueDate).toISOString();
+                    // Kỳ kế tiếp tính từ HẠN CỦA KỲ VỪA TRẢ, không phải từ hôm nay: trả sớm ngày 29/09
+                    // cho hạn 30/09 thì kỳ tới phải là 30/10 (tính từ hôm nay sẽ ra lại 30/09).
+                    const dom = new Date(card.originalDueDate).getDate();
+                    const from = card.nextDueDate || new Date().toISOString();
+                    updateData.nextDueDate = this.dueDayAfter(from, dom).toISOString();
                 } else {
                     const cycleDays = card.daysToAdd || card.estimatedCycleDays || 30;
                     const nextTxDate = new Date(card.transactionDate);
@@ -1235,7 +1384,10 @@
                     updateData.estimatedCycleDays = cycleDays;
                     updateData.nextDueDate = this.getDueDateVariable(nextTxStr, card.daysToAdd).toISOString();
                 }
-                try { await updateDoc(doc(db, 'cards', cardId), updateData); }
+                try {
+                    await updateDoc(doc(db, 'cards', cardId), updateData);
+                    this.showMessage(`Đã thanh toán ${fmtVND(paidAmount)} · kỳ tới ${fmtDM(updateData.nextDueDate)}`);
+                }
                 catch (e) { console.error('markAsPaid:', e); this.showMessage('Lỗi khi cập nhật thẻ', true); }
             },
 
@@ -1246,132 +1398,171 @@
                     el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">💳</div><h3>Chưa có thẻ nào</h3><p>Thêm thẻ tín dụng đầu tiên để bắt đầu theo dõi.</p></div>`;
                     return;
                 }
-                // Interest-free ranking: which card to swipe today for the longest grace period.
+                // Dải tóm tắt: (1) 7 ngày tới cần trả bao nhiêu, (2) hôm nay nên quẹt thẻ nào.
                 const ranked = this.cards
                     .map(c => ({ c, info: this.interestFreeInfo(c) }))
                     .filter(x => x.info)
                     .sort((a, b) => b.info.days - a.info.days);
-                let banner = '';
+                const dueWeek = this.cards.filter(c => num(c.statementAmount) > 0 && this.getDaysUntil(c.nextDueDate) <= 7);
+                const dueWeekTotal = dueWeek.reduce((s, c) => s + num(c.statementAmount), 0);
+                const overdueCount = dueWeek.filter(c => this.getDaysUntil(c.nextDueDate) < 0).length;
+                let banner = `
+                    <div class="summary-strip">
+                        <div class="summary-tile">
+                            <div class="k">7 ngày tới cần trả</div>
+                            <div class="v ${dueWeekTotal > 0 ? 'text-danger' : ''}">${fmtVND(dueWeekTotal)}</div>
+                            <div class="s">${dueWeek.length ? `${dueWeek.length} thẻ${overdueCount ? ` · <span class="text-danger">${overdueCount} quá hạn</span>` : ''}` : 'Không có khoản nào sắp đến hạn'}</div>
+                        </div>`;
                 if (ranked.length) {
                     const best = ranked[0];
-                    const rest = ranked.slice(1, 4).map(x => `${escapeHtml(x.c.name)} ${x.info.days}n`).join(' · ');
-                    banner = `
-                        <div class="inline-form" style="border-color:#bbf7d0; background:var(--success-soft);">
-                            <div style="font-weight:700; margin-bottom:2px;">💡 Quẹt hôm nay tối ưu thời gian</div>
-                            <div style="font-size:18px; font-weight:800;">${escapeHtml(best.c.name)} — <span class="text-success">miễn lãi ${best.info.days} ngày</span></div>
-                            <div class="text-gray" style="font-size:12px; margin-top:4px;">Trả trước ${best.info.dueDate.toLocaleDateString('vi-VN')}${best.info.maxDays ? ` · tối đa thẻ này ~${best.info.maxDays} ngày` : ''}${rest ? ` · Khác: ${rest}` : ''}</div>
+                    const rest = ranked.slice(1, 3).map(x => `${escapeHtml(x.c.name)} ${x.info.days} ngày`).join(' · ');
+                    banner += `
+                        <div class="summary-tile good">
+                            <div class="k">💳 Hôm nay nên quẹt</div>
+                            <div class="v">${escapeHtml(best.c.name)} <span class="text-success" style="font-size:14px;">· miễn lãi ${best.info.days} ngày</span></div>
+                            <div class="s">Trả trước ${fmtWD(best.info.dueDate)}${rest ? ` · Khác: ${rest}` : ''}</div>
                         </div>`;
                 }
+                banner += `</div>`;
 
-                // Cards with an amount due first (soonest on top); settled cards (0 to pay) sink to the bottom.
+                // Thẻ còn phải trả lên trước (gần hạn nhất trên cùng); thẻ đã trả xong xuống dưới.
                 const sorted = [...this.cards].sort((a, b) => {
                     const pa = num(a.statementAmount) > 0, pb = num(b.statementAmount) > 0;
                     if (pa !== pb) return pa ? -1 : 1;
                     return this.getDaysUntil(a.nextDueDate) - this.getDaysUntil(b.nextDueDate);
                 });
+                const cycle = this.currentCycle();
                 el.innerHTML = banner + sorted.map(card => {
                     const daysUntil = this.getDaysUntil(card.nextDueDate);
                     const settled = num(card.statementAmount) <= 0;
-                    const { status, class: cls, badge } = settled
-                        ? { status: 'Đã thanh toán', class: 'paid', badge: 'status-paid' }
-                        : this.getCardStatus(daysUntil, card.isPaid);
-                    const dueDate = new Date(card.nextDueDate);
+                    const urg = settled ? { label: 'Đã thanh toán', cls: 'paid', badge: 'status-paid' } : this.urgencyOf(daysUntil);
                     const balance = num(card.currentBalance);
-                    // Shared-limit aware: effective limit/balance across the card's group.
+                    // Hạn mức dùng chung: tính theo cả nhóm.
                     const grp = this.creditGroupOf(card);
                     const effLimit = grp ? this.groupLimit(card) : num(card.creditLimit);
                     const effBalance = grp ? this.groupBalance(card) : balance;
-                    const limit = effLimit; // used by "Hạn mức còn lại" box below
                     const usagePct = effLimit > 0 ? Math.min(100, Math.round(effBalance / effLimit * 100)) : 0;
-                    const usageColor = usagePct >= 90 ? 'var(--danger)' : usagePct >= 70 ? 'var(--warning)' : 'var(--success)';
 
-                    let typeInfo = '';
-                    if (card.type === 'variable' && card.transactionDate) {
-                        typeInfo = `<div class="text-gray" style="font-size:12px; margin-top:6px;">Ngày GD: ${new Date(card.transactionDate).toLocaleDateString('vi-VN')} + ${card.daysToAdd} ngày</div>`;
-                    }
+                    // (1) Việc chính: trả bao nhiêu, trước ngày nào.
+                    const hero = settled
+                        ? `<div class="hero">
+                               <div class="hero-line">✅ Kỳ này đã thanh toán xong · kỳ tới hạn <strong>${fmtWD(this.displayDueDate(card))}</strong></div>
+                           </div>`
+                        : `<div class="hero">
+                               <div class="hero-amount ${urg.cls === 'urgent' ? 'text-danger' : ''}">${fmtVND(card.statementAmount)}</div>
+                               <div class="hero-line">cần trả trước <strong>${fmtWD(card.nextDueDate)}</strong>${num(card.minimumPayment) ? ` · tối thiểu ${fmtVND(card.minimumPayment)}` : ''}</div>
+                           </div>`;
 
-                    const limitBox = effLimit > 0 ? `
-                        <div class="info-box" style="grid-column: 1 / -1;">
-                            <div class="label">${grp ? `Hạn mức dùng chung — nhóm ${escapeHtml(grp)}` : 'Hạn mức sử dụng'}</div>
-                            <div class="value">${fmtVND(effBalance)} / ${fmtVND(effLimit)} (${usagePct}%)</div>
-                            <div class="progress-bar"><div class="progress-fill" style="width:${usagePct}%; background:${usageColor};"></div></div>
-                            ${grp ? `<div class="text-gray" style="font-size:11px; margin-top:4px;">Dư nợ thẻ này: ${fmtVND(balance)} · còn lại chung: ${fmtVND(Math.max(0, effLimit - effBalance))}</div>` : ''}
-                        </div>` : '';
+                    // (2) Hạn mức: 1 thanh + 1 dòng (thay cho 3 ô dư nợ / còn lại / sử dụng).
+                    const usage = effLimit > 0 ? `
+                        <div style="margin-top:14px;">
+                            <div class="usage-line">
+                                <span>${grp ? `Nhóm ${escapeHtml(grp)} đã dùng` : 'Đã dùng'} <strong>${fmtVND(effBalance)}</strong> / ${fmtVND(effLimit)} (${usagePct}%)</span>
+                                <span>còn <strong>${fmtVND(Math.max(0, effLimit - effBalance))}</strong></span>
+                            </div>
+                            <div class="progress-bar"><div class="progress-fill" style="width:${usagePct}%; background:${this.usageColor(usagePct)};"></div></div>
+                            ${grp ? `<div class="text-gray" style="font-size:12px; margin-top:4px;">Dư nợ riêng thẻ này: ${fmtVND(balance)}</div>` : ''}
+                        </div>`
+                        : `<div class="usage-line" style="margin-top:14px;"><span>Dư nợ hiện tại <strong>${fmtVND(balance)}</strong></span></div>`;
 
+                    // (3) Câu hỏi khác: quẹt hôm nay thì sao — tách riêng khỏi phần trả nợ.
                     const ifInfo = this.interestFreeInfo(card);
-                    const ifBox = ifInfo ? `
-                        <div class="info-box"><div class="label">Quẹt hôm nay miễn lãi</div><div class="value text-success">${ifInfo.days} ngày</div></div>
-                        <div class="info-box"><div class="label">Sao kê → Hạn TT</div><div class="value" style="font-size:13px;">Ngày ${ifInfo.statementDay} → ${ifInfo.dueDate.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' })}</div></div>` : '';
-
-                    const cycle = this.currentCycle();
-                    const cashbackTags = (card.cashbackCategories || []).map(c => {
-                        const earned = (card.cashbackCycle === cycle) ? num(c.earned) : 0;
-                        const capTxt = num(c.cap) > 0 ? ` · đã hoàn ${fmtVND(earned)}/${fmtVND(c.cap)}` : '';
-                        return `<span class="cashback-tag">${catLabel(c.category)}: ${c.rate}%${capTxt}</span>`;
-                    }).join('');
-                    const hasCashback = (card.cashbackCategories || []).length || num(card.cashbackDefaultRate);
-                    const cashbackSection = hasCashback ? `
-                        <div class="mt-8">
-                            <div class="text-gray" style="font-size:11px; font-weight:600;">QUYỀN LỢI HOÀN TIỀN</div>
-                            <div class="mt-8">${cashbackTags}${num(card.cashbackDefaultRate) ? `<span class="cashback-tag">Khác: ${card.cashbackDefaultRate}%</span>` : ''}</div>
+                    const swipe = ifInfo ? `
+                        <div class="sub-block">
+                            💳 Quẹt hôm nay: <strong class="text-success">miễn lãi ${ifInfo.days} ngày</strong>
+                            <span class="text-gray"> · sao kê ${fmtDM(ifInfo.statementDate)} → trả trước ${fmtDM(ifInfo.dueDate)}</span>
                         </div>` : '';
 
+                    // (4) Hoàn tiền: thu gọn, mở ra mới thấy chi tiết từng danh mục.
+                    const cats = card.cashbackCategories || [];
+                    const hasCashback = cats.length || num(card.cashbackDefaultRate);
+                    const earnedTotal = card.cashbackCycle === cycle ? cats.reduce((s, c) => s + num(c.earned), 0) : 0;
+                    const cashbackSection = hasCashback ? `
+                        <details class="fold" ${this.foldAttrs('cb-' + card.id)}>
+                            <summary><span class="fold-title">🎁 Hoàn tiền tháng này</span><span class="fold-meta">${fmtVND(earnedTotal)}</span></summary>
+                            <div style="margin-top:6px;">
+                                ${cats.map(c => {
+                                    const earned = card.cashbackCycle === cycle ? num(c.earned) : 0;
+                                    const cap = num(c.cap);
+                                    const pct = cap > 0 ? Math.min(100, Math.round(earned / cap * 100)) : 0;
+                                    return `<div class="cb-item">
+                                        <div class="row" style="display:flex; justify-content:space-between; gap:8px;">
+                                            <span>${catLabel(c.category)} · <strong>${c.rate}%</strong></span>
+                                            <span class="text-gray">${cap > 0 ? `${fmtVND(earned)} / ${fmtVND(cap)}` : 'không giới hạn'}</span>
+                                        </div>
+                                        ${cap > 0 ? `<div class="mini-bar"><div style="width:${pct}%; ${pct >= 100 ? 'background:var(--gray);' : ''}"></div></div>` : ''}
+                                    </div>`;
+                                }).join('')}
+                                ${num(card.cashbackDefaultRate) ? `<div class="cb-item">Danh mục khác · <strong>${card.cashbackDefaultRate}%</strong></div>` : ''}
+                            </div>
+                        </details>` : '';
+
+                    // (5) Ghi chú: chỉ hiện khi có ghi chú hoặc đang thêm (thêm qua menu ⋯).
                     const cardNotes = this.cardNotes[card.id] || [];
-                    const notesHtml = `
-                        <div style="margin-top:14px; padding-top:14px; border-top:1px solid var(--border);">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                                <strong style="font-size:13px;">📝 Ghi chú thẻ</strong>
-                                <button class="btn btn-sm" onclick="app.toggleCardNoteForm('${card.id}')">➕</button>
+                    const noteForm = `
+                        <div id="card-note-form-${card.id}" class="hidden" style="margin-top:12px;">
+                            <textarea id="card-note-input-${card.id}" rows="2" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; font-family:inherit;" placeholder="Nội dung ghi chú..."></textarea>
+                            <div class="row-flex mt-8">
+                                <button class="btn btn-sm btn-success" onclick="app.addCardNote('${card.id}')">💾 Lưu ghi chú</button>
+                                <button class="btn btn-sm btn-secondary" onclick="app.toggleCardNoteForm('${card.id}')">Hủy</button>
                             </div>
-                            <div id="card-note-form-${card.id}" class="hidden" style="margin-bottom:8px;">
-                                <textarea id="card-note-input-${card.id}" rows="2" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; font-family:inherit;" placeholder="Nội dung ghi chú..."></textarea>
-                                <div class="row-flex mt-8">
-                                    <button class="btn btn-sm btn-success" onclick="app.addCardNote('${card.id}')">💾 Lưu</button>
-                                    <button class="btn btn-sm btn-secondary" onclick="app.toggleCardNoteForm('${card.id}')">Hủy</button>
-                                </div>
-                            </div>
+                        </div>`;
+                    const notesHtml = cardNotes.length ? `
+                        <details class="fold" ${this.foldAttrs('notes-' + card.id)}>
+                            <summary><span class="fold-title">📝 Ghi chú</span><span class="fold-meta">${cardNotes.length}</span></summary>
                             ${cardNotes.map(n => `
-                                <div style="background:var(--light); padding:8px 10px; border-radius:6px; margin-bottom:6px; border-left:3px solid var(--primary);">
+                                <div style="background:var(--light); padding:8px 10px; border-radius:6px; margin-top:6px;">
                                     <div style="font-size:13px; white-space:pre-wrap;">${escapeHtml(n.content)}</div>
                                     <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-                                        <span class="text-gray" style="font-size:11px;">${new Date(n.createdAt).toLocaleDateString('vi-VN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
-                                        <button class="btn btn-sm btn-danger" style="padding:2px 8px;" onclick="app.deleteCardNote('${n.id}')">🗑️</button>
+                                        <span class="text-gray" style="font-size:11px;">${fmtDate(n.createdAt)}</span>
+                                        <button class="icon-btn" title="Xóa ghi chú" onclick="app.deleteCardNote('${n.id}')">🗑️</button>
                                     </div>
                                 </div>`).join('')}
+                        </details>` : '';
+
+                    // Form ghi nhận thanh toán: nhập số tiền (mặc định = số cần trả), hỗ trợ trả một phần.
+                    const payForm = settled ? '' : `
+                        <div id="pay-form-${card.id}" class="hidden" style="margin-top:10px; background:var(--light); padding:12px; border-radius:8px;">
+                            <div class="form-group" style="margin-bottom:8px;">
+                                <label>Số tiền đã thanh toán (₫)</label>
+                                <input type="number" id="pay-amount-${card.id}" min="0">
+                                <small>Trả đủ → thẻ chuyển sang kỳ sau. Trả thiếu → chỉ giảm số còn phải trả, giữ nguyên hạn.</small>
+                            </div>
+                            <div class="row-flex">
+                                <button class="btn btn-sm btn-success" onclick="app.markAsPaid('${card.id}')">💾 Xác nhận</button>
+                                <button class="btn btn-sm btn-secondary" onclick="app.togglePayForm('${card.id}')">Hủy</button>
+                            </div>
                         </div>`;
 
                     return `
-                        <div class="item-card ${cls}">
-                            <div class="item-head">
-                                <div>
-                                    <div class="item-title">${escapeHtml(card.name)}</div>
-                                    <div class="item-meta">
-                                        <span class="badge badge-info">${card.type === 'fixed' ? '📅 Ngày cố định' : '🔄 Ngày biến động'}</span>
-                                        ${grp ? `<span class="badge badge-gray">🔗 Chung HM: ${escapeHtml(grp)}</span>` : ''}
-                                        <span>Đến hạn: ${dueDate.toLocaleDateString('vi-VN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                                    </div>
-                                    ${typeInfo}
+                        <div class="item-card ${urg.cls}">
+                            <div class="item-head" style="margin-bottom:6px;">
+                                <div style="min-width:0;">
+                                    <div class="item-title" style="margin-bottom:2px;">${escapeHtml(card.name)}</div>
+                                    ${grp ? `<div class="item-meta"><span class="badge badge-gray">🔗 Chung hạn mức: ${escapeHtml(grp)}</span></div>` : ''}
                                 </div>
-                                <div style="text-align:right;">
-                                    <div class="status-badge ${badge}">${status}</div>
-                                    <div class="text-gray" style="font-size:13px; margin-top:6px;">${settled ? 'Kỳ tới ' + dueDate.toLocaleDateString('vi-VN', { day: 'numeric', month: 'numeric' }) : this.daysText(daysUntil)}</div>
-                                </div>
+                                <div class="status-badge ${urg.badge}" style="white-space:nowrap;">${urg.label}</div>
                             </div>
-                            <div class="info-grid">
-                                <div class="info-box"><div class="label">Cần thanh toán kỳ này</div><div class="value text-danger">${fmtVND(card.statementAmount)}</div></div>
-                                <div class="info-box"><div class="label">Dư nợ hiện tại</div><div class="value">${fmtVND(balance)}</div></div>
-                                ${num(card.minimumPayment) ? `<div class="info-box"><div class="label">Tối thiểu</div><div class="value">${fmtVND(card.minimumPayment)}</div></div>` : ''}
-                                ${effLimit > 0 ? `<div class="info-box"><div class="label">Hạn mức còn lại${grp ? ' (chung)' : ''}</div><div class="value text-success">${fmtVND(Math.max(0, effLimit - effBalance))}</div></div>` : ''}
-                                ${ifBox}
-                                ${limitBox}
-                            </div>
+                            ${hero}
+                            ${usage}
+                            ${swipe}
                             ${cashbackSection}
-                            <div class="item-actions">
-                                <button class="btn btn-sm btn-success" onclick="app.markAsPaid('${card.id}')">✅ Đã thanh toán</button>
-                                <button class="btn btn-sm btn-warning" onclick="app.startEditCard('${card.id}')">✏️ Sửa</button>
-                                <button class="btn btn-sm btn-danger" onclick="app.deleteCard('${card.id}')">🗑️ Xóa</button>
-                            </div>
                             ${notesHtml}
+                            ${noteForm}
+                            <div class="action-bar">
+                                ${settled ? '' : `<button class="btn btn-sm btn-success" onclick="app.togglePayForm('${card.id}')">💵 Ghi nhận thanh toán</button>`}
+                                <span class="spacer"></span>
+                                <details class="menu">
+                                    <summary title="Thao tác khác">⋯</summary>
+                                    <div class="menu-list">
+                                        <button onclick="app.closeMenus(); app.startEditCard('${card.id}')">✏️ Sửa thông tin thẻ</button>
+                                        <button onclick="app.closeMenus(); app.toggleCardNoteForm('${card.id}')">📝 Thêm ghi chú</button>
+                                        <hr>
+                                        <button class="danger" onclick="app.closeMenus(); app.deleteCard('${card.id}')">🗑️ Xóa thẻ</button>
+                                    </div>
+                                </details>
+                            </div>
+                            ${payForm}
                         </div>`;
                 }).join('');
             },
@@ -1381,7 +1572,10 @@
             // ============================================================
             populateCategorySelects() {
                 const txCat = document.getElementById('txCategory');
-                if (txCat) txCat.innerHTML = CATEGORIES.map(c => `<option value="${c.key}">${c.icon} ${c.label}</option>`).join('');
+                // Không chọn sẵn danh mục: chọn nhầm sẽ tính sai hoàn tiền và trừ oan cap của danh mục đó.
+                if (txCat) txCat.innerHTML = `<option value="">— Chọn danh mục —</option>` + CATEGORIES.map(c => `<option value="${c.key}">${c.icon} ${c.label}</option>`).join('');
+                const fCat = document.getElementById('txFilterCategory');
+                if (fCat) fCat.innerHTML = `<option value="">Mọi danh mục</option>` + CATEGORIES.map(c => `<option value="${c.key}">${c.icon} ${c.label}</option>`).join('');
                 const txDate = document.getElementById('txDate');
                 if (txDate && !txDate.value) txDate.value = todayISO();
             },
@@ -1412,7 +1606,7 @@
                 const amount = num(document.getElementById('txAmount')?.value);
                 const category = document.getElementById('txCategory')?.value;
                 if (!amount || !category) {
-                    el.innerHTML = `<p class="text-gray" style="font-size:14px;">Nhập số tiền và chọn danh mục để xem gợi ý.</p>`;
+                    el.innerHTML = `<div class="step-hint">① Nhập <strong>số tiền</strong> và chọn <strong>danh mục</strong> ở trên → ② app xếp hạng các thẻ theo hoàn tiền → ③ bấm <strong>"Ghi vào thẻ này"</strong> để lưu giao dịch.</div>`;
                     return;
                 }
                 if (this.cards.length === 0) {
@@ -1438,7 +1632,7 @@
                                 </div>
                             </div>
                             ${capWarn}${creditWarn}
-                            <button class="btn btn-sm btn-success mt-8" onclick="app.recordTransaction('${s.card.id}')">Chọn & ghi nợ thẻ này</button>
+                            <button class="btn btn-sm ${i === 0 && s.creditOk ? 'btn-success' : 'btn-secondary'} mt-8" onclick="app.recordTransaction('${s.card.id}')">💾 Ghi vào thẻ này</button>
                         </div>`;
                 }).join('');
             },
@@ -1451,6 +1645,13 @@
                 const description = document.getElementById('txDescription').value.trim();
                 const date = document.getElementById('txDate').value || todayISO();
                 if (!amount || amount <= 0) return alert('Vui lòng nhập số tiền giao dịch hợp lệ');
+                if (!category) return alert('Vui lòng chọn danh mục chi tiêu');
+                // Số tiền lớn bất thường (≥ 50 triệu hoặc > 50% hạn mức còn lại): hỏi lại để tránh gõ nhầm số 0.
+                const avail = this.availableCredit(card);
+                const bigByLimit = avail !== Infinity && avail > 0 && amount > avail * 0.5;
+                if ((amount >= 50000000 || bigByLimit) && avail >= amount) {
+                    if (!confirm(`Xác nhận ghi ${fmtVND(amount)} vào thẻ ${card.name}?${bigByLimit ? `\n(Chiếm hơn 50% hạn mức còn lại: ${fmtVND(avail)})` : ''}`)) return;
+                }
 
                 const { cashback } = this.computeCashback(card, category, amount);
                 if (this.availableCredit(card) < amount) {
@@ -1481,6 +1682,7 @@
 
                     document.getElementById('txAmount').value = '';
                     document.getElementById('txDescription').value = '';
+                    document.getElementById('txCategory').value = '';
                     this.refreshSuggestions();
                     this.showMessage(`Đã ghi nợ ${fmtVND(amount)} vào ${card.name} · hoàn ${fmtVND(applied)} 🎉`);
                 } catch (e) {
@@ -1522,14 +1724,56 @@
             renderTransactions() {
                 const el = document.getElementById('transactionsList');
                 if (!el) return;
+                // Bộ lọc tháng: lấy từ dữ liệu, mặc định "Tất cả".
+                const monthSel = document.getElementById('txFilterMonth');
+                if (monthSel) {
+                    const prev = monthSel.value;
+                    const months = [...new Set(this.transactions.map(t => String(t.date || '').slice(0, 7)).filter(Boolean))].sort().reverse();
+                    monthSel.innerHTML = `<option value="">Mọi tháng</option>` + months.map(m => `<option value="${m}">Tháng ${Number(m.slice(5))}/${m.slice(0, 4)}</option>`).join('');
+                    monthSel.value = months.includes(prev) ? prev : '';
+                }
+                const filterMonth = monthSel?.value || '';
                 const filterCard = document.getElementById('txFilterCard')?.value || '';
+                const filterCat = document.getElementById('txFilterCategory')?.value || '';
                 let list = this.transactions;
+                if (filterMonth) list = list.filter(t => String(t.date || '').startsWith(filterMonth));
                 if (filterCard) list = list.filter(t => t.cardId === filterCard);
+                if (filterCat) list = list.filter(t => t.category === filterCat);
+
+                const sumEl = document.getElementById('txSummary');
+                if (sumEl) {
+                    const spent = list.reduce((s, t) => s + num(t.amount), 0);
+                    const cb = list.reduce((s, t) => s + num(t.cashbackEarned), 0);
+                    sumEl.innerHTML = list.length ? `<div class="step-hint" style="margin-bottom:6px;">${filterMonth ? `Tháng ${Number(filterMonth.slice(5))}/${filterMonth.slice(0, 4)}` : 'Tổng'}: chi <strong>${fmtVND(spent)}</strong> · hoàn <strong class="text-success">${fmtVND(cb)}</strong> · ${list.length} giao dịch</div>` : '';
+                }
                 if (list.length === 0) {
-                    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">💸</div><h3>Chưa có giao dịch</h3><p>Ghi giao dịch đầu tiên để theo dõi chi tiêu và hoàn tiền.</p></div>`;
+                    const filtered = filterMonth || filterCard || filterCat;
+                    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">💸</div><h3>${filtered ? 'Không có giao dịch phù hợp' : 'Chưa có giao dịch'}</h3><p>${filtered ? 'Thử đổi bộ lọc ở trên.' : 'Ghi giao dịch đầu tiên để theo dõi chi tiêu và hoàn tiền.'}</p></div>`;
                     return;
                 }
-                el.innerHTML = list.map(t => {
+
+                // Lý do hoàn tiền = 0 để không bỏ trống gây khó hiểu.
+                const zeroReason = (t) => {
+                    const card = this.cards.find(c => c.id === t.cardId);
+                    if (!card) return '0 ₫';
+                    const m = (card.cashbackCategories || []).find(c => c.category === t.category);
+                    const rate = m ? num(m.rate) : num(card.cashbackDefaultRate);
+                    return rate > 0 ? '0 ₫ · hết hạn mức hoàn' : 'không hoàn tiền';
+                };
+                const today = todayISO();
+                const yesterday = toISODate(new Date(Date.now() - 86400000));
+                const dayLabel = (d) => d === today ? 'Hôm nay' : d === yesterday ? 'Hôm qua' : `${weekdayVN(new Date(d))} · ${fmtDate(d)}`;
+
+                // Chia nhóm theo ngày, mỗi nhóm có tổng chi.
+                const groups = [];
+                list.forEach(t => {
+                    const d = String(t.date || '').slice(0, 10);
+                    let g = groups[groups.length - 1];
+                    if (!g || g.date !== d) { g = { date: d, items: [] }; groups.push(g); }
+                    g.items.push(t);
+                });
+
+                const rowHtml = (t) => {
                     if (this.editingTxId === t.id) {
                         const opts = CATEGORIES.map(c => `<option value="${c.key}" ${c.key === t.category ? 'selected' : ''}>${c.icon} ${c.label}</option>`).join('');
                         return `
@@ -1549,19 +1793,31 @@
                                 </div>
                             </div>`;
                     }
+                    const cbHtml = num(t.cashbackEarned) > 0
+                        ? `<span class="text-success" style="font-weight:700; font-size:14px;">+${fmtVND(t.cashbackEarned)}</span>`
+                        : `<span class="tx-cb-zero">${zeroReason(t)}</span>`;
                     return `
                         <div class="tx-row">
                             <div class="tx-main">
                                 <div class="tx-amount">${fmtVND(t.amount)} <span class="badge badge-gray">${catLabel(t.category)}</span></div>
-                                <div class="tx-sub">${escapeHtml(t.cardName || '')}${t.description ? ' · ' + escapeHtml(t.description) : ''} · ${new Date(t.date).toLocaleDateString('vi-VN')}</div>
+                                <div class="tx-sub">${escapeHtml(t.cardName || '')}${t.description ? ' · ' + escapeHtml(t.description) : ''}</div>
                             </div>
                             <div class="tx-right">
-                                ${num(t.cashbackEarned) > 0 ? `<span class="text-success" style="font-weight:700; font-size:14px;">+${fmtVND(t.cashbackEarned)}</span>` : ''}
-                                <button class="icon-btn" title="Sửa" onclick="app.startEditTransaction('${t.id}')">✏️</button>
-                                <button class="icon-btn" title="Xóa" onclick="app.deleteTransaction('${t.id}')">🗑️</button>
+                                ${cbHtml}
+                                <details class="menu menu-flat">
+                                    <summary title="Thao tác">⋯</summary>
+                                    <div class="menu-list">
+                                        <button onclick="app.closeMenus(); app.startEditTransaction('${t.id}')">✏️ Sửa giao dịch</button>
+                                        <button class="danger" onclick="app.closeMenus(); app.deleteTransaction('${t.id}')">🗑️ Xóa giao dịch</button>
+                                    </div>
+                                </details>
                             </div>
                         </div>`;
-                }).join('');
+                };
+
+                el.innerHTML = groups.map(g => `
+                    <div class="tx-day"><span>${dayLabel(g.date)}</span><span>${fmtVND(g.items.reduce((s, t) => s + num(t.amount), 0))}</span></div>
+                    ${g.items.map(rowHtml).join('')}`).join('');
             },
 
             startEditTransaction(txId) {
@@ -1703,6 +1959,10 @@
             async toggleLoanStatus(loanId) {
                 const loan = this.loans.find(l => l.id === loanId);
                 if (!loan) return;
+                if (loan.status !== 'repaid') {
+                    const { remaining } = this.loanRemaining(loan);
+                    if (remaining > 0 && !confirm(`Khoản vay còn ${fmtVND(remaining)} gốc chưa thu. Vẫn đánh dấu đã tất toán?`)) return;
+                }
                 try {
                     await updateDoc(doc(db, 'loans', loanId), {
                         status: loan.status === 'repaid' ? 'active' : 'repaid',
@@ -1970,13 +2230,12 @@
                     const deadline = deadlineOf(loan);
                     const daysUntil = deadline ? this.getDaysUntil(deadline) : null;
 
-                    let statusBadge;
                     const collected = this.loanPeriodCollected(loan);
-                    if (isRepaid) statusBadge = '<span class="status-badge status-paid">Đã thu hồi</span>';
-                    else if (collected) statusBadge = '<span class="status-badge status-paid">Đã thu kỳ này</span>';
-                    else if (daysUntil !== null && daysUntil < 0) statusBadge = '<span class="status-badge status-overdue">Quá hạn thu</span>';
-                    else if (daysUntil !== null && daysUntil <= 7) statusBadge = '<span class="status-badge status-due-soon">Sắp đến hạn</span>';
-                    else statusBadge = '<span class="status-badge status-upcoming">Đang cho vay</span>';
+                    let urg;
+                    if (isRepaid) urg = { label: 'Đã tất toán', cls: 'paid', badge: 'status-paid' };
+                    else if (collected) urg = { label: 'Đã thu kỳ này', cls: '', badge: 'status-paid' };
+                    else if (daysUntil !== null) urg = this.urgencyOf(daysUntil);
+                    else urg = { label: 'Chưa đặt hạn thu', cls: '', badge: 'status-upcoming' };
 
                     // Ngày tất toán: lấy dueDate, nếu trống thì suy ra từ ngày vay + kỳ hạn.
                     let maturity = loan.dueDate || null, maturityEst = false;
@@ -2001,17 +2260,28 @@
                             </div>
                         </div>`;
 
+                    // Lịch sử theo ngày trả mới nhất; nghi nhập trùng = 2 lần trả cùng số tiền cách nhau ≤ 10 ngày.
+                    const repsByDate = [...reps].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+                    const realReps = repsByDate.filter(r => !r.capitalized);
+                    const dupPairs = [];
+                    for (let i = 0; i + 1 < realReps.length; i++) {
+                        const a = realReps[i], b = realReps[i + 1];
+                        if (num(a.amount) === num(b.amount) && Math.abs(new Date(a.date) - new Date(b.date)) <= 10 * 86400000) dupPairs.push([b, a]);
+                    }
+                    const lastRep = realReps[0];
+                    const editingHere = reps.some(r => r.id === this.editingRepId);
                     const repHistory = reps.length ? `
-                        <div style="margin-top:10px;">
-                            <div class="text-gray" style="font-size:11px; font-weight:600;">LỊCH SỬ TRẢ (${reps.length})</div>
-                            ${reps.map(r => {
+                        <details class="fold" ${this.foldAttrs('rep-' + loan.id, editingHere)}>
+                            <summary><span class="fold-title">Lịch sử trả (${reps.length})</span><span class="fold-meta">${lastRep ? `gần nhất ${fmtVND(lastRep.amount)} · ${fmtDM(lastRep.date)}` : ''}</span></summary>
+                            ${dupPairs.map(([a, b]) => `<div class="warn-note">⚠️ Có 2 lần trả ${fmtVND(a.amount)} vào ${fmtDM(a.date)} và ${fmtDM(b.date)} — kiểm tra xem có nhập trùng không.</div>`).join('')}
+                            ${repsByDate.map(r => {
                                 // Capitalization entry (interest rolled into principal) — special row, delete only.
                                 if (r.capitalized) {
                                     return `
                                         <div style="display:flex; justify-content:space-between; align-items:center; background:var(--warning-soft); padding:8px 10px; border-radius:6px; margin-top:6px;">
                                             <div style="font-size:13px;">
                                                 <strong class="text-warning">➕ Dồn lãi vào gốc: ${fmtVND(r.interestShortfall)}</strong>
-                                                <div class="text-gray" style="font-size:11px;">${new Date(r.date).toLocaleDateString('vi-VN')}</div>
+                                                <div class="text-gray" style="font-size:11px;">${fmtDate(r.date)}</div>
                                             </div>
                                             <button class="icon-btn" title="Hoàn tác" onclick="app.deleteRepayment('${r.id}')">🗑️</button>
                                         </div>`;
@@ -2034,8 +2304,8 @@
                                     <div style="display:flex; justify-content:space-between; align-items:center; background:var(--light); padding:8px 10px; border-radius:6px; margin-top:6px;">
                                         <div style="font-size:13px;">
                                             <strong>${fmtVND(r.amount)}</strong>
-                                            <span class="text-gray">(gốc ${fmtVND(r.principalPortion)} · lãi ${fmtVND(r.interestPortion)}${num(r.interestShortfall) > 0 ? ` · thiếu lãi ${fmtVND(r.interestShortfall)}→gốc` : ''})</span>
-                                            <div class="text-gray" style="font-size:11px;">${new Date(r.date).toLocaleDateString('vi-VN')}</div>
+                                            <span class="text-gray">${num(r.principalPortion) === 0 ? '· tiền lãi' : num(r.interestPortion) === 0 ? '· trả gốc' : `(gốc ${fmtVND(r.principalPortion)} · lãi ${fmtVND(r.interestPortion)})`}${num(r.interestShortfall) > 0 ? ` · thiếu lãi ${fmtVND(r.interestShortfall)} → cộng vào gốc` : ''}</span>
+                                            <div class="text-gray" style="font-size:11px;">${fmtDate(r.date)}</div>
                                         </div>
                                         <div style="display:flex; gap:4px;">
                                             <button class="icon-btn" title="Sửa" onclick="app.startEditRepayment('${r.id}')">✏️</button>
@@ -2043,40 +2313,57 @@
                                         </div>
                                     </div>`;
                             }).join('')}
-                        </div>` : '';
+                        </details>` : '';
+
+                    // Việc chính: kỳ tới thu bao nhiêu, vào ngày nào.
+                    let hero;
+                    if (isRepaid) hero = `<div class="hero-line">✅ Đã thu hồi đủ gốc</div>`;
+                    else if (!deadline) hero = `<div class="hero-line text-warning">Chưa đặt hạn thu kỳ tới — bấm ⋯ → Sửa để thêm.</div>`;
+                    else hero = `
+                        <div class="hero-line">${collected ? 'Đã thu kỳ này · kỳ tới' : 'Kỳ này cần thu'}${expInterest > 0 ? ` lãi ≈ <strong class="hero-amount" style="font-size:20px; ${urg.cls === 'urgent' ? 'color:var(--danger);' : ''}">${fmtVND(Math.round(expInterest))}</strong>` : ''}</div>
+                        <div class="hero-line">hạn <strong>${fmtWD(deadline)}</strong>${collected ? '' : ` · ${this.daysText(daysUntil).toLowerCase()}`}</div>`;
+
+                    const rate = num(loan.interestRate);
+                    const yearly = Math.round(rate * 12 * 10) / 10;
+                    const rateBadge = rate ? `<span class="badge ${yearly > 20 ? '' : 'badge-gray'}" ${yearly > 20 ? `style="background:var(--warning-soft); color:var(--warning);" title="Vượt trần 20%/năm (Điều 468 Bộ luật Dân sự 2015): phần lãi vượt không được pháp luật bảo vệ khi tranh chấp."` : ''}>${rate}%/tháng ≈ ${yearly}%/năm${yearly > 20 ? ' ⚠️' : ''}</span>` : '';
+                    const principalPaid = totalPaid - interestPaid;
 
                     return `
-                        <div class="item-card ${isRepaid || collected ? 'paid' : (daysUntil !== null && daysUntil < 0 ? 'overdue' : '')}">
-                            <div class="item-head">
-                                <div>
-                                    <div class="item-title">${escapeHtml(loan.borrowerName)}</div>
+                        <div class="item-card ${urg.cls}">
+                            <div class="item-head" style="margin-bottom:6px;">
+                                <div style="min-width:0;">
+                                    <div class="item-title" style="margin-bottom:4px;">${escapeHtml(loan.borrowerName)}</div>
                                     <div class="item-meta">
                                         <span class="badge badge-info">${LOAN_TYPES[loan.loanType] || loan.loanType}</span>
-                                        ${loan.interestRate ? `<span class="badge badge-gray">${loan.interestRate}%/tháng</span>` : ''}
+                                        ${rateBadge}
                                         ${num(loan.termMonths) > 0 ? `<span class="badge badge-gray">Kỳ hạn ${num(loan.termMonths)} tháng</span>` : ''}
-                                        ${deadline ? `<span>Đến hạn phải trả: <strong>${fmtDate(deadline)}</strong></span>` : `<span class="text-warning">Chưa đặt ngày đến hạn phải trả</span>`}
                                     </div>
-                                    <div class="text-gray" style="font-size:12px; margin-top:6px;">
-                                        Ngày vay: ${fmtDate(loan.startDate)}${maturity ? ` · Tất toán${maturityEst ? ' (dự kiến)' : ''}: ${fmtDate(maturity)}` : ''}
-                                    </div>
-                                    ${daysUntil !== null && !isRepaid ? `<div class="text-gray" style="font-size:12px; margin-top:6px;">${collected ? 'Đã thu kỳ này · hạn kế tiếp ' + new Date(deadline).toLocaleDateString('vi-VN') : this.daysText(daysUntil)}</div>` : ''}
                                 </div>
-                                <div style="text-align:right;">${statusBadge}</div>
+                                <div class="status-badge ${urg.badge}" style="white-space:nowrap;">${urg.label}</div>
                             </div>
+                            <div class="hero">${hero}</div>
                             <div class="info-grid">
                                 <div class="info-box"><div class="label">Gốc cho vay</div><div class="value">${fmtVND(loan.principal)}</div>${capitalized > 0 ? `<div class="text-warning" style="font-size:11px; margin-top:2px;">gồm ${fmtVND(capitalized)} lãi dồn</div>` : ''}</div>
-                                <div class="info-box"><div class="label">Còn lại (gốc)</div><div class="value ${remaining > 0 ? 'text-danger' : 'text-success'}">${fmtVND(remaining)}</div></div>
-                                <div class="info-box"><div class="label">Đã thu (gốc+lãi)</div><div class="value text-success">${fmtVND(totalPaid)}</div></div>
-                                <div class="info-box"><div class="label">Lãi đã thu</div><div class="value">${fmtVND(interestPaid)}</div></div>
-                                ${!isRepaid && expInterest > 0 ? `<div class="info-box"><div class="label">Lãi dự kiến kỳ tới</div><div class="value">${fmtVND(Math.round(expInterest))}</div></div>` : ''}
+                                <div class="info-box"><div class="label">Gốc còn phải thu</div><div class="value">${fmtVND(remaining)}</div></div>
+                                <div class="info-box"><div class="label">Đã thu</div><div class="value text-success">${fmtVND(totalPaid)}</div>${principalPaid > 0 && interestPaid > 0 ? `<div class="text-gray" style="font-size:11px; margin-top:2px;">gốc ${fmtVND(principalPaid)} · lãi ${fmtVND(interestPaid)}</div>` : interestPaid > 0 ? `<div class="text-gray" style="font-size:11px; margin-top:2px;">toàn bộ là tiền lãi</div>` : ''}</div>
                             </div>
-                            ${loan.note ? `<div class="text-gray" style="font-size:13px; margin-top:10px; white-space:pre-wrap;">📌 ${escapeHtml(loan.note)}</div>` : ''}
-                            <div class="item-actions">
+                            <div class="text-gray" style="font-size:12px; margin-top:10px;">
+                                Ngày vay ${fmtDate(loan.startDate)}${maturity ? ` · Tất toán${maturityEst ? ' (dự kiến)' : ''} ${fmtDate(maturity)}` : ''}
+                            </div>
+                            ${loan.note ? `<div class="text-gray" style="font-size:13px; margin-top:6px; white-space:pre-wrap;">📌 ${escapeHtml(loan.note)}</div>` : ''}
+                            <div class="action-bar">
                                 ${!isRepaid ? `<button class="btn btn-sm btn-success" onclick="app.toggleRepayForm('${loan.id}')">💵 Ghi nhận trả</button>` : ''}
-                                ${!isRepaid && num(loan.interestRate) > 0 ? `<button class="btn btn-sm btn-warning" onclick="app.capitalizeInterest('${loan.id}')">➕ Dồn lãi vào gốc</button>` : ''}
-                                <button class="btn btn-sm btn-info" onclick="app.toggleLoanStatus('${loan.id}')">${isRepaid ? '↩️ Mở lại' : '✅ Đã thu hồi'}</button>
-                                <button class="btn btn-sm btn-warning" onclick="app.startEditLoan('${loan.id}')">✏️ Sửa</button>
-                                <button class="btn btn-sm btn-danger" onclick="app.deleteLoan('${loan.id}')">🗑️ Xóa</button>
+                                <span class="spacer"></span>
+                                <details class="menu">
+                                    <summary title="Thao tác khác">⋯</summary>
+                                    <div class="menu-list">
+                                        ${!isRepaid && rate > 0 ? `<button onclick="app.closeMenus(); app.capitalizeInterest('${loan.id}')">➕ Dồn lãi kỳ này vào gốc</button>` : ''}
+                                        <button onclick="app.closeMenus(); app.toggleLoanStatus('${loan.id}')">${isRepaid ? '↩️ Mở lại khoản vay' : '✅ Tất toán khoản vay'}</button>
+                                        <button onclick="app.closeMenus(); app.startEditLoan('${loan.id}')">✏️ Sửa khoản vay</button>
+                                        <hr>
+                                        <button class="danger" onclick="app.closeMenus(); app.deleteLoan('${loan.id}')">🗑️ Xóa khoản vay</button>
+                                    </div>
+                                </details>
                             </div>
                             ${repayForm}
                             ${repHistory}
@@ -2253,7 +2540,7 @@
                         <div class="stat-item">
                             <div class="stat-number">${fmtVND(totalBalance)}</div>
                             <div class="stat-label">Tổng dư nợ</div>
-                            ${totalLimit > 0 ? `<div class="progress-bar"><div class="progress-fill" style="width:${usagePct}%; background:${usagePct >= 90 ? 'var(--danger)' : usagePct >= 70 ? 'var(--warning)' : 'var(--success)'};"></div></div><div class="stat-sub">${usagePct}% của ${fmtVND(totalLimit)}</div>` : ''}
+                            ${totalLimit > 0 ? `<div class="progress-bar"><div class="progress-fill" style="width:${usagePct}%; background:${this.usageColor(usagePct)};"></div></div><div class="stat-sub">${usagePct}% của ${fmtVND(totalLimit)}</div>` : ''}
                         </div>
                         <div class="stat-item">
                             <div class="stat-number text-success">+${fmtVND(cashbackThisCycle)}</div>
@@ -2482,6 +2769,10 @@
         };
 
         window.app = app;
+        document.addEventListener('click', (e) => {
+            const menu = e.target.closest && e.target.closest('details.menu');
+            app.closeMenus(menu);
+        });
         document.addEventListener('DOMContentLoaded', () => app.init());
 
         if ('serviceWorker' in navigator) {
