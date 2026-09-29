@@ -116,7 +116,11 @@
         }
         .brand h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; }
         .brand p { font-size: 12px; color: var(--gray); }
-        .topbar-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .topbar-actions { display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; }
+        .topbar { flex-wrap: nowrap; }
+        .account-menu > summary { width: auto; height: auto; border: none; background: none; padding: 0; }
+        .account-menu > summary:hover, .account-menu[open] > summary { background: none; }
+        .menu-email { padding: 8px 12px 4px; font-size: 13px; color: var(--gray); word-break: break-all; }
         .user-chip { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--gray); }
         .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--dark); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 14px; }
 
@@ -288,6 +292,21 @@
         .cb-item { padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 13px; }
         .cb-item:last-child { border-bottom: none; }
 
+        /* Nhóm khoản vay theo người vay */
+        .borrower-group { border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 14px; background: #fafafa; }
+        .borrower-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; }
+        .borrower-group .item-card { margin-bottom: 10px; }
+        .borrower-group .item-card:last-child { margin-bottom: 0; }
+
+        /* Việc cần làm (tab Tổng quan) */
+        .todo-row { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 8px; font-size: 14px; }
+        .todo-row.urgent { border-left: 4px solid var(--danger); }
+        .todo-row.soon { border-left: 4px solid #f59e0b; }
+        .todo-icon { font-size: 18px; }
+        .todo-main { flex: 1; min-width: 0; }
+        .todo-side { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+        .tab-count { display: inline-block; min-width: 18px; padding: 0 5px; border-radius: 9px; background: var(--danger); color: #fff; font-size: 11px; line-height: 18px; text-align: center; margin-left: 4px; }
+
         /* Tóm tắt đầu tab */
         .summary-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-bottom: 14px; }
         .summary-tile { border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
@@ -355,6 +374,8 @@
             .cashback-row.header { display: none; }
             .item-actions .btn { flex: 1; }
             .user-chip span { display: none; }
+            .notif-text { display: none; }          /* điện thoại: chỉ còn biểu tượng chuông, màu xanh = đang bật */
+            .notification-toggle { padding: 8px 10px; }
             .tab-btn { padding: 11px 12px; font-size: 13px; }
         }
     </style>
@@ -447,15 +468,19 @@
                 </div>
             </div>
             <div class="topbar-actions">
-                <div class="user-chip">
-                    <div class="user-avatar" id="userAvatar">U</div>
-                    <span id="userEmail"></span>
+                <div id="notificationToggle" class="notification-toggle" onclick="app.toggleNotifications()" title="Thông báo nhắc hạn">
+                    <span>🔔</span><span id="notificationStatus" class="notif-text">Bật thông báo</span>
                 </div>
-                <div id="notificationToggle" class="notification-toggle" onclick="app.toggleNotifications()">
-                    <span>🔔</span><span id="notificationStatus">Bật thông báo</span>
-                </div>
-                <button class="btn btn-sm btn-secondary" onclick="app.refreshApp()" title="Tải lại bản mới nhất">🔄 Làm mới</button>
-                <button class="btn btn-sm btn-secondary" onclick="app.logout()">Đăng xuất</button>
+                <!-- Menu tài khoản: email + Làm mới + Đăng xuất (gọn trên điện thoại) -->
+                <details class="menu account-menu">
+                    <summary title="Tài khoản"><span class="user-avatar" id="userAvatar">U</span></summary>
+                    <div class="menu-list">
+                        <div class="menu-email" id="userEmail"></div>
+                        <hr>
+                        <button onclick="app.closeMenus(); app.refreshApp()">🔄 Tải bản mới nhất</button>
+                        <button class="danger" onclick="app.closeMenus(); app.logout()">↪️ Đăng xuất</button>
+                    </div>
+                </details>
             </div>
         </div>
 
@@ -471,7 +496,7 @@
         <!-- ============ TAB: DASHBOARD ============ -->
         <div id="tab-dashboard" class="tab-content active">
             <div class="panel">
-                <div class="panel-header"><h2>📊 Tổng quan tài chính</h2></div>
+                <div class="panel-header"><h2>📊 Hôm nay</h2></div>
                 <div id="dashboardContent"></div>
             </div>
         </div>
@@ -628,12 +653,18 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label>Người vay</label>
-                            <input type="text" id="loanBorrower" placeholder="VD: Anh Tuấn">
+                            <input type="text" id="loanBorrower" list="borrowerList" placeholder="VD: Anh Tuấn">
+                            <datalist id="borrowerList"></datalist>
+                            <small>Nhập đúng cùng một tên cho các khoản của cùng một người để app cộng dồn.</small>
                         </div>
                         <div class="form-group">
                             <label>Số tiền cho vay (gốc, ₫)</label>
                             <input type="number" id="loanPrincipal" placeholder="0" min="0">
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tên khoản vay (tùy chọn)</label>
+                        <input type="text" id="loanLabel" placeholder="VD: Vay đứng lần 5, Mua xe...">
                     </div>
                     <div class="form-row">
                         <div class="form-group">
@@ -1886,13 +1917,28 @@
             showLoanForm() {
                 this.editingLoanId = null;
                 document.getElementById('loanFormTitle').textContent = 'Thêm khoản cho vay';
-                ['loanBorrower', 'loanPrincipal', 'loanRate', 'loanDueDate', 'loanNextPaymentDate', 'loanTerm', 'loanNote'].forEach(id => document.getElementById(id).value = '');
+                ['loanBorrower', 'loanLabel', 'loanPrincipal', 'loanRate', 'loanDueDate', 'loanNextPaymentDate', 'loanTerm', 'loanNote'].forEach(id => document.getElementById(id).value = '');
                 document.getElementById('loanType').value = 'installment';
                 document.getElementById('loanStartDate').value = todayISO();
+                this.populateBorrowerList();
                 const form = document.getElementById('loanForm');
                 form.classList.remove('hidden');
                 form.scrollIntoView({ behavior: 'smooth', block: 'start' });
             },
+            // Gợi ý tên người vay đã có, để các khoản của cùng một người gõ trùng tên.
+            populateBorrowerList() {
+                const dl = document.getElementById('borrowerList');
+                if (!dl) return;
+                const byKey = new Map();
+                this.loans.forEach(l => { const k = this.borrowerKey(l); if (k && !byKey.has(k)) byKey.set(k, l.borrowerName.trim()); });
+                const names = [...byKey.values()];
+                dl.innerHTML = names.map(n => `<option value="${escapeHtml(n)}"></option>`).join('');
+            },
+            // Khoá gom nhóm: không phân biệt hoa thường / khoảng trắng thừa.
+            borrowerKey(loan) { return (loan.borrowerName || '').trim().replace(/\s+/g, ' ').toLowerCase(); },
+            // Tên hiển thị của một khoản: "Ly · Vay đứng lần 5".
+            loanTitle(loan) { return loan.loanLabel ? `${loan.borrowerName} · ${loan.loanLabel}` : (loan.borrowerName || ''); },
+
             hideLoanForm() { document.getElementById('loanForm').classList.add('hidden'); this.editingLoanId = null; },
 
             startEditLoan(loanId) {
@@ -1901,6 +1947,8 @@
                 this.editingLoanId = loanId;
                 document.getElementById('loanFormTitle').textContent = 'Chỉnh sửa khoản vay';
                 document.getElementById('loanBorrower').value = loan.borrowerName || '';
+                document.getElementById('loanLabel').value = loan.loanLabel || '';
+                this.populateBorrowerList();
                 document.getElementById('loanPrincipal').value = loan.principal || '';
                 document.getElementById('loanType').value = loan.loanType || 'installment';
                 document.getElementById('loanRate').value = loan.interestRate || '';
@@ -1921,6 +1969,7 @@
                 if (!principal) return alert('Vui lòng nhập số tiền cho vay');
                 const data = {
                     borrowerName, principal,
+                    loanLabel: document.getElementById('loanLabel').value.trim(),
                     loanType: document.getElementById('loanType').value,
                     interestRate: num(document.getElementById('loanRate').value),
                     startDate: document.getElementById('loanStartDate').value || null,
@@ -2223,7 +2272,8 @@
                     const db = deadlineOf(b) ? this.getDaysUntil(deadlineOf(b)) : Infinity;
                     return da - db;
                 });
-                el.innerHTML = sortedLoans.map(loan => {
+                // Vẽ 1 khoản vay. inGroup = nằm trong nhóm của 1 người vay → tiêu đề chỉ cần tên khoản.
+                const cardOf = (loan, inGroup) => {
                     const { remaining, totalPaid, interestPaid, capitalized } = this.loanRemaining(loan);
                     const reps = this.loanRepayments[loan.id] || [];
                     const isRepaid = loan.status === 'repaid' || remaining <= 0;
@@ -2332,7 +2382,7 @@
                         <div class="item-card ${urg.cls}">
                             <div class="item-head" style="margin-bottom:6px;">
                                 <div style="min-width:0;">
-                                    <div class="item-title" style="margin-bottom:4px;">${escapeHtml(loan.borrowerName)}</div>
+                                    <div class="item-title" style="margin-bottom:4px;">${escapeHtml(inGroup ? (loan.loanLabel || LOAN_TYPES[loan.loanType] || 'Khoản vay') : this.loanTitle(loan))}</div>
                                     <div class="item-meta">
                                         <span class="badge badge-info">${LOAN_TYPES[loan.loanType] || loan.loanType}</span>
                                         ${rateBadge}
@@ -2368,6 +2418,46 @@
                             ${repayForm}
                             ${repHistory}
                         </div>`;
+                };
+
+                // Gom theo người vay (giữ thứ tự ưu tiên: nhóm có khoản gấp nhất lên trước).
+                const groups = new Map();
+                sortedLoans.forEach(l => {
+                    const k = this.borrowerKey(l) || ('#' + l.id);
+                    if (!groups.has(k)) groups.set(k, []);
+                    groups.get(k).push(l);
+                });
+                // Gợi ý (không tự sửa): các tên khác nhau nhưng cùng chữ đầu, VD "Ly đứng lần 5" và "Ly gốc".
+                const byFirst = {};
+                [...groups.keys()].filter(k => !k.startsWith('#')).forEach(k => {
+                    const f = k.split(' ')[0];
+                    (byFirst[f] = byFirst[f] || []).push(groups.get(k)[0].borrowerName);
+                });
+                const hints = Object.values(byFirst).filter(names => names.length >= 2);
+                const hintHtml = hints.length ? `<div class="step-hint" style="margin-bottom:14px;">💡 Có phải ${hints.map(n => n.map(x => `"${escapeHtml(x)}"`).join(', ')).join('; ')} là của cùng một người? Bấm ⋯ → <strong>Sửa khoản vay</strong>, đặt <strong>Người vay</strong> trùng một tên (VD "${escapeHtml(hints[0][0].split(' ')[0])}") và ghi phần còn lại vào <strong>Tên khoản vay</strong> — app sẽ cộng dồn số đang nợ của người đó.</div>` : '';
+                el.innerHTML = hintHtml + [...groups.values()].map(list => {
+                    if (list.length < 2) return cardOf(list[0], false);
+                    const active = list.filter(l => !this.isLoanSettled(l));
+                    const owed = active.reduce((s, l) => s + this.loanRemaining(l).remaining, 0);
+                    const nextInterest = active.reduce((s, l) => s + Math.round(this.expectedInterest(l, this.loanRemaining(l).remaining)), 0);
+                    const pending = active.filter(l => !this.loanPeriodCollected(l) && this.loanDeadline(l))
+                        .sort((a, b) => this.getDaysUntil(this.loanDeadline(a)) - this.getDaysUntil(this.loanDeadline(b)));
+                    const nearest = pending[0];
+                    return `
+                        <div class="borrower-group">
+                            <div class="borrower-head">
+                                <div>
+                                    <div class="item-title" style="margin-bottom:2px;">👤 ${escapeHtml(list[0].borrowerName)}</div>
+                                    <div class="text-gray" style="font-size:13px;">${list.length} khoản${active.length !== list.length ? ` (${active.length} đang cho vay)` : ''}${nearest ? ` · kỳ thu gần nhất <strong style="color:var(--dark);">${fmtWD(this.loanDeadline(nearest))}</strong>` : ''}</div>
+                                </div>
+                                <div style="text-align:right;">
+                                    <div class="text-gray" style="font-size:12px;">Đang nợ (gốc)</div>
+                                    <div style="font-size:20px; font-weight:800;">${fmtVND(owed)}</div>
+                                    ${nextInterest > 0 ? `<div class="text-gray" style="font-size:12px;">lãi mỗi kỳ ≈ ${fmtVND(nextInterest)}</div>` : ''}
+                                </div>
+                            </div>
+                            ${list.map(l => cardOf(l, true)).join('')}
+                        </div>`;
                 }).join('');
             },
 
@@ -2380,26 +2470,7 @@
             buildAdvice() {
                 const tips = [];
                 const push = (level, title, detail) => tips.push({ level, title, detail });
-                const dueCards = this.cards.filter(c => num(c.statementAmount) > 0);
-
-                // 1) Overdue cards (most urgent)
-                dueCards.filter(c => this.getDaysUntil(c.nextDueDate) < 0)
-                    .sort((a, b) => this.getDaysUntil(a.nextDueDate) - this.getDaysUntil(b.nextDueDate))
-                    .forEach(c => push('urgent', `Thẻ ${c.name} đã quá hạn ${Math.abs(this.getDaysUntil(c.nextDueDate))} ngày`,
-                        `Thanh toán ${fmtVND(c.statementAmount)} ngay để tránh phí phạt & lãi.${num(c.minimumPayment) ? ` Tối thiểu ${fmtVND(c.minimumPayment)}.` : ''}`));
-
-                // 2) Cards due within 3 days
-                dueCards.filter(c => { const d = this.getDaysUntil(c.nextDueDate); return d >= 0 && d <= 3; })
-                    .sort((a, b) => this.getDaysUntil(a.nextDueDate) - this.getDaysUntil(b.nextDueDate))
-                    .forEach(c => push('warning', `Thẻ ${c.name} ${this.daysText(this.getDaysUntil(c.nextDueDate)).toLowerCase()}`,
-                        `Chuẩn bị ${fmtVND(c.statementAmount)} để thanh toán đúng hạn.`));
-
-                // 3) Payment order when several cards are due — which to đáo hạn/pay first
-                if (dueCards.length >= 2) {
-                    const order = [...dueCards].sort((a, b) => this.getDaysUntil(a.nextDueDate) - this.getDaysUntil(b.nextDueDate));
-                    push('tip', 'Thứ tự nên thanh toán / đáo hạn trước',
-                        order.map((c, i) => `${i + 1}. ${c.name} (${this.daysText(this.getDaysUntil(c.nextDueDate)).toLowerCase()}, ${fmtVND(c.statementAmount)})`).join('  →  '));
-                }
+                // (Thẻ đến hạn, thứ tự trả và khoản vay cần thu nằm ở "Việc cần làm", sắp theo hạn.)
 
                 // 4) High utilization (per card or shared group, once each)
                 const seen = new Set();
@@ -2420,33 +2491,15 @@
                 const ranked = this.cards.map(c => ({ c, info: this.interestFreeInfo(c) })).filter(x => x.info)
                     .sort((a, b) => b.info.days - a.info.days);
                 if (ranked.length) {
-                    const b = ranked[0];
-                    push('tip', `Hôm nay quẹt thẻ ${b.c.name} là tối ưu`,
-                        `Được miễn lãi ~${b.info.days} ngày (trả trước ${b.info.dueDate.toLocaleDateString('vi-VN')}).${ranked.length > 1 ? ' Kém hơn: ' + ranked.slice(1, 3).map(x => `${x.c.name} ${x.info.days}n`).join(', ') + '.' : ''}`);
+                    // (Thẻ nên quẹt hôm nay đã hiện ở "Việc cần làm".)
                     // Cards where waiting until just after the statement gives a much longer window
                     ranked.filter(x => (x.info.maxDays - x.info.days) >= 7).slice(0, 2).forEach(x =>
                         push('tip', `Thẻ ${x.c.name}: nên đợi tới sau ngày sao kê`,
                             `Quẹt ngay sau ngày sao kê (ngày ${x.info.statementDay}) được ~${x.info.maxDays} ngày miễn lãi, thay vì chỉ ${x.info.days} ngày nếu quẹt hôm nay.`));
                 }
 
-                // 6) Loans to collect
-                const loanDl = l => l.nextPaymentDate || l.dueDate;
-                const activeLoans = this.loans.filter(l => this.loanNeedsCollection(l));
-                activeLoans.filter(l => loanDl(l) && this.getDaysUntil(loanDl(l)) < 0)
-                    .sort((a, b) => this.getDaysUntil(loanDl(a)) - this.getDaysUntil(loanDl(b)))
-                    .forEach(l => push('urgent', `Nên thu hồi: ${l.borrowerName} đã quá hạn`,
-                        `Còn ${fmtVND(this.loanRemaining(l).remaining)} gốc. Nhắc thu hồi, hoặc dùng "Dồn lãi vào gốc" nếu chưa trả.`));
-                activeLoans.filter(l => { const d = loanDl(l) ? this.getDaysUntil(loanDl(l)) : null; return d !== null && d >= 0 && d <= 7; })
-                    .forEach(l => push('warning', `Sắp đến hạn thu: ${l.borrowerName}`,
-                        `Hạn ${new Date(loanDl(l)).toLocaleDateString('vi-VN')} · còn ${fmtVND(this.loanRemaining(l).remaining)} gốc.`));
-
-                // 7) Tổng cần thanh toán trong 7 ngày tới
+                // Các khoản đến hạn thẻ / thu nợ đã nằm ở "Việc cần làm" nên không lặp lại ở đây.
                 const cycle = this.currentCycle();
-                const dueSoonTotal = this.cards
-                    .filter(c => { const d = this.getDaysUntil(c.nextDueDate); return num(c.statementAmount) > 0 && d >= 0 && d <= 7; })
-                    .reduce((s, c) => s + num(c.statementAmount), 0);
-                if (dueSoonTotal > 0) push('tip', 'Tổng cần thanh toán trong 7 ngày tới', `${fmtVND(dueSoonTotal)} — chuẩn bị dòng tiền để không lỡ hạn.`);
-
                 // 8) Cashback: sắp/đã chạm cap kỳ này
                 this.cards.forEach(c => {
                     if (c.cashbackCycle !== cycle) return;
@@ -2476,11 +2529,84 @@
                 });
                 if (catBest.length) push('tip', 'Tối đa hoàn tiền tháng này — quẹt thẻ theo danh mục', catBest.join('  ·  '));
 
-                if (!tips.length) push('tip', 'Mọi thứ đang ổn 👍',
-                    'Không có khoản nào cần chú ý gấp. Nhớ quẹt thẻ ngay sau ngày sao kê để tối đa thời gian miễn lãi.');
+                if (!tips.length) push('tip', 'Không có gợi ý thêm',
+                    'Nhớ quẹt thẻ ngay sau ngày sao kê để tối đa thời gian miễn lãi.');
 
                 const rank = { urgent: 0, warning: 1, tip: 2 };
                 return tips.sort((a, b) => rank[a.level] - rank[b.level]);
+            },
+
+            // Việc cần làm: thẻ phải trả + khoản vay phải thu, gom chung, gấp nhất lên đầu.
+            buildTodos() {
+                const items = [];
+                this.cards.filter(c => num(c.statementAmount) > 0).forEach(c => {
+                    const d = this.getDaysUntil(c.nextDueDate);
+                    items.push({ days: d, kind: 'card',
+                        title: `Trả <strong>${fmtVND(c.statementAmount)}</strong> cho thẻ ${escapeHtml(c.name)}`,
+                        sub: `hạn ${fmtWD(c.nextDueDate)}${num(c.minimumPayment) ? ` · tối thiểu ${fmtVND(c.minimumPayment)}` : ''}`,
+                        action: `app.goPayCard('${c.id}')`, actionLabel: 'Ghi nhận trả' });
+                });
+                this.loans.filter(l => this.loanNeedsCollection(l) && this.loanDeadline(l)).forEach(l => {
+                    const d = this.getDaysUntil(this.loanDeadline(l));
+                    const exp = Math.round(this.expectedInterest(l, this.loanRemaining(l).remaining));
+                    items.push({ days: d, kind: 'loan',
+                        title: exp > 0 ? `Thu lãi ≈ <strong>${fmtVND(exp)}</strong> từ ${escapeHtml(this.loanTitle(l))}` : `Thu tiền từ ${escapeHtml(this.loanTitle(l))}`,
+                        sub: `hạn ${fmtWD(this.loanDeadline(l))} · còn ${fmtVND(this.loanRemaining(l).remaining)} gốc`,
+                        action: `app.goCollectLoan('${l.id}')`, actionLabel: 'Ghi nhận thu' });
+                });
+                return items.sort((a, b) => a.days - b.days);
+            },
+            todoHtml() {
+                const all = this.buildTodos();
+                const now = all.filter(t => t.days <= 7);
+                const later = all.filter(t => t.days > 7 && t.days <= 30);
+                const row = (t) => {
+                    const u = this.urgencyOf(t.days);
+                    return `
+                        <div class="todo-row ${u.cls}">
+                            <div class="todo-icon">${t.kind === 'card' ? '💳' : '🤝'}</div>
+                            <div class="todo-main">
+                                <div>${t.title}</div>
+                                <div class="text-gray" style="font-size:12px;">${t.sub}</div>
+                            </div>
+                            <div class="todo-side">
+                                <span class="status-badge ${u.badge}">${u.label}</span>
+                                <button class="btn btn-sm btn-secondary" onclick="${t.action}">${t.actionLabel}</button>
+                            </div>
+                        </div>`;
+                };
+                const ranked = this.cards.map(c => ({ c, info: this.interestFreeInfo(c) })).filter(x => x.info).sort((a, b) => b.info.days - a.info.days);
+                const swipe = ranked.length ? `
+                    <div class="todo-row">
+                        <div class="todo-icon">💡</div>
+                        <div class="todo-main">
+                            <div>Hôm nay nên quẹt <strong>${escapeHtml(ranked[0].c.name)}</strong> · <span class="text-success">miễn lãi ${ranked[0].info.days} ngày</span></div>
+                            <div class="text-gray" style="font-size:12px;">trả trước ${fmtWD(ranked[0].info.dueDate)}${ranked.length > 1 ? ` · khác: ${ranked.slice(1, 3).map(x => `${escapeHtml(x.c.name)} ${x.info.days} ngày`).join(', ')}` : ''}</div>
+                        </div>
+                    </div>` : '';
+                const total = (list, kind) => list.filter(t => t.kind === kind).length;
+                return `
+                    <div class="section-title" style="margin-top:0;">✅ Việc cần làm trong 7 ngày tới</div>
+                    ${now.length ? now.map(row).join('') : `<div class="step-hint">Không có khoản nào cần trả hay cần thu trong 7 ngày tới. 👍</div>`}
+                    ${swipe}
+                    ${later.length ? `
+                        <details class="fold" ${this.foldAttrs('todo-later')}>
+                            <summary><span class="fold-title">Sắp tới (8–30 ngày)</span><span class="fold-meta">${total(later, 'card')} thẻ · ${total(later, 'loan')} khoản vay</span></summary>
+                            ${later.map(row).join('')}
+                        </details>` : ''}`;
+            },
+            // Nhảy từ "Việc cần làm" tới đúng thẻ / khoản vay và mở sẵn form ghi nhận.
+            goPayCard(cardId) {
+                this.switchTab('cards');
+                const form = document.getElementById(`pay-form-${cardId}`);
+                if (form && form.classList.contains('hidden')) this.togglePayForm(cardId);
+                form?.closest('.item-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            },
+            goCollectLoan(loanId) {
+                this.switchTab('loans');
+                const form = document.getElementById(`repay-form-${loanId}`);
+                if (form && form.classList.contains('hidden')) this.toggleRepayForm(loanId);
+                form?.closest('.item-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             },
 
             adviceHtml() {
@@ -2517,7 +2643,7 @@
                 const cashbackThisCycle = this.transactions.reduce((s, t) =>
                     (String(t.date).slice(0, 7) === cycle ? s + num(t.cashbackEarned) : s), 0);
 
-                const dueSoon = this.cards.filter(c => num(c.statementAmount) > 0 && this.getDaysUntil(c.nextDueDate) >= 0 && this.getDaysUntil(c.nextDueDate) <= 3).length;
+                const dueSoon = this.cards.filter(c => num(c.statementAmount) > 0 && this.getDaysUntil(c.nextDueDate) >= 0 && this.getDaysUntil(c.nextDueDate) <= 7).length;
                 const overdue = this.cards.filter(c => num(c.statementAmount) > 0 && this.getDaysUntil(c.nextDueDate) < 0).length;
 
                 const activeLoans = this.loans.filter(l => !this.isLoanSettled(l));
@@ -2529,8 +2655,13 @@
                 const loansDueSoon = pending.filter(l => loanDl(l) && this.getDaysUntil(loanDl(l)) >= 0 && this.getDaysUntil(loanDl(l)) <= 7).length;
                 const loansOverdue = pending.filter(l => loanDl(l) && this.getDaysUntil(loanDl(l)) < 0).length;
 
+                const urgentCount = this.buildTodos().filter(t => t.days <= 7).length;
+                const tabBtn = document.querySelector('.tab-btn[data-tab="dashboard"]');
+                if (tabBtn) tabBtn.innerHTML = `📊 Tổng quan${urgentCount ? ` <span class="tab-count">${urgentCount}</span>` : ''}`;
+
                 el.innerHTML = `
-                    ${this.adviceHtml()}
+                    ${this.todoHtml()}
+                    <div style="margin-top:22px;">${this.adviceHtml()}</div>
                     <div class="section-title">💳 Thẻ tín dụng</div>
                     <div class="stats-grid">
                         <div class="stat-item">
@@ -2746,8 +2877,8 @@
                 const activeLoans = this.loans.filter(l => this.loanNeedsCollection(l) && loanDeadline(l));
                 const loanOverdue = activeLoans.filter(l => this.getDaysUntil(loanDeadline(l)) < 0);
                 const loanSoon = activeLoans.filter(l => { const d = this.getDaysUntil(loanDeadline(l)); return d >= 0 && d <= 7; });
-                if (loanOverdue.length) this.notify('💰 Khoản cho vay quá hạn thu!', `${loanOverdue.length} khoản: ${loanOverdue.map(l => l.borrowerName).join(', ')}`, 'pingpay-loan-overdue', true);
-                if (loanSoon.length) this.notify('📅 Khoản cho vay sắp đến hạn thu', `${loanSoon.length} khoản trong 7 ngày tới: ${loanSoon.map(l => l.borrowerName).join(', ')}`, 'pingpay-loan-soon');
+                if (loanOverdue.length) this.notify('💰 Khoản cho vay quá hạn thu!', `${loanOverdue.length} khoản: ${loanOverdue.map(l => this.loanTitle(l)).join(', ')}`, 'pingpay-loan-overdue', true);
+                if (loanSoon.length) this.notify('📅 Khoản cho vay sắp đến hạn thu', `${loanSoon.length} khoản trong 7 ngày tới: ${loanSoon.map(l => this.loanTitle(l)).join(', ')}`, 'pingpay-loan-soon');
             },
             startNotificationCheck() {
                 this.checkAndSendNotifications();
