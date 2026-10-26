@@ -629,6 +629,20 @@
             </div>
 
             <div class="panel">
+                <div class="panel-header"><h2>📥 Nhập hàng loạt từ sao kê</h2></div>
+                <div class="step-hint">Mỗi dòng một giao dịch: <strong>ngày | số tiền | mô tả | danh mục</strong> (danh mục có thể bỏ trống, app tự đoán). Giao dịch đã có (trùng thẻ + ngày + số tiền + mô tả) sẽ được bỏ qua.</div>
+                <div class="form-group">
+                    <label>Thẻ</label>
+                    <select id="bulkCard"></select>
+                </div>
+                <div class="form-group">
+                    <label>Danh sách giao dịch</label>
+                    <textarea id="bulkText" rows="6" placeholder="25/10/2026 | 50.000 | EVERY HALF COFFEE | dining"></textarea>
+                </div>
+                <button class="btn btn-sm" onclick="app.bulkImport()">📥 Nhập vào thẻ</button>
+            </div>
+
+            <div class="panel">
                 <div class="panel-header">
                     <h2>📜 Lịch sử giao dịch</h2>
                     <div class="filter-bar">
@@ -1619,6 +1633,12 @@
                 const prev = filter.value;
                 filter.innerHTML = `<option value="">Tất cả thẻ</option>` + this.cards.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
                 filter.value = prev;
+                const bulk = document.getElementById('bulkCard');
+                if (bulk) {
+                    const pb = bulk.value;
+                    bulk.innerHTML = `<option value="">— Chọn thẻ —</option>` + this.cards.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+                    bulk.value = pb;
+                }
             },
 
             // Rank cards by cashback for the current amount + category.
@@ -1722,6 +1742,87 @@
                 } catch (e) {
                     console.error('recordTransaction:', e);
                     this.showMessage('Lỗi khi ghi giao dịch — kiểm tra kết nối rồi thử lại', true);
+                }
+            },
+
+            // Nhập nhiều giao dịch một lần (dán từ sao kê). Một runTransaction cho cả lô để
+            // dư nợ/hoàn tiền cộng dồn đúng, không bị ghi đè như khi ghi lần lượt.
+            guessCategory(desc) {
+                const d = desc.toUpperCase();
+                const rules = [
+                    ['dining', /COFFEE|CAFE|HIGHLANDS|PHUC LONG|STARBUCKS|KFC|PIZZA|NHA HANG|BUN|PHO/],
+                    ['grocery', /MART|AEON|COOP|BACH HOA|WINMART|LOTTE|EMART|MUJI/],
+                    ['travel', /GREEN SM|GRAB|BE |XANH SM|VIETJET|VIETNAM AIRLINES|HOTEL|AGODA/],
+                    ['health', /NHC|PHARMA|HOSPITAL|BENH VIEN|LONG CHAU|PHARMACITY|CLINIC/],
+                    ['online', /OPENAI|SHOPEE|LAZADA|TIKI|GOOGLE|APPLE|NETFLIX|SPOTIFY/],
+                    ['bills', /EVN|VNPT|VIETTEL|FPT|NUOC|DIEN/],
+                    ['entertainment', /CGV|CINEMA|GALAXY|BHD/],
+                ];
+                const hit = rules.find(([, re]) => re.test(d));
+                return hit ? hit[0] : 'other';
+            },
+
+            parseBulkLines(text) {
+                const keys = CATEGORIES.map(c => c.key);
+                const rows = [], errors = [];
+                text.split('\n').map(l => l.trim()).filter(Boolean).forEach((line, i) => {
+                    const [dStr, aStr, desc = '', catStr = ''] = line.split('|').map(x => x.trim());
+                    const m = (dStr || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+                    const amount = num((aStr || '').replace(/[^\d]/g, ''));
+                    if (!m || !amount) { errors.push(`Dòng ${i + 1}: "${line}"`); return; }
+                    const date = `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+                    const category = keys.includes(catStr) ? catStr : this.guessCategory(desc);
+                    rows.push({ date, amount, description: desc, category });
+                });
+                return { rows, errors };
+            },
+
+            async bulkImport() {
+                const cardId = document.getElementById('bulkCard').value;
+                const card = this.cards.find(c => c.id === cardId);
+                if (!card) return alert('Vui lòng chọn thẻ');
+                const { rows, errors } = this.parseBulkLines(document.getElementById('bulkText').value);
+                if (errors.length) return alert('Không đọc được:\n' + errors.join('\n'));
+                const sig = t => `${t.cardId}|${t.date}|${num(t.amount)}|${(t.description || '').trim()}`;
+                const existing = new Set(this.transactions.map(sig));
+                const fresh = rows.filter(r => !existing.has(sig({ ...r, cardId })));
+                const skipped = rows.length - fresh.length;
+                if (!fresh.length) return this.showMessage(`Không có giao dịch mới (bỏ qua ${skipped} trùng)`);
+                const total = fresh.reduce((s, r) => s + r.amount, 0);
+                if (!confirm(`Ghi ${fresh.length} giao dịch, tổng ${fmtVND(total)} vào thẻ ${card.name}?${skipped ? `\n(Bỏ qua ${skipped} giao dịch đã có)` : ''}`)) return;
+                try {
+                    let cashbackTotal = 0;
+                    await runTransaction(db, async (t) => {
+                        const cardRef = doc(db, 'cards', cardId);
+                        const snap = await t.get(cardRef);
+                        if (!snap.exists()) throw new Error('Thẻ không tồn tại');
+                        let state = { id: cardId, ...snap.data() };
+                        cashbackTotal = 0;
+                        for (const r of fresh) {
+                            const cb = this.computeCashback(state, r.category, r.amount).cashback;
+                            cashbackTotal += cb;
+                            t.set(doc(collection(db, 'transactions')), {
+                                userId: this.currentUser.uid,
+                                cardId, cardName: state.name || card.name,
+                                amount: r.amount, category: r.category, description: r.description,
+                                date: r.date, cashbackEarned: cb,
+                                createdAt: new Date().toISOString(),
+                            });
+                            state = { ...state, ...this.buildCardUpdateForTransaction(state, r.category, r.amount, cb) };
+                        }
+                        const { id, ...update } = state;
+                        t.update(cardRef, {
+                            cashbackCategories: update.cashbackCategories,
+                            cashbackCycle: update.cashbackCycle,
+                            currentBalance: update.currentBalance,
+                            updatedAt: update.updatedAt,
+                        });
+                    });
+                    document.getElementById('bulkText').value = '';
+                    this.showMessage(`Đã nhập ${fresh.length} giao dịch · ${fmtVND(total)} · hoàn ${fmtVND(cashbackTotal)}${skipped ? ` · bỏ qua ${skipped} trùng` : ''}`);
+                } catch (e) {
+                    console.error('bulkImport:', e);
+                    this.showMessage('Lỗi khi nhập giao dịch — kiểm tra kết nối rồi thử lại', true);
                 }
             },
 
