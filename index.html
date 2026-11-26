@@ -282,7 +282,7 @@
         .item-card:has(details.menu[open]), .borrower-group:has(details.menu[open]), .tx-row:has(details.menu[open]) { position: relative; z-index: 40; }
         .status-urgent { background: var(--danger); color: #fff; }
 
-        /* Khối thu gọn (hoàn tiền, ghi chú, lịch sử trả) */
+        /* Khối thu gọn (hoàn tiền, lịch sử trả) */
         .fold { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
         .fold > summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--ink-2); list-style: none; display: flex; justify-content: space-between; gap: 8px; }
         .fold > summary::-webkit-details-marker { display: none; }
@@ -363,6 +363,62 @@
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-thumb { background: #d4d4d8; border-radius: 4px; }
 
+        /* ---------- Ô nhập tiền + bảng tính ---------- */
+        input.money { font-variant-numeric: tabular-nums; }
+        input.money.invalid { border-color: var(--danger) !important; box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12); }
+        /* Máy tính: neo ở góc dưới màn hình để không che các ô kế bên ô đang nhập. */
+        .calc {
+            position: fixed; right: 16px; bottom: 16px; z-index: 9000; width: 272px; background: var(--white);
+            border: 1px solid var(--border); border-radius: var(--radius); padding: 10px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.16); user-select: none; -webkit-user-select: none;
+        }
+        .calc.sheet {
+            position: fixed; left: 0; right: 0; bottom: 0; width: 100%;
+            border-radius: 16px 16px 0 0; border-width: 1px 0 0;
+            padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+            box-shadow: 0 -8px 28px rgba(0,0,0,0.14);
+        }
+        .calc-display { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 2px 4px 10px; }
+        .calc-label { font-size: 12px; color: var(--gray); font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .calc-result { text-align: right; flex-shrink: 0; }
+        .calc-result .r { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; }
+        .calc-result .w { font-size: 11px; color: var(--gray); min-height: 15px; }
+        .calc-keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .calc-keys button {
+            height: 42px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--white);
+            font-size: 17px; font-weight: 600; font-family: inherit; color: var(--dark); cursor: pointer; touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .calc.sheet .calc-keys button { height: 46px; font-size: 20px; }
+        .calc-keys button:active { background: var(--border); }
+        .calc-keys button.op { background: var(--light); color: var(--ink-2); }
+        .calc-keys button.eq { background: var(--dark); border-color: var(--dark); color: #fff; }
+        .calc-keys button.done { grid-column: 1 / -1; background: var(--success); border-color: var(--success); color: #fff; font-size: 15px; }
+
+        /* Giao dịch quẹt thẻ rút tiền */
+        .check-line { display: flex; align-items: center; gap: 10px; font-size: 14px; margin: 0 0 14px; cursor: pointer; }
+        .check-line input { width: 18px; height: 18px; accent-color: var(--primary); flex-shrink: 0; }
+        .cash-box { border: 1px solid var(--border); border-left: 3px solid var(--warning); border-radius: var(--radius-sm); padding: 14px 14px 4px; margin-bottom: 16px; background: var(--warning-soft); }
+        .cash-preview { font-size: 13px; color: var(--ink-2); margin: -4px 0 10px; }
+        .cash-preview strong { color: var(--dark); }
+        .badge-cash { background: var(--warning-soft); color: var(--warning); }
+
+        /* Báo cáo lãi cho vay (tab Tổng quan) */
+        .stats-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+        .report-block { margin-top: 14px; border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+        .report-title { font-size: 14px; font-weight: 700; display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+        .report-title .t { color: var(--gray); font-weight: 600; font-size: 13px; }
+        .report-row { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+        .report-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .report-row .l { min-width: 0; flex: 1; }
+        .report-row .l .s { font-size: 12px; color: var(--gray); margin-top: 2px; word-break: break-word; }
+        .report-row .v { font-weight: 800; white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; }
+        .report-row .v .s { font-size: 12px; color: var(--gray); font-weight: 500; margin-top: 2px; }
+        .report-row.total { border-top: 2px solid var(--dark); border-bottom: none; margin-top: 2px; }
+        .month-bar { height: 5px; background: var(--light); border-radius: 3px; overflow: hidden; margin-top: 6px; max-width: 260px; }
+        .month-bar > div { height: 100%; background: var(--success); border-radius: 3px; }
+        .settled-toggle { display: flex; justify-content: center; margin-top: 6px; }
+
         /* ---------- Mobile ---------- */
         @media (max-width: 640px) {
             .container { padding: 12px; }
@@ -370,7 +426,9 @@
             .brand h1 { font-size: 18px; }
             .brand p { display: none; }
             .panel-header h2 { font-size: 17px; }
-            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .stats-grid, .stats-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+            .stat-item { padding: 14px 12px; }
+            .stat-number { font-size: 18px; }   /* số hàng trăm triệu vẫn nằm trên một dòng */
             .info-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
             .cashback-row { grid-template-columns: 1fr 1fr; }
             .cashback-row.header { display: none; }
@@ -492,7 +550,6 @@
             <button class="tab-btn" data-tab="cards" onclick="app.switchTab('cards')">💳 Thẻ tín dụng</button>
             <button class="tab-btn" data-tab="transactions" onclick="app.switchTab('transactions')">💸 Giao dịch</button>
             <button class="tab-btn" data-tab="loans" onclick="app.switchTab('loans')">🤝 Cho vay</button>
-            <button class="tab-btn" data-tab="notes" onclick="app.switchTab('notes')">📝 Ghi chú</button>
         </div>
 
         <!-- ============ TAB: DASHBOARD ============ -->
@@ -554,21 +611,21 @@
                     <div class="form-row-3">
                         <div class="form-group">
                             <label>Hạn mức (₫)</label>
-                            <input type="number" id="creditLimit" placeholder="0" min="0">
+                            <input type="text" class="money" inputmode="numeric" autocomplete="off" id="creditLimit" placeholder="0">
                         </div>
                         <div class="form-group">
                             <label>Dư nợ hiện tại (₫)</label>
-                            <input type="number" id="currentBalance" placeholder="0" min="0">
+                            <input type="text" class="money" inputmode="numeric" autocomplete="off" id="currentBalance" placeholder="0">
                         </div>
                         <div class="form-group">
                             <label>Cần thanh toán kỳ này (₫)</label>
-                            <input type="number" id="statementAmount" placeholder="0" min="0">
+                            <input type="text" class="money" inputmode="numeric" autocomplete="off" id="statementAmount" placeholder="0">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Thanh toán tối thiểu (₫)</label>
-                            <input type="number" id="minimumPayment" placeholder="0" min="0">
+                            <input type="text" class="money" inputmode="numeric" autocomplete="off" id="minimumPayment" placeholder="0">
                         </div>
                         <div class="form-group">
                             <label>Hoàn tiền mặc định (% cho danh mục khác)</label>
@@ -606,12 +663,37 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Số tiền giao dịch (₫)</label>
-                        <input type="number" id="txAmount" placeholder="0" min="0" oninput="app.refreshSuggestions()">
+                        <input type="text" class="money" inputmode="numeric" autocomplete="off" id="txAmount" placeholder="0" oninput="app.onTxAmountInput()">
                     </div>
                     <div class="form-group">
                         <label>Danh mục chi tiêu</label>
                         <select id="txCategory" onchange="app.refreshSuggestions()"></select>
+                        <small id="txCategoryHint" class="hidden">Chọn danh mục mà giao dịch quẹt được ghi nhận — hoàn tiền tính theo danh mục này.</small>
                     </div>
+                </div>
+                <label class="check-line">
+                    <input type="checkbox" id="txIsCash" onchange="app.onTxCashToggle()">
+                    <span>💵 Đây là giao dịch <strong>quẹt thẻ rút tiền</strong></span>
+                </label>
+                <div id="txCashFields" class="cash-box hidden">
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label>Phí quẹt (%)</label>
+                            <input type="number" id="txFeeRate" placeholder="VD: 1,8" min="0" step="0.01" inputmode="decimal" oninput="app.updateCashPreview()">
+                        </div>
+                        <div class="form-group">
+                            <label>Hình thức</label>
+                            <select id="txPayType" onchange="app.onTxCashToggle()">
+                                <option value="one_time">Quẹt 1 lần</option>
+                                <option value="installment">Trả góp</option>
+                            </select>
+                        </div>
+                        <div class="form-group hidden" id="txInstallGroup">
+                            <label>Số tháng trả góp</label>
+                            <input type="number" id="txInstallMonths" placeholder="VD: 6" min="1" step="1" inputmode="numeric" oninput="app.updateCashPreview()">
+                        </div>
+                    </div>
+                    <div id="txCashPreview" class="cash-preview"></div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -660,7 +742,7 @@
                         </div>
                         <div class="form-group">
                             <label>Số tiền cho vay (gốc, ₫)</label>
-                            <input type="number" id="loanPrincipal" placeholder="0" min="0">
+                            <input type="text" class="money" inputmode="numeric" autocomplete="off" id="loanPrincipal" placeholder="0">
                         </div>
                     </div>
                     <div class="form-group">
@@ -701,10 +783,6 @@
                             <input type="number" id="loanTerm" placeholder="0" min="0">
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label>Ghi chú</label>
-                        <textarea id="loanNote" rows="2" placeholder="Ghi chú về khoản vay..."></textarea>
-                    </div>
                     <div class="row-flex">
                         <button class="btn btn-success" onclick="app.saveLoan()">💾 Lưu khoản vay</button>
                         <button class="btn btn-secondary" onclick="app.hideLoanForm()">Hủy</button>
@@ -712,32 +790,6 @@
                 </div>
 
                 <div id="loansList"></div>
-            </div>
-        </div>
-
-        <!-- ============ TAB: NOTES ============ -->
-        <div id="tab-notes" class="tab-content">
-            <div class="panel">
-                <div class="panel-header">
-                    <h2>📝 Ghi chú</h2>
-                    <button class="btn btn-success" onclick="app.showNoteForm()">➕ Thêm ghi chú</button>
-                </div>
-                <div id="noteForm" class="hidden inline-form">
-                    <h3 id="noteFormTitle" class="section-title" style="margin-top:0;">Thêm ghi chú mới</h3>
-                    <div class="form-group">
-                        <label>Tiêu đề</label>
-                        <input type="text" id="noteTitle" placeholder="Nhập tiêu đề ghi chú">
-                    </div>
-                    <div class="form-group">
-                        <label>Nội dung</label>
-                        <textarea id="noteContent" rows="4" placeholder="Nhập nội dung ghi chú..."></textarea>
-                    </div>
-                    <div class="row-flex">
-                        <button class="btn btn-success" onclick="app.saveNote()">💾 Lưu</button>
-                        <button class="btn btn-secondary" onclick="app.hideNoteForm()">Hủy</button>
-                    </div>
-                </div>
-                <div id="notesList"></div>
             </div>
         </div>
     </div>
@@ -769,6 +821,7 @@
             { key: 'dining',        label: 'Ăn uống',            icon: '🍜' },
             { key: 'grocery',       label: 'Siêu thị',           icon: '🛒' },
             { key: 'online',        label: 'Mua sắm online',     icon: '🛍️' },
+            { key: 'instore',       label: 'Mua sắm tại cửa hàng', icon: '🏬' },
             { key: 'travel',        label: 'Du lịch',            icon: '✈️' },
             { key: 'fuel',          label: 'Xăng dầu',           icon: '⛽' },
             { key: 'bills',         label: 'Hóa đơn & tiện ích', icon: '🧾' },
@@ -808,6 +861,259 @@
             .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 
+        // ============================================================
+        //  Ô NHẬP TIỀN: dấu chấm hàng nghìn + phép tính + bảng tính
+        // ============================================================
+        const groupDigits = (s) => String(s).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        // Tính biểu thức kiểu máy tính bỏ túi: + − × ÷, ngoặc, %, dấu phẩy thập phân,
+        // dấu chấm ngăn hàng nghìn. Trả null nếu chưa hợp lệ. Không dùng eval.
+        // Quy ước %: "100 + 10%" = 110, "100 − 10%" = 90, "100 × 10%" = 10.
+        const evalExpr = (raw) => {
+            const s = String(raw == null ? '' : raw)
+                .replace(/[\s.]/g, '').replace(/,/g, '.')
+                .replace(/[×xX*]/g, '*').replace(/[÷:/]/g, '/').replace(/[−–]/g, '-');
+            if (!s) return null;
+            let i = 0;
+            const fail = () => { throw new Error('expr'); };
+            let expr;
+            const factor = () => {
+                if (s[i] === '-') { i++; return { v: -factor().v, pct: false }; }
+                let v;
+                if (s[i] === '(') { i++; v = expr(); if (s[i] !== ')') fail(); i++; }
+                else {
+                    const m = /^(\d+(\.\d*)?|\.\d+)/.exec(s.slice(i));
+                    if (!m) fail();
+                    v = Number(m[0]); i += m[0].length;
+                }
+                let pct = false;
+                while (s[i] === '%') { i++; v /= 100; pct = true; }
+                return { v, pct };
+            };
+            const term = () => {
+                let t = factor();
+                while (s[i] === '*' || s[i] === '/') {
+                    const op = s[i++]; const f = factor();
+                    if (op === '/' && f.v === 0) fail();
+                    t = { v: op === '*' ? t.v * f.v : t.v / f.v, pct: false };
+                }
+                return t;
+            };
+            expr = () => {
+                let acc = term().v;
+                while (s[i] === '+' || s[i] === '-') {
+                    const op = s[i++]; const t = term();
+                    const rhs = t.pct ? acc * t.v : t.v;
+                    acc = op === '+' ? acc + rhs : acc - rhs;
+                }
+                return acc;
+            };
+            try { const v = expr(); return (i === s.length && Number.isFinite(v)) ? v : null; }
+            catch (e) { return null; }
+        };
+        // Bỏ phép tính đang gõ dở ở cuối ("100.000 ×" → "100.000") để giá trị luôn đọc được.
+        const trimExpr = (v) => String(v == null ? '' : v).replace(/[+\-−–×xX*÷:/,(\s]+$/, '');
+        // Đọc số tiền từ ô nhập (chấp nhận "1.500.000" lẫn "1.500.000 × 3") → số nguyên đồng, không âm.
+        const parseMoney = (v) => {
+            if (typeof v === 'number') return Number.isFinite(v) && v > 0 ? Math.round(v) : 0;
+            const r = evalExpr(trimExpr(v));
+            return r == null || r < 0 ? 0 : Math.round(r);
+        };
+        // Số đã lưu → chuỗi hiển thị trong ô nhập ("1.500.000"; 0 → để trống).
+        const fmtMoneyInput = (n) => { const x = Math.round(Number(n) || 0); return x > 0 ? groupDigits(x) : ''; };
+        const moneyVal = (id) => parseMoney(document.getElementById(id)?.value);
+        const setMoney = (id, n) => { const el = document.getElementById(id); if (el) { el.value = fmtMoneyInput(n); el.classList.remove('invalid'); } };
+        // Chuẩn hoá chuỗi đang gõ: đổi * / thành × ÷, bỏ ký tự lạ, chèn dấu chấm hàng nghìn.
+        const prettyExpr = (raw) => String(raw)
+            .replace(/[*xX]/g, '×').replace(/[/:]/g, '÷').replace(/[-–]/g, '−')
+            .replace(/[^\d.,+−×÷%()]/g, '')
+            .replace(/[\d.]+(,[\d.]*)?/g, (run) => {
+                const [int, dec] = run.split(',');
+                const d = int.replace(/\./g, '').replace(/^0+(?=\d)/, '');
+                return groupDigits(d) + (dec !== undefined ? ',' + dec.replace(/\./g, '') : '');
+            });
+        // Định dạng lại ngay khi gõ, giữ con trỏ đúng chỗ.
+        const liveFormat = (input) => {
+            const old = input.value;
+            const next = prettyExpr(old);
+            if (next === old) return;
+            const pos = input.selectionStart ?? old.length;
+            const sig = prettyExpr(old.slice(0, pos)).replace(/\./g, '').length;
+            input.value = next;
+            let p = 0, seen = 0;
+            while (p < next.length && seen < sig) { if (next[p] !== '.') seen++; p++; }
+            try { input.setSelectionRange(p, p); } catch (e) { /* ô chưa hiển thị */ }
+        };
+        // Chốt giá trị khi rời ô / bấm "=": thay phép tính bằng kết quả đã làm tròn.
+        const commitMoney = (input) => {
+            const raw = trimExpr(input.value);
+            if (!raw) { input.value = ''; input.classList.remove('invalid'); return true; }
+            const r = evalExpr(raw);
+            if (r == null || r < 0) { input.classList.add('invalid'); return false; }
+            input.classList.remove('invalid');
+            input.value = fmtMoneyInput(r);
+            return true;
+        };
+        // Đọc nhanh độ lớn: 1.800.000 → "1,8 triệu".
+        const shortVN = (n) => {
+            const f = (x) => String(Math.round(x * 100) / 100).replace('.', ',');
+            if (n >= 1e9) return `${f(n / 1e9)} tỷ`;
+            if (n >= 1e6) return `${f(n / 1e6)} triệu`;
+            if (n >= 1e3) return `${f(n / 1e3)} nghìn`;
+            return '';
+        };
+        const fmtPct = (n) => String(Math.round(num(n) * 100) / 100).replace('.', ',');
+        // Điện thoại: bảng tính thay bàn phím hệ thống (inputmode=none). Máy tính: gõ phím bình thường.
+        const IS_TOUCH = window.matchMedia('(pointer: coarse)').matches;
+        const MONEY_MODE = IS_TOUCH ? 'none' : 'numeric';
+        const moneyInput = (id, value, attrs = '') =>
+            `<input type="text" class="money" inputmode="${MONEY_MODE}" autocomplete="off" id="${id}" value="${fmtMoneyInput(value)}" placeholder="0" ${attrs}>`;
+
+        const calc = {
+            el: null, input: null, lastPress: 0, padTimer: null, watch: null,
+            build() {
+                const keys = [
+                    ['C', 'op'], ['⌫', 'op'], ['%', 'op'], ['÷', 'op'],
+                    ['7'], ['8'], ['9'], ['×', 'op'],
+                    ['4'], ['5'], ['6'], ['−', 'op'],
+                    ['1'], ['2'], ['3'], ['+', 'op'],
+                    ['0'], ['000'], [','], ['=', 'eq'],
+                ];
+                const el = document.createElement('div');
+                el.className = 'calc hidden' + (IS_TOUCH ? ' sheet' : '');
+                el.innerHTML = `
+                    <div class="calc-display">
+                        <div class="calc-label" id="calcLabel"></div>
+                        <div class="calc-result"><div class="r" id="calcResult">—</div><div class="w" id="calcWords"></div></div>
+                    </div>
+                    <div class="calc-keys">
+                        ${keys.map(([k, cls]) => `<button type="button" tabindex="-1" data-k="${k}" class="${cls || ''}">${k}</button>`).join('')}
+                        <button type="button" tabindex="-1" data-k="done" class="done">Xong</button>
+                    </div>`;
+                // pointerdown + preventDefault: bấm phím mà ô nhập không mất con trỏ.
+                el.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                    const b = e.target.closest('button[data-k]');
+                    if (b) this.press(b.dataset.k);
+                });
+                el.addEventListener('mousedown', (e) => e.preventDefault());
+                document.body.appendChild(el);
+                this.el = el;
+            },
+            open(input) {
+                if (!this.el) this.build();
+                clearTimeout(this.padTimer);
+                this.input = input;
+                const label = input.dataset.label || input.closest('.form-group')?.querySelector('label')?.textContent || 'Số tiền';
+                document.getElementById('calcLabel').textContent = label.replace(/\s*\(₫\)\s*/, '');
+                this.el.classList.remove('hidden');
+                this.refresh();
+                this.place();
+                clearInterval(this.watch);
+                // Ô bị vẽ lại/xoá khỏi trang (dữ liệu vừa đồng bộ) thì đóng bảng tính.
+                this.watch = setInterval(() => { if (!this.input || !this.input.isConnected) this.close(); }, 400);
+            },
+            place() {
+                const inp = this.input; if (!inp) return;
+                if (IS_TOUCH) {
+                    const h = this.el.offsetHeight;
+                    document.body.style.paddingBottom = h + 'px';
+                    const r = inp.getBoundingClientRect();
+                    const over = r.bottom + 16 - (window.innerHeight - h);
+                    if (over > 0) window.scrollBy({ top: over, behavior: 'smooth' });
+                    return;
+                }
+                // Mặc định neo góc dưới-phải; nếu đè lên ô đang nhập thì chuyển sang góc dưới-trái.
+                const r = inp.getBoundingClientRect();
+                const w = this.el.offsetWidth, h = this.el.offsetHeight;
+                const vw = document.documentElement.clientWidth, vh = window.innerHeight;
+                const hitsRight = r.right > vw - w - 24 && r.bottom > vh - h - 24;
+                this.el.style.right = hitsRight ? 'auto' : '16px';
+                this.el.style.left = hitsRight ? '16px' : 'auto';
+            },
+            close() {
+                clearInterval(this.watch);
+                this.input = null;
+                if (!this.el) return;
+                this.el.classList.add('hidden');
+                // Gỡ khoảng đệm chậm một nhịp để cú chạm đang diễn ra không bị lệch vị trí.
+                clearTimeout(this.padTimer);
+                this.padTimer = setTimeout(() => { document.body.style.paddingBottom = ''; }, 250);
+            },
+            refresh() {
+                if (!this.input || !this.el) return;
+                const raw = trimExpr(this.input.value);
+                const r = raw ? evalExpr(raw) : null;
+                const ok = r != null && r >= 0;
+                const n = ok ? Math.round(r) : 0;
+                document.getElementById('calcResult').textContent = ok ? `= ${groupDigits(n)} ₫` : (raw ? 'Chưa hợp lệ' : '—');
+                document.getElementById('calcWords').textContent = ok ? shortVN(n) : '';
+            },
+            press(k) {
+                const inp = this.input;
+                if (!inp || !inp.isConnected) return this.close();
+                if (k === 'done') { this.lastPress = 0; commitMoney(inp); inp.blur(); this.close(); return; }
+                this.lastPress = Date.now();
+                if (document.activeElement !== inp) inp.focus({ preventScroll: true });
+                let v = inp.value;
+                let a = inp.selectionStart ?? v.length, b = inp.selectionEnd ?? v.length;
+                const isOp = '+−×÷'.includes(k);
+                if (k === '=') {
+                    commitMoney(inp);
+                    a = b = inp.value.length;
+                    try { inp.setSelectionRange(a, a); } catch (e) { /* bỏ qua */ }
+                    inp.dispatchEvent(new Event('input', { bubbles: true }));
+                    return;
+                }
+                if (k === 'C') { v = ''; a = 0; }
+                else if (k === '⌫') {
+                    if (a === b && a > 0) { let c = a - 1; if (v[c] === '.' && c > 0) c--; v = v.slice(0, c) + v.slice(b); a = c; }
+                    else if (a !== b) { v = v.slice(0, a) + v.slice(b); }
+                } else {
+                    // Đang chọn cả ô mà bấm phép tính/% → tính tiếp trên số đang có, không xoá.
+                    if ((isOp || k === '%') && a === 0 && b === v.length && v) a = b;
+                    // Không cho 2 phép tính liền nhau: phép sau thay phép trước.
+                    if (isOp && a === b && a > 0 && '+−×÷'.includes(v[a - 1])) { v = v.slice(0, a - 1) + v.slice(a); a--; b--; }
+                    v = v.slice(0, a) + k + v.slice(b);
+                    a += k.length;
+                }
+                inp.value = v;
+                try { inp.setSelectionRange(a, a); } catch (e) { /* bỏ qua */ }
+                inp.dispatchEvent(new Event('input', { bubbles: true }));   // định dạng lại + cập nhật gợi ý
+            },
+        };
+
+        document.addEventListener('focusin', (e) => {
+            if (e.target.matches && e.target.matches('input.money')) calc.open(e.target);
+        });
+        document.addEventListener('focusout', (e) => {
+            const inp = e.target;
+            if (!(inp.matches && inp.matches('input.money'))) return;
+            // Vừa bấm phím trên bảng tính mà ô bị mất con trỏ (một số trình duyệt di động) → lấy lại.
+            if (calc.input === inp && Date.now() - calc.lastPress < 400 && inp.isConnected) {
+                setTimeout(() => inp.focus({ preventScroll: true }), 0);
+                return;
+            }
+            commitMoney(inp);
+            setTimeout(() => { if (calc.input === inp && document.activeElement !== inp) calc.close(); }, 0);
+        });
+        document.addEventListener('input', (e) => {
+            if (!(e.target.matches && e.target.matches('input.money'))) return;
+            liveFormat(e.target);
+            e.target.classList.remove('invalid');
+            if (calc.input === e.target) calc.refresh();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (!(e.target.matches && e.target.matches('input.money'))) return;
+            if (e.key === 'Enter' || e.key === '=') {
+                e.preventDefault();
+                commitMoney(e.target);
+                e.target.dispatchEvent(new Event('input', { bubbles: true }));
+            } else if (e.key === 'Escape') { calc.close(); }
+        });
+        window.addEventListener('resize', () => { if (calc.input) calc.place(); });
+        window.addEventListener('scroll', () => { if (calc.input && !IS_TOUCH) calc.place(); }, { passive: true });
+        if (IS_TOUCH) document.querySelectorAll('input.money').forEach(i => i.setAttribute('inputmode', 'none'));
+
         const app = {
             currentUser: null,
             activeTab: 'dashboard',
@@ -815,13 +1121,12 @@
             transactions: [],
             loans: [],
             loanRepayments: {},   // grouped by loanId
-            notes: [],
-            cardNotes: {},
             editingCardId: null,
             editingLoanId: null,
-            editingNoteId: null,
             editingTxId: null,
             editingRepId: null,
+            showSettledLoans: false,   // khoản đã tất toán: mặc định ẩn
+            showAllMonths: false,
             cashbackDraft: [],     // working list of cashback categories in the card form
             notificationsEnabled: false,
             notificationCheckInterval: null,
@@ -900,36 +1205,13 @@
                     },
                     (err) => console.error('loanRepayments listener:', err)
                 );
-
-                this.unsub.cardNotes = onSnapshot(
-                    query(collection(db, 'cardNotes'), where('userId', '==', uid), orderBy('createdAt', 'desc')),
-                    (snap) => {
-                        const grouped = {};
-                        snap.docs.forEach(d => {
-                            const n = { id: d.id, ...d.data() };
-                            (grouped[n.cardId] = grouped[n.cardId] || []).push(n);
-                        });
-                        this.cardNotes = grouped;
-                        this.renderCards();
-                    },
-                    (err) => console.error('cardNotes listener:', err)
-                );
-
-                this.unsub.notes = onSnapshot(
-                    query(collection(db, 'notes'), where('userId', '==', uid), orderBy('createdAt', 'desc')),
-                    (snap) => {
-                        this.notes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-                        this.renderNotes();
-                    },
-                    (err) => console.error('notes listener:', err)
-                );
             },
 
             unsubscribeData() {
                 Object.values(this.unsub).forEach(fn => { if (typeof fn === 'function') fn(); });
                 this.unsub = {};
                 this.cards = []; this.transactions = []; this.loans = [];
-                this.loanRepayments = {}; this.notes = []; this.cardNotes = {};
+                this.loanRepayments = {};
             },
 
             // ---------- UI plumbing ----------
@@ -1195,7 +1477,8 @@
                 document.getElementById('dueDate').value = '';
                 document.getElementById('transactionDate').value = '';
                 document.getElementById('daysToAdd').value = '20';
-                ['creditLimit', 'currentBalance', 'statementAmount', 'minimumPayment', 'cashbackDefaultRate', 'statementDayFixed', 'creditGroup'].forEach(id => document.getElementById(id).value = '');
+                ['cashbackDefaultRate', 'statementDayFixed', 'creditGroup'].forEach(id => document.getElementById(id).value = '');
+                ['creditLimit', 'currentBalance', 'statementAmount', 'minimumPayment'].forEach(id => setMoney(id, 0));
                 this.populateCreditGroupList();
                 this.onCardTypeChange();
                 this.renderCashbackEditor();
@@ -1253,7 +1536,7 @@
                     <div class="cashback-row">
                         <select id="cb-cat-${i}">${opts(row.category)}</select>
                         <input type="number" id="cb-rate-${i}" placeholder="%" min="0" step="0.1" value="${row.rate ?? ''}">
-                        <input type="number" id="cb-cap-${i}" placeholder="0 = không giới hạn" min="0" value="${row.cap ?? ''}">
+                        <input type="text" class="money" inputmode="${MONEY_MODE}" autocomplete="off" id="cb-cap-${i}" data-label="Mức hoàn tối đa mỗi tháng" placeholder="0 = không giới hạn" value="${fmtMoneyInput(parseMoney(row.cap ?? 0))}">
                         <button class="btn btn-sm btn-danger" onclick="app.removeCashbackRow(${i})">✕</button>
                     </div>
                 `).join('');
@@ -1269,10 +1552,10 @@
                 document.getElementById('dueDate').value = card.originalDueDate || '';
                 document.getElementById('transactionDate').value = card.transactionDate || '';
                 document.getElementById('daysToAdd').value = card.daysToAdd || 20;
-                document.getElementById('creditLimit').value = card.creditLimit || '';
-                document.getElementById('currentBalance').value = card.currentBalance || '';
-                document.getElementById('statementAmount').value = card.statementAmount || '';
-                document.getElementById('minimumPayment').value = card.minimumPayment || '';
+                setMoney('creditLimit', card.creditLimit);
+                setMoney('currentBalance', card.currentBalance);
+                setMoney('statementAmount', card.statementAmount);
+                setMoney('minimumPayment', card.minimumPayment);
                 document.getElementById('cashbackDefaultRate').value = card.cashbackDefaultRate || '';
                 document.getElementById('statementDayFixed').value = card.statementDay || '';
                 document.getElementById('creditGroup').value = card.creditGroup || '';
@@ -1296,15 +1579,15 @@
                 const existingCats = existing?.cashbackCategories || [];
                 const cashbackCategories = this.cashbackDraft.map(r => {
                     const prev = existingCats.find(c => c.category === r.category);
-                    return { category: r.category, rate: num(r.rate), cap: num(r.cap), earned: prev ? num(prev.earned) : 0 };
+                    return { category: r.category, rate: num(r.rate), cap: parseMoney(r.cap ?? 0), earned: prev ? num(prev.earned) : 0 };
                 });
 
                 const data = {
                     name, type,
-                    creditLimit: num(document.getElementById('creditLimit').value),
-                    currentBalance: num(document.getElementById('currentBalance').value),
-                    statementAmount: num(document.getElementById('statementAmount').value),
-                    minimumPayment: num(document.getElementById('minimumPayment').value),
+                    creditLimit: moneyVal('creditLimit'),
+                    currentBalance: moneyVal('currentBalance'),
+                    statementAmount: moneyVal('statementAmount'),
+                    minimumPayment: moneyVal('minimumPayment'),
                     cashbackDefaultRate: num(document.getElementById('cashbackDefaultRate').value),
                     creditGroup: document.getElementById('creditGroup').value.trim() || null,
                     cashbackCategories,
@@ -1372,7 +1655,7 @@
                 if (!form.classList.contains('hidden')) {
                     const card = this.cards.find(c => c.id === cardId);
                     const input = document.getElementById(`pay-amount-${cardId}`);
-                    if (input) { input.value = num(card?.statementAmount) || ''; input.focus(); input.select(); }
+                    if (input) { input.value = fmtMoneyInput(card?.statementAmount); input.focus(); input.select(); }
                 }
             },
 
@@ -1383,7 +1666,7 @@
                 const today = new Date();
                 const due = num(card.statementAmount);
                 const input = document.getElementById(`pay-amount-${cardId}`);
-                const paidAmount = input ? num(input.value) : due;
+                const paidAmount = input ? parseMoney(input.value) : due;
                 if (!paidAmount || paidAmount <= 0) return alert('Vui lòng nhập số tiền đã thanh toán');
                 const balanceAfter = Math.max(0, num(card.currentBalance) - paidAmount);
                 if (paidAmount < due) {
@@ -1531,35 +1814,12 @@
                             </div>
                         </details>` : '';
 
-                    // (5) Ghi chú: chỉ hiện khi có ghi chú hoặc đang thêm (thêm qua menu ⋯).
-                    const cardNotes = this.cardNotes[card.id] || [];
-                    const noteForm = `
-                        <div id="card-note-form-${card.id}" class="hidden" style="margin-top:12px;">
-                            <textarea id="card-note-input-${card.id}" rows="2" style="width:100%; padding:8px; border:1px solid var(--border); border-radius:6px; font-family:inherit;" placeholder="Nội dung ghi chú..."></textarea>
-                            <div class="row-flex mt-8">
-                                <button class="btn btn-sm btn-success" onclick="app.addCardNote('${card.id}')">💾 Lưu ghi chú</button>
-                                <button class="btn btn-sm btn-secondary" onclick="app.toggleCardNoteForm('${card.id}')">Hủy</button>
-                            </div>
-                        </div>`;
-                    const notesHtml = cardNotes.length ? `
-                        <details class="fold" ${this.foldAttrs('notes-' + card.id)}>
-                            <summary><span class="fold-title">📝 Ghi chú</span><span class="fold-meta">${cardNotes.length}</span></summary>
-                            ${cardNotes.map(n => `
-                                <div style="background:var(--light); padding:8px 10px; border-radius:6px; margin-top:6px;">
-                                    <div style="font-size:13px; white-space:pre-wrap;">${escapeHtml(n.content)}</div>
-                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
-                                        <span class="text-gray" style="font-size:11px;">${fmtDate(n.createdAt)}</span>
-                                        <button class="icon-btn" title="Xóa ghi chú" onclick="app.deleteCardNote('${n.id}')">🗑️</button>
-                                    </div>
-                                </div>`).join('')}
-                        </details>` : '';
-
                     // Form ghi nhận thanh toán: nhập số tiền (mặc định = số cần trả), hỗ trợ trả một phần.
                     const payForm = settled ? '' : `
                         <div id="pay-form-${card.id}" class="hidden" style="margin-top:10px; background:var(--light); padding:12px; border-radius:8px;">
                             <div class="form-group" style="margin-bottom:8px;">
                                 <label>Số tiền đã thanh toán (₫)</label>
-                                <input type="number" id="pay-amount-${card.id}" min="0">
+                                ${moneyInput('pay-amount-' + card.id, 0)}
                                 <small>Trả đủ → thẻ chuyển sang kỳ sau. Trả thiếu → chỉ giảm số còn phải trả, giữ nguyên hạn.</small>
                             </div>
                             <div class="row-flex">
@@ -1581,8 +1841,6 @@
                             ${usage}
                             ${swipe}
                             ${cashbackSection}
-                            ${notesHtml}
-                            ${noteForm}
                             <div class="action-bar">
                                 ${settled ? '' : `<button class="btn btn-sm btn-success" onclick="app.togglePayForm('${card.id}')">💵 Ghi nhận thanh toán</button>`}
                                 <span class="spacer"></span>
@@ -1590,7 +1848,6 @@
                                     <summary title="Thao tác khác">⋯</summary>
                                     <div class="menu-list">
                                         <button onclick="app.closeMenus(); app.startEditCard('${card.id}')">✏️ Sửa thông tin thẻ</button>
-                                        <button onclick="app.closeMenus(); app.toggleCardNoteForm('${card.id}')">📝 Thêm ghi chú</button>
                                         <hr>
                                         <button class="danger" onclick="app.closeMenus(); app.deleteCard('${card.id}')">🗑️ Xóa thẻ</button>
                                     </div>
@@ -1609,7 +1866,7 @@
                 // Không chọn sẵn danh mục: chọn nhầm sẽ tính sai hoàn tiền và trừ oan cap của danh mục đó.
                 if (txCat) txCat.innerHTML = `<option value="">— Chọn danh mục —</option>` + CATEGORIES.map(c => `<option value="${c.key}">${c.icon} ${c.label}</option>`).join('');
                 const fCat = document.getElementById('txFilterCategory');
-                if (fCat) fCat.innerHTML = `<option value="">Mọi danh mục</option>` + CATEGORIES.map(c => `<option value="${c.key}">${c.icon} ${c.label}</option>`).join('');
+                if (fCat) fCat.innerHTML = `<option value="">Mọi danh mục</option><option value="__cash">💵 Quẹt rút tiền</option>` + CATEGORIES.map(c => `<option value="${c.key}">${c.icon} ${c.label}</option>`).join('');
                 const txDate = document.getElementById('txDate');
                 if (txDate && !txDate.value) txDate.value = todayISO();
             },
@@ -1634,10 +1891,62 @@
                 });
             },
 
+            // ---- Quẹt thẻ rút tiền: phí %, hình thức (1 lần / trả góp) ----
+            // Nợ thẻ = số tiền quẹt. Phí quẹt quản lý riêng (không cộng vào nợ thẻ).
+            cashInfo(amount, feeRate, payType, months) {
+                const feeAmount = Math.round(num(amount) * num(feeRate) / 100);
+                const m = payType === 'installment' ? Math.max(0, Math.floor(num(months))) : 0;
+                return { feeAmount, net: Math.max(0, num(amount) - feeAmount), months: m, monthly: m > 0 ? Math.round(num(amount) / m) : 0 };
+            },
+            cashSummaryText(t) {
+                const parts = [];
+                if (num(t.feeRate) > 0 || num(t.feeAmount) > 0) parts.push(`phí ${fmtPct(t.feeRate)}% = ${fmtVND(t.feeAmount)}`);
+                else parts.push('không phí');
+                if (t.payType === 'installment' && num(t.installmentMonths) > 0) parts.push(`trả góp ${num(t.installmentMonths)} tháng (≈ ${fmtVND(Math.round(num(t.amount) / num(t.installmentMonths)))}/tháng)`);
+                else parts.push('quẹt 1 lần');
+                return parts.join(' · ');
+            },
+            onTxAmountInput() { this.refreshSuggestions(); this.updateCashPreview(); },
+            onTxCashToggle() {
+                const on = document.getElementById('txIsCash').checked;
+                document.getElementById('txCashFields').classList.toggle('hidden', !on);
+                document.getElementById('txCategoryHint').classList.toggle('hidden', !on);
+                const fee = document.getElementById('txFeeRate');
+                // Nhớ mức phí lần trước để khỏi gõ lại.
+                if (on && !fee.value) fee.value = localStorage.getItem('lastCashFeeRate') || '';
+                const inst = document.getElementById('txPayType').value === 'installment';
+                document.getElementById('txInstallGroup').classList.toggle('hidden', !inst);
+                this.updateCashPreview();
+            },
+            updateCashPreview() {
+                const el = document.getElementById('txCashPreview');
+                if (!el) return;
+                if (!document.getElementById('txIsCash').checked) { el.innerHTML = ''; return; }
+                const amount = moneyVal('txAmount');
+                if (!amount) { el.innerHTML = 'Nhập số tiền quẹt ở trên để xem phí và tiền thực nhận.'; return; }
+                const c = this.cashInfo(amount, document.getElementById('txFeeRate').value,
+                    document.getElementById('txPayType').value, document.getElementById('txInstallMonths').value);
+                el.innerHTML = `Phí quẹt <strong>${fmtVND(c.feeAmount)}</strong> · thực nhận <strong>${fmtVND(c.net)}</strong>`
+                    + (c.months > 0 ? ` · góp ≈ <strong>${fmtVND(c.monthly)}</strong>/tháng × ${c.months} tháng` : '')
+                    + ` · nợ thẻ tăng <strong>${fmtVND(amount)}</strong>`;
+            },
+            // Đọc phần rút tiền từ một nhóm ô (form ghi mới hoặc form sửa). Trả null nếu thiếu thông tin.
+            readCashFields(amount, ids) {
+                const on = document.getElementById(ids.on)?.checked;
+                if (!on) return { isCash: false, feeRate: 0, feeAmount: 0, payType: null, installmentMonths: 0 };
+                const feeRate = num(document.getElementById(ids.fee).value);
+                const payType = document.getElementById(ids.type).value === 'installment' ? 'installment' : 'one_time';
+                const months = Math.floor(num(document.getElementById(ids.months).value));
+                if (feeRate < 0 || feeRate >= 100) { alert('Phí quẹt (%) không hợp lệ'); return null; }
+                if (payType === 'installment' && months < 1) { alert('Vui lòng nhập số tháng trả góp'); return null; }
+                const c = this.cashInfo(amount, feeRate, payType, months);
+                return { isCash: true, feeRate, feeAmount: c.feeAmount, payType, installmentMonths: c.months };
+            },
+
             refreshSuggestions() {
                 const el = document.getElementById('suggestionList');
                 if (!el) return;
-                const amount = num(document.getElementById('txAmount')?.value);
+                const amount = moneyVal('txAmount');
                 const category = document.getElementById('txCategory')?.value;
                 if (!amount || !category) {
                     el.innerHTML = `<div class="step-hint">① Nhập <strong>số tiền</strong> và chọn <strong>danh mục</strong> ở trên → ② app xếp hạng các thẻ theo hoàn tiền → ③ bấm <strong>"Ghi vào thẻ này"</strong> để lưu giao dịch.</div>`;
@@ -1674,12 +1983,14 @@
             async recordTransaction(cardId) {
                 const card = this.cards.find(c => c.id === cardId);
                 if (!card) return;
-                const amount = num(document.getElementById('txAmount').value);
+                const amount = moneyVal('txAmount');
                 const category = document.getElementById('txCategory').value;
                 const description = document.getElementById('txDescription').value.trim();
                 const date = document.getElementById('txDate').value || todayISO();
                 if (!amount || amount <= 0) return alert('Vui lòng nhập số tiền giao dịch hợp lệ');
                 if (!category) return alert('Vui lòng chọn danh mục chi tiêu');
+                const cash = this.readCashFields(amount, { on: 'txIsCash', fee: 'txFeeRate', type: 'txPayType', months: 'txInstallMonths' });
+                if (!cash) return;
                 // Số tiền lớn bất thường (≥ 50 triệu hoặc > 50% hạn mức còn lại): hỏi lại để tránh gõ nhầm số 0.
                 const avail = this.availableCredit(card);
                 const bigByLimit = avail !== Infinity && avail > 0 && amount > avail * 0.5;
@@ -1709,16 +2020,24 @@
                             cardId, cardName: fresh.name || card.name,
                             amount, category, description,
                             date, cashbackEarned: applied,
+                            ...cash,
                             createdAt: new Date().toISOString(),
                         });
                         t.update(cardRef, this.buildCardUpdateForTransaction(fresh, category, amount, applied));
                     });
 
-                    document.getElementById('txAmount').value = '';
+                    setMoney('txAmount', 0);
                     document.getElementById('txDescription').value = '';
                     document.getElementById('txCategory').value = '';
+                    if (cash.isCash) {
+                        localStorage.setItem('lastCashFeeRate', String(cash.feeRate));
+                        document.getElementById('txIsCash').checked = false;
+                        document.getElementById('txInstallMonths').value = '';
+                        document.getElementById('txPayType').value = 'one_time';
+                        this.onTxCashToggle();
+                    }
                     this.refreshSuggestions();
-                    this.showMessage(`Đã ghi nợ ${fmtVND(amount)} vào ${card.name} · hoàn ${fmtVND(applied)} 🎉`);
+                    this.showMessage(`Đã ghi nợ ${fmtVND(amount)} vào ${card.name} · hoàn ${fmtVND(applied)}${cash.isCash ? ` · phí quẹt ${fmtVND(cash.feeAmount)}` : ''} 🎉`);
                 } catch (e) {
                     console.error('recordTransaction:', e);
                     this.showMessage('Lỗi khi ghi giao dịch — kiểm tra kết nối rồi thử lại', true);
@@ -1772,13 +2091,18 @@
                 let list = this.transactions;
                 if (filterMonth) list = list.filter(t => String(t.date || '').startsWith(filterMonth));
                 if (filterCard) list = list.filter(t => t.cardId === filterCard);
-                if (filterCat) list = list.filter(t => t.category === filterCat);
+                if (filterCat === '__cash') list = list.filter(t => t.isCash);
+                else if (filterCat) list = list.filter(t => t.category === filterCat);
 
                 const sumEl = document.getElementById('txSummary');
                 if (sumEl) {
                     const spent = list.reduce((s, t) => s + num(t.amount), 0);
                     const cb = list.reduce((s, t) => s + num(t.cashbackEarned), 0);
-                    sumEl.innerHTML = list.length ? `<div class="step-hint" style="margin-bottom:6px;">${filterMonth ? `Tháng ${Number(filterMonth.slice(5))}/${filterMonth.slice(0, 4)}` : 'Tổng'}: chi <strong>${fmtVND(spent)}</strong> · hoàn <strong class="text-success">${fmtVND(cb)}</strong> · ${list.length} giao dịch</div>` : '';
+                    const cashList = list.filter(t => t.isCash);
+                    const cashAmt = cashList.reduce((s, t) => s + num(t.amount), 0);
+                    const cashFee = cashList.reduce((s, t) => s + num(t.feeAmount), 0);
+                    const cashTxt = cashList.length ? `<br>💵 Trong đó quẹt rút tiền: <strong>${fmtVND(cashAmt)}</strong> (${cashList.length} lần) · phí quẹt <strong class="text-danger">${fmtVND(cashFee)}</strong>` : '';
+                    sumEl.innerHTML = list.length ? `<div class="step-hint" style="margin-bottom:6px;">${filterMonth ? `Tháng ${Number(filterMonth.slice(5))}/${filterMonth.slice(0, 4)}` : 'Tổng'}: quẹt <strong>${fmtVND(spent)}</strong> · hoàn <strong class="text-success">${fmtVND(cb)}</strong> · ${list.length} giao dịch${cashTxt}</div>` : '';
                 }
                 if (list.length === 0) {
                     const filtered = filterMonth || filterCard || filterCat;
@@ -1813,12 +2137,21 @@
                         return `
                             <div class="tx-edit">
                                 <div class="form-row">
-                                    <div class="form-group" style="margin-bottom:10px;"><label>Số tiền (₫)</label><input type="number" id="edit-tx-amount-${t.id}" value="${num(t.amount)}" min="0"></div>
+                                    <div class="form-group" style="margin-bottom:10px;"><label>Số tiền (₫)</label>${moneyInput('edit-tx-amount-' + t.id, t.amount)}</div>
                                     <div class="form-group" style="margin-bottom:10px;"><label>Danh mục</label><select id="edit-tx-category-${t.id}">${opts}</select></div>
                                 </div>
                                 <div class="form-row">
                                     <div class="form-group" style="margin-bottom:10px;"><label>Mô tả</label><input type="text" id="edit-tx-desc-${t.id}" value="${escapeHtml(t.description || '')}"></div>
                                     <div class="form-group" style="margin-bottom:10px;"><label>Ngày</label><input type="date" id="edit-tx-date-${t.id}" value="${escapeHtml(t.date || '')}"></div>
+                                </div>
+                                <label class="check-line" style="margin-bottom:10px;">
+                                    <input type="checkbox" id="edit-tx-cash-${t.id}" ${t.isCash ? 'checked' : ''} onchange="document.getElementById('edit-tx-cashbox-${t.id}').classList.toggle('hidden', !this.checked)">
+                                    <span>💵 Giao dịch quẹt thẻ rút tiền</span>
+                                </label>
+                                <div id="edit-tx-cashbox-${t.id}" class="form-row-3 ${t.isCash ? '' : 'hidden'}">
+                                    <div class="form-group" style="margin-bottom:10px;"><label>Phí quẹt (%)</label><input type="number" id="edit-tx-fee-${t.id}" value="${t.isCash ? num(t.feeRate) : ''}" min="0" step="0.01" inputmode="decimal"></div>
+                                    <div class="form-group" style="margin-bottom:10px;"><label>Hình thức</label><select id="edit-tx-paytype-${t.id}"><option value="one_time">Quẹt 1 lần</option><option value="installment" ${t.payType === 'installment' ? 'selected' : ''}>Trả góp</option></select></div>
+                                    <div class="form-group" style="margin-bottom:10px;"><label>Số tháng (nếu trả góp)</label><input type="number" id="edit-tx-months-${t.id}" value="${num(t.installmentMonths) || ''}" min="1" step="1" inputmode="numeric"></div>
                                 </div>
                                 <div class="text-gray" style="font-size:12px; margin-bottom:12px;">Thẻ: ${escapeHtml(t.cardName || '')} · dư nợ & hoàn tiền sẽ được tính lại theo số tiền/danh mục mới.</div>
                                 <div class="row-flex">
@@ -1833,8 +2166,9 @@
                     return `
                         <div class="tx-row">
                             <div class="tx-main">
-                                <div class="tx-amount">${fmtVND(t.amount)} <span class="badge badge-gray">${catLabel(t.category)}</span></div>
+                                <div class="tx-amount">${fmtVND(t.amount)} ${t.isCash ? '<span class="badge badge-cash">💵 Rút tiền</span> ' : ''}<span class="badge badge-gray">${catLabel(t.category)}</span></div>
                                 <div class="tx-sub">${escapeHtml(t.cardName || '')}${t.description ? ' · ' + escapeHtml(t.description) : ''}</div>
+                                ${t.isCash ? `<div class="tx-sub">${this.cashSummaryText(t)}</div>` : ''}
                             </div>
                             <div class="tx-right">
                                 ${cbHtml}
@@ -1867,8 +2201,10 @@
             async saveTransactionEdit(txId) {
                 const tx = this.transactions.find(t => t.id === txId);
                 if (!tx) return;
-                const newAmount = num(document.getElementById(`edit-tx-amount-${txId}`).value);
+                const newAmount = moneyVal(`edit-tx-amount-${txId}`);
                 if (!newAmount || newAmount <= 0) return alert('Vui lòng nhập số tiền hợp lệ');
+                const cash = this.readCashFields(newAmount, { on: `edit-tx-cash-${txId}`, fee: `edit-tx-fee-${txId}`, type: `edit-tx-paytype-${txId}`, months: `edit-tx-months-${txId}` });
+                if (!cash) return;
                 const newCategory = document.getElementById(`edit-tx-category-${txId}`).value;
                 const newDescription = document.getElementById(`edit-tx-desc-${txId}`).value.trim();
                 const newDate = document.getElementById(`edit-tx-date-${txId}`).value || tx.date;
@@ -1903,7 +2239,7 @@
                         }
                         t.update(doc(db, 'transactions', txId), {
                             amount: newAmount, category: newCategory, description: newDescription,
-                            date: newDate, cashbackEarned: newCashback, updatedAt: new Date().toISOString(),
+                            date: newDate, cashbackEarned: newCashback, ...cash, updatedAt: new Date().toISOString(),
                         });
                     });
                     this.editingTxId = null;
@@ -1920,7 +2256,8 @@
             showLoanForm() {
                 this.editingLoanId = null;
                 document.getElementById('loanFormTitle').textContent = 'Thêm khoản cho vay';
-                ['loanBorrower', 'loanLabel', 'loanPrincipal', 'loanRate', 'loanDueDate', 'loanNextPaymentDate', 'loanTerm', 'loanNote'].forEach(id => document.getElementById(id).value = '');
+                ['loanBorrower', 'loanLabel', 'loanRate', 'loanDueDate', 'loanNextPaymentDate', 'loanTerm'].forEach(id => document.getElementById(id).value = '');
+                setMoney('loanPrincipal', 0);
                 document.getElementById('loanType').value = 'installment';
                 document.getElementById('loanStartDate').value = todayISO();
                 this.populateBorrowerList();
@@ -1952,14 +2289,13 @@
                 document.getElementById('loanBorrower').value = loan.borrowerName || '';
                 document.getElementById('loanLabel').value = loan.loanLabel || '';
                 this.populateBorrowerList();
-                document.getElementById('loanPrincipal').value = loan.principal || '';
+                setMoney('loanPrincipal', loan.principal);
                 document.getElementById('loanType').value = loan.loanType || 'installment';
                 document.getElementById('loanRate').value = loan.interestRate || '';
                 document.getElementById('loanStartDate').value = loan.startDate || '';
                 document.getElementById('loanDueDate').value = loan.dueDate || '';
                 document.getElementById('loanNextPaymentDate').value = loan.nextPaymentDate || '';
                 document.getElementById('loanTerm').value = loan.termMonths || '';
-                document.getElementById('loanNote').value = loan.note || '';
                 const form = document.getElementById('loanForm');
                 form.classList.remove('hidden');
                 form.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1967,7 +2303,7 @@
 
             async saveLoan() {
                 const borrowerName = document.getElementById('loanBorrower').value.trim();
-                const principal = num(document.getElementById('loanPrincipal').value);
+                const principal = moneyVal('loanPrincipal');
                 if (!borrowerName) return alert('Vui lòng nhập tên người vay');
                 if (!principal) return alert('Vui lòng nhập số tiền cho vay');
                 const data = {
@@ -1979,7 +2315,6 @@
                     dueDate: document.getElementById('loanDueDate').value || null,
                     nextPaymentDate: document.getElementById('loanNextPaymentDate').value || null,
                     termMonths: num(document.getElementById('loanTerm').value),
-                    note: document.getElementById('loanNote').value.trim(),
                     updatedAt: new Date().toISOString(),
                 };
                 try {
@@ -2016,11 +2351,13 @@
                     if (remaining > 0 && !confirm(`Khoản vay còn ${fmtVND(remaining)} gốc chưa thu. Vẫn đánh dấu đã tất toán?`)) return;
                 }
                 try {
+                    const toRepaid = loan.status !== 'repaid';
                     await updateDoc(doc(db, 'loans', loanId), {
-                        status: loan.status === 'repaid' ? 'active' : 'repaid',
+                        status: toRepaid ? 'repaid' : 'active',
                         updatedAt: new Date().toISOString(),
                     });
-                } catch (e) { console.error('toggleLoanStatus:', e); }
+                    this.showMessage(toRepaid ? 'Đã tất toán · khoản này được ẩn, bấm "Hiện khoản đã tất toán" ở cuối danh sách để xem lại' : 'Đã mở lại khoản vay');
+                } catch (e) { console.error('toggleLoanStatus:', e); this.showMessage('Lỗi khi cập nhật khoản vay', true); }
             },
 
             // Repaid principal / remaining for a loan.
@@ -2092,7 +2429,7 @@
                     const { remaining } = this.loanRemaining(loan);
                     const interest = Math.round(this.expectedInterest(loan, remaining));
                     const intInput = document.getElementById(`repay-interest-${loanId}`);
-                    if (intInput && !intInput.value) intInput.value = interest || '';
+                    if (intInput && !intInput.value) intInput.value = fmtMoneyInput(interest);
                     const dateInput = document.getElementById(`repay-date-${loanId}`);
                     if (dateInput && !dateInput.value) dateInput.value = todayISO();
                 }
@@ -2101,9 +2438,9 @@
             async addRepayment(loanId) {
                 const loan = this.loans.find(l => l.id === loanId);
                 if (!loan) return;
-                const amount = num(document.getElementById(`repay-amount-${loanId}`).value);
+                const amount = moneyVal(`repay-amount-${loanId}`);
                 // Clamp interest into [0, amount] so principal portion can't go negative.
-                const interestPortion = Math.min(amount, Math.max(0, num(document.getElementById(`repay-interest-${loanId}`).value)));
+                const interestPortion = Math.min(amount, Math.max(0, moneyVal(`repay-interest-${loanId}`)));
                 const date = document.getElementById(`repay-date-${loanId}`).value || todayISO();
                 if (!amount || amount <= 0) return alert('Vui lòng nhập số tiền đã trả hợp lệ');
                 const principalPortion = Math.max(0, amount - interestPortion);
@@ -2141,7 +2478,7 @@
 
                     const rollTxt = rolled ? ` · hạn kế tiếp ${new Date(rolled).toLocaleDateString('vi-VN')}` : '';
                     if (shortfall > 0) this.showMessage(`Thiếu lãi ${fmtVND(shortfall)} → đã cộng vào gốc${rollTxt}`);
-                    else this.showMessage(`Đã ghi nhận thanh toán${rollTxt}`);
+                    else this.showMessage(settled ? 'Đã thu đủ gốc · khoản vay đã tất toán và được ẩn khỏi danh sách' : `Đã ghi nhận thanh toán${rollTxt}`);
                     this.toggleRepayForm(loanId);
                 } catch (e) { console.error('addRepayment:', e); this.showMessage('Lỗi khi ghi nhận thanh toán', true); }
             },
@@ -2221,9 +2558,9 @@
                 if (!found) return;
                 const { rep, loanId } = found;
                 const loan = this.loans.find(l => l.id === loanId);
-                const amount = num(document.getElementById(`edit-rep-amount-${repId}`).value);
+                const amount = moneyVal(`edit-rep-amount-${repId}`);
                 if (!amount || amount <= 0) return alert('Vui lòng nhập số tiền hợp lệ');
-                const interestPortion = Math.min(amount, Math.max(0, num(document.getElementById(`edit-rep-interest-${repId}`).value)));
+                const interestPortion = Math.min(amount, Math.max(0, moneyVal(`edit-rep-interest-${repId}`)));
                 const date = document.getElementById(`edit-rep-date-${repId}`).value || rep.date;
                 const principalPortion = Math.max(0, amount - interestPortion);
                 try {
@@ -2265,7 +2602,18 @@
                 // undated last), fully-repaid loans at the bottom.
                 // Payment deadline = next payment date if set, else final maturity date.
                 const deadlineOf = l => l.nextPaymentDate || l.dueDate || null;
-                const sortedLoans = [...this.loans].sort((a, b) => {
+                // Khoản đã tất toán mặc định ẩn; bật nút ở cuối danh sách mới hiện.
+                const settledCount = this.loans.filter(l => this.isLoanSettled(l)).length;
+                const visibleLoans = this.showSettledLoans ? this.loans : this.loans.filter(l => !this.isLoanSettled(l));
+                const settledToggle = settledCount ? `
+                    <div class="settled-toggle">
+                        <button class="btn btn-sm btn-secondary" onclick="app.toggleSettledLoans()">${this.showSettledLoans ? `🙈 Ẩn ${settledCount} khoản đã tất toán` : `👁 Hiện ${settledCount} khoản đã tất toán`}</button>
+                    </div>` : '';
+                if (visibleLoans.length === 0) {
+                    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">✅</div><h3>Không còn khoản nào đang cho vay</h3><p>${settledCount} khoản đã tất toán đang được ẩn.</p></div>${settledToggle}`;
+                    return;
+                }
+                const sortedLoans = [...visibleLoans].sort((a, b) => {
                     const ra = this.isLoanSettled(a), rb = this.isLoanSettled(b);
                     if (ra !== rb) return ra ? 1 : -1;
                     // Kỳ này chưa thu thì ưu tiên lên trên
@@ -2302,8 +2650,8 @@
                     const repayForm = `
                         <div id="repay-form-${loan.id}" class="hidden" style="margin-top:10px; background:var(--light); padding:12px; border-radius:8px;">
                             <div class="form-row-3">
-                                <div class="form-group" style="margin-bottom:8px;"><label>Số tiền trả (₫)</label><input type="number" id="repay-amount-${loan.id}" min="0"></div>
-                                <div class="form-group" style="margin-bottom:8px;"><label>Trong đó lãi (₫)</label><input type="number" id="repay-interest-${loan.id}" min="0"></div>
+                                <div class="form-group" style="margin-bottom:8px;"><label>Số tiền trả (₫)</label>${moneyInput('repay-amount-' + loan.id, 0)}</div>
+                                <div class="form-group" style="margin-bottom:8px;"><label>Trong đó lãi (₫)</label>${moneyInput('repay-interest-' + loan.id, 0)}</div>
                                 <div class="form-group" style="margin-bottom:8px;"><label>Ngày trả</label><input type="date" id="repay-date-${loan.id}"></div>
                             </div>
                             <div class="text-gray" style="font-size:12px; margin-bottom:8px;">Lãi cần trả kỳ này ≈ ${fmtVND(Math.round(expInterest))}. Nếu trả thiếu lãi, phần thiếu sẽ được cộng vào gốc.</div>
@@ -2337,8 +2685,8 @@
                                     return `
                                         <div class="tx-edit" style="margin-top:6px;">
                                             <div class="form-row-3">
-                                                <div class="form-group" style="margin-bottom:8px;"><label>Số tiền trả (₫)</label><input type="number" id="edit-rep-amount-${r.id}" value="${num(r.amount)}" min="0"></div>
-                                                <div class="form-group" style="margin-bottom:8px;"><label>Trong đó lãi (₫)</label><input type="number" id="edit-rep-interest-${r.id}" value="${num(r.interestPortion)}" min="0"></div>
+                                                <div class="form-group" style="margin-bottom:8px;"><label>Số tiền trả (₫)</label>${moneyInput('edit-rep-amount-' + r.id, r.amount)}</div>
+                                                <div class="form-group" style="margin-bottom:8px;"><label>Trong đó lãi (₫)</label>${moneyInput('edit-rep-interest-' + r.id, r.interestPortion)}</div>
                                                 <div class="form-group" style="margin-bottom:8px;"><label>Ngày trả</label><input type="date" id="edit-rep-date-${r.id}" value="${escapeHtml(r.date || '')}"></div>
                                             </div>
                                             <div class="row-flex">
@@ -2397,7 +2745,6 @@
                             <div class="text-gray" style="font-size:12px; margin-top:10px;">
                                 Ngày vay ${fmtDate(loan.startDate)}${maturity ? ` · Tất toán${maturityEst ? ' (dự kiến)' : ''} ${fmtDate(maturity)}` : ''}
                             </div>
-                            ${loan.note ? `<div class="text-gray" style="font-size:13px; margin-top:6px; white-space:pre-wrap;">📌 ${escapeHtml(loan.note)}</div>` : ''}
                             <div class="action-bar">
                                 ${!isRepaid ? `<button class="btn btn-sm btn-success" onclick="app.toggleRepayForm('${loan.id}')">💵 Ghi nhận trả</button>` : ''}
                                 <span class="spacer"></span>
@@ -2447,8 +2794,9 @@
                             </div>
                             ${list.map(l => cardOf(l, true)).join('')}
                         </div>`;
-                }).join('');
+                }).join('') + settledToggle;
             },
+            toggleSettledLoans() { this.showSettledLoans = !this.showSettledLoans; this.renderLoans(); },
 
             // ============================================================
             //  DASHBOARD
@@ -2611,6 +2959,117 @@
                 return `<div class="section-title" style="margin-top:0;">💡 Tư vấn tài chính</div>${items}`;
             },
 
+            // ============================================================
+            //  BÁO CÁO LÃI CHO VAY
+            // ============================================================
+            // Gom số liệu lãi: theo kỳ (hạn thu), theo tháng (ngày thực thu), và tổng đã thu.
+            // Lãi đã thu = phần "Trong đó lãi" của các lần trả. Lãi dồn vào gốc KHÔNG tính là đã thu.
+            loanInterestReport() {
+                const cycle = this.currentCycle();
+                const months = {};   // 'YYYY-MM' → { interest, principal, capitalized, fee }
+                const bucket = (m) => (months[m] = months[m] || { interest: 0, principal: 0, capitalized: 0, fee: 0 });
+                let interestAll = 0, principalAll = 0, capitalizedAll = 0;
+                this.loans.forEach(l => (this.loanRepayments[l.id] || []).forEach(r => {
+                    const m = String(r.date || r.createdAt || '').slice(0, 7);
+                    const i = num(r.interestPortion), p = num(r.principalPortion), c = num(r.interestShortfall);
+                    interestAll += i; principalAll += p; capitalizedAll += c;
+                    if (m.length === 7) { const b = bucket(m); b.interest += i; b.principal += p; b.capitalized += c; }
+                }));
+                // Phí quẹt thẻ rút tiền = chi phí vốn, trừ vào lãi để ra lãi ròng.
+                let feeAll = 0;
+                this.transactions.forEach(t => {
+                    if (!t.isCash || !num(t.feeAmount)) return;
+                    feeAll += num(t.feeAmount);
+                    const m = String(t.date || '').slice(0, 7);
+                    if (m.length === 7) bucket(m).fee += num(t.feeAmount);
+                });
+
+                // Theo kỳ: gom các khoản đang vay theo hạn thu kỳ tới.
+                const active = this.loans.filter(l => !this.isLoanSettled(l));
+                const now = new Date();
+                const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+                const periodMap = new Map();
+                let perPeriod = 0, pendingThisMonth = 0;
+                active.forEach(l => {
+                    const exp = Math.round(this.expectedInterest(l, this.loanRemaining(l).remaining));
+                    perPeriod += exp;
+                    const dl = this.loanDeadline(l);
+                    const collected = this.loanPeriodCollected(l);
+                    if (dl && !collected && new Date(dl) <= monthEnd) pendingThisMonth += exp;
+                    const key = dl ? toISODate(new Date(dl)) : '';
+                    if (!periodMap.has(key)) periodMap.set(key, { date: key, total: 0, items: [] });
+                    const g = periodMap.get(key);
+                    g.total += exp;
+                    g.items.push({ title: this.loanTitle(l), exp, collected });
+                });
+                const periods = [...periodMap.values()].sort((a, b) => (a.date || '9999').localeCompare(b.date || '9999'));
+                const cur = months[cycle] || { interest: 0, principal: 0, capitalized: 0, fee: 0 };
+                return { months, periods, perPeriod, pendingThisMonth, interestAll, principalAll, capitalizedAll, feeAll, cur, activeCount: active.length };
+            },
+
+            loanReportHtml(rep) {
+                if (!this.loans.length) return '';
+                const monthName = (m) => `Tháng ${Number(m.slice(5))}/${m.slice(0, 4)}`;
+                // --- Lãi từng kỳ
+                const periodRows = rep.periods.map(g => {
+                    const days = g.date ? this.getDaysUntil(g.date) : null;
+                    const allCollected = g.items.every(x => x.collected);
+                    const when = !g.date ? 'Chưa đặt hạn thu'
+                        : `${fmtWD(g.date)}/${new Date(g.date).getFullYear()} · ${allCollected ? 'đã thu kỳ này' : this.daysText(days).toLowerCase()}`;
+                    return `
+                        <div class="report-row">
+                            <div class="l">
+                                <div><strong>${g.date ? `Kỳ ${fmtDM(g.date)}` : 'Chưa đặt hạn'}</strong> <span class="text-gray" style="font-size:12px;">· ${g.items.length} khoản</span></div>
+                                <div class="s">${when}</div>
+                                <div class="s">${g.items.map(x => `${escapeHtml(x.title)}: ${fmtVND(x.exp)}`).join(' · ')}</div>
+                            </div>
+                            <div class="v ${days !== null && days < 0 && !allCollected ? 'text-danger' : ''}">${fmtVND(g.total)}</div>
+                        </div>`;
+                }).join('');
+                const periodBlock = rep.periods.length ? `
+                    <div class="report-block">
+                        <div class="report-title"><span>📅 Tổng lãi từng kỳ</span><span class="t">theo hạn thu kỳ tới</span></div>
+                        ${periodRows}
+                        <div class="report-row total">
+                            <div class="l"><strong>Tổng lãi một kỳ</strong><div class="s">${rep.activeCount} khoản đang cho vay</div></div>
+                            <div class="v">${fmtVND(rep.perPeriod)}</div>
+                        </div>
+                    </div>` : '';
+
+                // --- Lãi từng tháng: 6 tháng gần nhất, bấm để xem toàn bộ.
+                const cycle = this.currentCycle();
+                const recent = [];
+                for (let i = 0; i < 6; i++) { const d = new Date(new Date().getFullYear(), new Date().getMonth() - i, 1); recent.push(toISODate(d).slice(0, 7)); }
+                const older = Object.keys(rep.months).filter(m => !recent.includes(m)).sort().reverse();
+                const shown = this.showAllMonths ? [...recent, ...older] : recent;
+                const maxInt = Math.max(1, ...shown.map(m => (rep.months[m] || {}).interest || 0));
+                const monthRows = shown.map(m => {
+                    const b = rep.months[m] || { interest: 0, principal: 0, capitalized: 0, fee: 0 };
+                    const sub = [];
+                    if (b.principal > 0) sub.push(`gốc đã thu ${fmtVND(b.principal)}`);
+                    if (b.capitalized > 0) sub.push(`lãi dồn vào gốc ${fmtVND(b.capitalized)}`);
+                    if (b.fee > 0) sub.push(`phí quẹt thẻ ${fmtVND(b.fee)}`);
+                    if (m === cycle && rep.pendingThisMonth > 0) sub.push(`còn phải thu ≈ ${fmtVND(rep.pendingThisMonth)}`);
+                    return `
+                        <div class="report-row">
+                            <div class="l">
+                                <div><strong>${monthName(m)}</strong>${m === cycle ? ' <span class="badge badge-gray">tháng này</span>' : ''}</div>
+                                ${sub.length ? `<div class="s">${sub.join(' · ')}</div>` : ''}
+                                <div class="month-bar"><div style="width:${Math.round(b.interest / maxInt * 100)}%;"></div></div>
+                            </div>
+                            <div class="v ${b.interest > 0 ? 'text-success' : 'text-gray'}">${fmtVND(b.interest)}${b.fee > 0 ? `<div class="s">ròng ${fmtVND(b.interest - b.fee)}</div>` : ''}</div>
+                        </div>`;
+                }).join('');
+                const monthBlock = `
+                    <div class="report-block">
+                        <div class="report-title"><span>🗓️ Tổng lãi từng tháng</span><span class="t">lãi thực thu theo ngày trả</span></div>
+                        ${monthRows}
+                        ${older.length ? `<div class="settled-toggle" style="margin-top:12px;"><button class="btn btn-sm btn-secondary" onclick="app.toggleAllMonths()">${this.showAllMonths ? 'Chỉ xem 6 tháng gần nhất' : `Xem thêm ${older.length} tháng trước`}</button></div>` : ''}
+                    </div>`;
+                return periodBlock + monthBlock;
+            },
+            toggleAllMonths() { this.showAllMonths = !this.showAllMonths; this.renderDashboard(); },
+
             renderDashboard() {
                 const el = document.getElementById('dashboardContent');
                 if (!el) return;
@@ -2637,7 +3096,7 @@
 
                 const activeLoans = this.loans.filter(l => !this.isLoanSettled(l));
                 const totalLent = activeLoans.reduce((s, l) => s + this.loanRemaining(l).remaining, 0);
-                const totalCollected = this.loans.reduce((s, l) => s + this.loanRemaining(l).totalPaid, 0);
+                const rep = this.loanInterestReport();
                 // Chỉ đếm khoản kỳ này CHƯA thu (thu trước hạn cũng coi như xong kỳ).
                 const loanDl = l => this.loanDeadline(l);
                 const pending = activeLoans.filter(l => !this.loanPeriodCollected(l));
@@ -2674,119 +3133,39 @@
                     </div>
 
                     <div class="section-title">🤝 Cho vay</div>
-                    <div class="stats-grid">
+                    <div class="stats-grid cols-3">
                         <div class="stat-item">
                             <div class="stat-number text-warning">${fmtVND(totalLent)}</div>
                             <div class="stat-label">Đang cho vay (gốc còn lại)</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number text-success">${fmtVND(totalCollected)}</div>
-                            <div class="stat-label">Tổng đã thu</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-number">${activeLoans.length}</div>
-                            <div class="stat-label">Khoản đang hoạt động</div>
+                            <div class="stat-sub">${activeLoans.length} khoản đang hoạt động</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-number" style="color:${loansOverdue ? 'var(--danger)' : loansDueSoon ? 'var(--warning)' : 'var(--success)'};">${loansOverdue + loansDueSoon}</div>
                             <div class="stat-label">Cần thu hồi</div>
                             <div class="stat-sub">${loansOverdue} quá hạn · ${loansDueSoon} sắp đến hạn</div>
                         </div>
-                    </div>`;
-            },
-
-            // ============================================================
-            //  NOTES (standalone) + CARD NOTES
-            // ============================================================
-            showNoteForm() {
-                this.editingNoteId = null;
-                document.getElementById('noteFormTitle').textContent = 'Thêm ghi chú mới';
-                document.getElementById('noteTitle').value = '';
-                document.getElementById('noteContent').value = '';
-                document.getElementById('noteForm').classList.remove('hidden');
-                document.getElementById('noteTitle').focus();
-            },
-            hideNoteForm() {
-                this.editingNoteId = null;
-                document.getElementById('noteForm').classList.add('hidden');
-                document.getElementById('noteTitle').value = '';
-                document.getElementById('noteContent').value = '';
-            },
-            async saveNote() {
-                const title = document.getElementById('noteTitle').value.trim();
-                const content = document.getElementById('noteContent').value.trim();
-                if (!title || !content) return alert('Vui lòng nhập đầy đủ tiêu đề và nội dung');
-                const data = { title, content, updatedAt: new Date().toISOString() };
-                try {
-                    if (this.editingNoteId) {
-                        await updateDoc(doc(db, 'notes', this.editingNoteId), data);
-                    } else {
-                        data.userId = this.currentUser.uid;
-                        data.createdAt = new Date().toISOString();
-                        await addDoc(collection(db, 'notes'), data);
-                    }
-                    this.hideNoteForm();
-                } catch (e) { console.error('saveNote:', e); alert('Lỗi khi lưu ghi chú'); }
-            },
-            startEditNote(noteId) {
-                const note = this.notes.find(n => n.id === noteId);
-                if (!note) return;
-                this.editingNoteId = noteId;
-                document.getElementById('noteFormTitle').textContent = 'Chỉnh sửa ghi chú';
-                document.getElementById('noteTitle').value = note.title;
-                document.getElementById('noteContent').value = note.content;
-                document.getElementById('noteForm').classList.remove('hidden');
-                document.getElementById('noteTitle').focus();
-            },
-            async deleteNote(noteId) {
-                if (!confirm('Bạn có chắc muốn xóa ghi chú này?')) return;
-                try { await deleteDoc(doc(db, 'notes', noteId)); }
-                catch (e) { console.error('deleteNote:', e); alert('Lỗi khi xóa ghi chú'); }
-            },
-            renderNotes() {
-                const el = document.getElementById('notesList');
-                if (!el) return;
-                if (this.notes.length === 0) {
-                    el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📝</div><h3>Chưa có ghi chú nào</h3><p>Thêm ghi chú đầu tiên của bạn.</p></div>`;
-                    return;
-                }
-                el.innerHTML = this.notes.map(note => `
-                    <div class="item-card">
-                        <div style="font-weight:700; font-size:17px;">${escapeHtml(note.title)}</div>
-                        <div class="text-gray" style="font-size:12px; margin-top:2px;">${new Date(note.createdAt).toLocaleDateString('vi-VN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
-                        <div style="margin-top:10px; white-space:pre-wrap; font-size:14px;">${escapeHtml(note.content)}</div>
-                        <div class="item-actions">
-                            <button class="btn btn-sm btn-warning" onclick="app.startEditNote('${note.id}')">✏️ Sửa</button>
-                            <button class="btn btn-sm btn-danger" onclick="app.deleteNote('${note.id}')">🗑️ Xóa</button>
+                        <div class="stat-item">
+                            <div class="stat-number">${fmtVND(rep.perPeriod)}</div>
+                            <div class="stat-label">Tổng lãi một kỳ</div>
+                            <div class="stat-sub">dự kiến, tính trên các khoản đang vay</div>
                         </div>
-                    </div>`).join('');
-            },
-
-            toggleCardNoteForm(cardId) {
-                const form = document.getElementById(`card-note-form-${cardId}`);
-                if (form) {
-                    form.classList.toggle('hidden');
-                    if (!form.classList.contains('hidden')) form.querySelector('textarea')?.focus();
-                }
-            },
-            async addCardNote(cardId) {
-                const textarea = document.getElementById(`card-note-input-${cardId}`);
-                if (!textarea) return;
-                const content = textarea.value.trim();
-                if (!content) return alert('Vui lòng nhập nội dung ghi chú');
-                try {
-                    await addDoc(collection(db, 'cardNotes'), {
-                        userId: this.currentUser.uid, cardId, content,
-                        createdAt: new Date().toISOString(),
-                    });
-                    textarea.value = '';
-                    this.toggleCardNoteForm(cardId);
-                } catch (e) { console.error('addCardNote:', e); alert('Lỗi khi lưu ghi chú'); }
-            },
-            async deleteCardNote(noteId) {
-                if (!confirm('Bạn có chắc muốn xóa ghi chú này?')) return;
-                try { await deleteDoc(doc(db, 'cardNotes', noteId)); }
-                catch (e) { console.error('deleteCardNote:', e); alert('Lỗi khi xóa ghi chú'); }
+                        <div class="stat-item">
+                            <div class="stat-number text-success">${fmtVND(rep.cur.interest)}</div>
+                            <div class="stat-label">Lãi đã thu tháng này</div>
+                            <div class="stat-sub">${rep.pendingThisMonth > 0 ? `còn phải thu ≈ ${fmtVND(rep.pendingThisMonth)}` : 'đã thu hết các kỳ trong tháng'}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number text-success">${fmtVND(rep.interestAll)}</div>
+                            <div class="stat-label">Tổng lãi đã thu</div>
+                            <div class="stat-sub">gốc đã thu ${fmtVND(rep.principalAll)}${rep.capitalizedAll > 0 ? ` · lãi dồn gốc ${fmtVND(rep.capitalizedAll)}` : ''}</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number ${rep.cur.interest - rep.cur.fee < 0 ? 'text-danger' : ''}">${fmtVND(rep.cur.interest - rep.cur.fee)}</div>
+                            <div class="stat-label">Lãi ròng tháng này</div>
+                            <div class="stat-sub">lãi đã thu − phí quẹt thẻ ${fmtVND(rep.cur.fee)}</div>
+                        </div>
+                    </div>
+                    ${this.loanReportHtml(rep)}`;
             },
 
             // ============================================================
